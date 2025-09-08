@@ -1,0 +1,124 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Infinite Logo Carousel Block\n"
+"Language: de_DE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Infinite Logo Carousel"
+msgstr "Unendliches Logo Karussell"
+
+msgid "Professional infinity logo carousel with customizable speed, spacing and hover-pause."
+msgstr "Professionelles Endlos-Logo-Karussell mit anpassbarer Geschwindigkeit, Abstand und Hover-Pause."
+
+msgid "Images"
+msgstr "Bilder"
+
+msgid "Add logos to create your infinity carousel."
+msgstr "Füge Logos hinzu, um dein Endlos-Karussell zu erstellen."
+
+msgid "Speed"
+msgstr "Geschwindigkeit"
+
+msgid "Carousel Speed"
+msgstr "Karussell-Geschwindigkeit"
+
+msgid "Slow"
+msgstr "Langsam"
+
+msgid "Medium"
+msgstr "Mittel"
+
+msgid "Fast"
+msgstr "Schnell"
+
+msgid "Logo Spacing"
+msgstr "Logo-Abstand"
+
+msgid "Gap between logos"
+msgstr "Abstand zwischen Logos"
+
+msgid "Small"
+msgstr "Klein"
+
+msgid "Large"
+msgstr "Groß"
+
+msgid "Margins"
+msgstr "Außenabstände"
+
+msgid "Top/Bottom Margin"
+msgstr "Abstand oben/unten"
+
+msgid "Small (25px)"
+msgstr "Klein (25px)"
+
+msgid "Medium (50px)"
+msgstr "Mittel (50px)"
+
+msgid "Large (75px)"
+msgstr "Groß (75px)"
+
+msgid "Logo Size"
+msgstr "Logo-Größe"
+
+msgid "Maximum Logo Height (px)"
+msgstr "Maximale Logo-Höhe (px)"
+
+msgid "Sets the maximum height for logos. Width adjusts automatically."
+msgstr "Legt die maximale Höhe für Logos fest. Die Breite passt sich automatisch an."
+
+msgid "Quick Select"
+msgstr "Schnellauswahl"
+
+msgid "Small (40px)"
+msgstr "Klein (40px)"
+
+msgid "Large (70px)"
+msgstr "Groß (70px)"
+
+msgid "Extra Large (100px)"
+msgstr "Extra Groß (100px)"
+
+msgid "Overlay Settings"
+msgstr "Overlay-Einstellungen"
+
+msgid "Show Overlay"
+msgstr "Overlay anzeigen"
+
+msgid "Shows a gradient overlay at the edges of the carousel."
+msgstr "Zeigt einen Verlaufseffekt an den Rändern des Karussells."
+
+msgid "Overlay Color"
+msgstr "Overlay-Farbe"
+
+msgid "Background color for overlay"
+msgstr "Hintergrundfarbe für Overlay"
+
+msgid "Logo Display"
+msgstr "Logo-Darstellung"
+
+msgid "Convert to Black"
+msgstr "In Schwarz umwandeln"
+
+msgid "Converts all logos to black for a uniform appearance."
+msgstr "Wandelt alle Logos in Schwarz um für ein einheitliches Erscheinungsbild."
+
+msgid "Logo Link (optional)"
+msgstr "Logo-Link (optional)"
+
+msgid "Remove"
+msgstr "Entfernen"
+
+msgid "Add Images"
+msgstr "Bilder hinzufügen"
+
+msgid "Support"
+msgstr "Support"
+
+msgid "Documentation"
+msgstr "Dokumentation"
+
+msgid "WordPress Agentur"
+msgstr "WordPress Agentur"

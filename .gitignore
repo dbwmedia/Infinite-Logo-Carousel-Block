@@ -1,0 +1,58 @@
+# Dependencies
+node_modules/
+vendor/
+
+# Build files (können generiert werden)
+# HINWEIS: Für WordPress.org müssen build files INKLUDIERT sein!
+# Kommentiere diese Zeilen aus wenn du zu WordPress.org hochlädst
+# build/
+
+# Development files
+.DS_Store
+Thumbs.db
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor directories and files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+
+# WordPress
+wp-config.php
+.htaccess
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Package files
+*.zip
+*.tar.gz
+*.rar
+
+# Test files
+tests/
+phpunit.xml
+.phpunit.result.cache
+
+# Documentation source
+docs/

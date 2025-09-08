@@ -1,0 +1,33 @@
+{
+	"name": "infinite-logo-carousel-block",
+	"version": "1.0.0",
+	"description": "Professional infinity logo carousel Gutenberg block with customizable speed, spacing and hover-pause.",
+	"author": "dbw media <hallo@dbw-media.de>",
+	"homepage": "https://wordpress.org/plugins/infinite-logo-carousel-block/",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"block",
+		"carousel",
+		"logo",
+		"infinite",
+		"scroll",
+		"client-logos",
+		"partner-logos"
+	],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/dbw-media/infinite-logo-carousel-block"
+	},
+	"scripts": {
+		"build": "wp-scripts build",
+		"start": "wp-scripts start",
+		"lint:js": "wp-scripts lint-js",
+		"format": "wp-scripts format",
+		"packages-update": "wp-scripts packages-update"
+	},
+	"devDependencies": {
+		"@wordpress/scripts": "^24.3.0"
+	}
+}
