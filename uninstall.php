@@ -5,7 +5,7 @@
  * Executed when the plugin is uninstalled via WordPress Admin.
  * 
  * @package infinite-logo-carousel-block
- * @since 1.0.0
+ * @since 1.0.1
  */
 
 // Security: Only execute when called by WordPress
