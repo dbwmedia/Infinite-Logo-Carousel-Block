@@ -138,7 +138,13 @@ npm run format   # Code formatting
 
 ## Changelog
 
-### 1.0.0 (2024)
+### 1.0.1
+
+- Added developer source files for JS and CSS to comply with WordPress.org guidelines
+- Updated readme.txt with correct "Contributors" including WordPress.org username
+- Documented build process and source code location in readme
+
+### 1.0.0 (2025)
 
 - Initial release
 - Infinite scrolling animation

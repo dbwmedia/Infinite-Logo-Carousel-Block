@@ -2,6 +2,7 @@
 	position: relative;
 	overflow: hidden;
 	width: 100%;
+	min-height: 70px; // Mindesthöhe setzen
 	margin-top: var(--outer-margin, 50px);
 	margin-bottom: var(--outer-margin, 50px);
 
@@ -51,6 +52,7 @@
 
 .dbw-slider-wrapper {
 	width: 100%;
+	min-height: 70px; // Mindesthöhe
 	overflow: hidden;
 }
 
@@ -68,13 +70,16 @@
 	align-items: center;
 	justify-content: center;
 	padding: 0 calc(var(--slide-gap, 40px) / 2);
+	min-height: var(--logo-height, 50px); // Mindesthöhe für Items
 
 	img {
 		display: block;
 		max-height: var(--logo-height, 50px);
+		min-height: var(--logo-height, 50px); // NEU: min-height mit Variable
 		width: auto;
 		height: auto;
 		object-fit: contain;
+		aspect-ratio: attr(width) / attr(height); // Aspect Ratio beibehalten
 	}
 
 	a {

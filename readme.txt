@@ -1,5 +1,5 @@
 === Infinite Logo Carousel Block ===
-Contributors: dbwmedia
+Contributors: dbwmediadennis
 Tags: logo carousel, infinite scroll, client logos, partner logos, gutenberg
 Requires at least: 5.8
 Tested up to: 6.8
@@ -166,6 +166,11 @@ Yes, the plugin doesn't collect, store, or transmit any personal data. It's comp
 
 == Changelog ==
 
+= 1.0.1 =
+* Added developer source files for JS and CSS to comply with WordPress.org guidelines
+* Updated readme.txt with correct "Contributors" including WordPress.org username
+* Documented build process and source code location in readme
+
 = 1.0.0 =
 * Initial release
 * Infinite scrolling for logos
@@ -183,13 +188,20 @@ Yes, the plugin doesn't collect, store, or transmit any personal data. It's comp
 = 1.0.0 =
 Initial release of Infinite Logo Carousel Block. Start showcasing your client, partner, or sponsor logos professionally!
 
-== Support ==
+== Source Code ==
+   
+   The source code for this plugin is available at:
+   https://github.com/dbw-media/Infinite-Logo-Carousel-Block
 
-Need help? We're here for you!
+== Source Code ==
 
-* **Support Forum**: [WordPress.org Support](https://wordpress.org/support/plugin/infinite-logo-carousel-block/)
-* **Documentation**: Check the plugin description for detailed usage instructions
-* **Professional Support**: [Contact dbw media](https://dbw-media.de/contact) for custom development
+The source code for this plugin is available at:
+https://github.com/dbw-media/Infinite-Logo-Carousel-Block
+
+Build instructions:
+1. Clone the repository
+2. Run npm install
+3. Run npm run build
 
 == Privacy Policy ==
 
