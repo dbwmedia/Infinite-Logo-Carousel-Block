@@ -28,6 +28,18 @@ define( 'ILCB_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'ILCB_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 
 /**
+ * Load plugin textdomain for translations
+ */
+function ilcb_load_textdomain() {
+    load_plugin_textdomain(
+        'infinite-logo-carousel-block',
+        false,
+        dirname( ILCB_PLUGIN_BASENAME ) . '/languages'
+    );
+}
+add_action( 'plugins_loaded', 'ilcb_load_textdomain' );
+
+/**
  * Register the Gutenberg Block
  */
 function ilcb_register_block() {
