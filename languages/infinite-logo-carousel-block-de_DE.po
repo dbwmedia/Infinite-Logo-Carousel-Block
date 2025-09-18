@@ -1,22 +1,33 @@
+# German translation for Infinite Logo Carousel Block
+# Copyright (C) 2024 dbw media
+# This file is distributed under the same license as the Infinite Logo Carousel Block package.
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: Infinite Logo Carousel Block\n"
+"Project-Id-Version: Infinite Logo Carousel Block 1.0.1\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/infinite-logo-carousel-block/\n"
+"POT-Creation-Date: 2024-01-01 12:00+0000\n"
+"PO-Revision-Date: 2024-01-01 12:00+0000\n"
+"Last-Translator: dbw media <support@dbw-media.de>\n"
+"Language-Team: German\n"
 "Language: de_DE\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Manual\n"
 
 msgid "Infinite Logo Carousel"
-msgstr "Unendliches Logo Karussell"
+msgstr "Infinite Logo Karussell"
 
-msgid "Professional infinity logo carousel with customizable speed, spacing and hover-pause."
-msgstr "Professionelles Endlos-Logo-Karussell mit anpassbarer Geschwindigkeit, Abstand und Hover-Pause."
+msgid "Professional infinity logo carousel with customizable speed, spacing and hover-pause. Perfect for client, partner or sponsor logos."
+msgstr "Professionelles Endlos-Logo-Karussell mit anpassbarer Geschwindigkeit, Abständen und Hover-Pause. Perfekt für Kunden-, Partner- oder Sponsor-Logos."
 
 msgid "Images"
 msgstr "Bilder"
 
 msgid "Add logos to create your infinity carousel."
-msgstr "Füge Logos hinzu, um dein Endlos-Karussell zu erstellen."
+msgstr "Fügen Sie Logos hinzu, um Ihr Endlos-Karussell zu erstellen."
 
 msgid "Speed"
 msgstr "Geschwindigkeit"
@@ -34,7 +45,7 @@ msgid "Fast"
 msgstr "Schnell"
 
 msgid "Logo Spacing"
-msgstr "Logo-Abstand"
+msgstr "Logo-Abstände"
 
 msgid "Gap between logos"
 msgstr "Abstand zwischen Logos"
@@ -49,7 +60,7 @@ msgid "Margins"
 msgstr "Außenabstände"
 
 msgid "Top/Bottom Margin"
-msgstr "Abstand oben/unten"
+msgstr "Oben/Unten Außenabstand"
 
 msgid "Small (25px)"
 msgstr "Klein (25px)"
@@ -67,7 +78,7 @@ msgid "Maximum Logo Height (px)"
 msgstr "Maximale Logo-Höhe (px)"
 
 msgid "Sets the maximum height for logos. Width adjusts automatically."
-msgstr "Legt die maximale Höhe für Logos fest. Die Breite passt sich automatisch an."
+msgstr "Legt die maximale Höhe für Logos fest. Die Breite wird automatisch angepasst."
 
 msgid "Quick Select"
 msgstr "Schnellauswahl"
@@ -88,7 +99,7 @@ msgid "Show Overlay"
 msgstr "Overlay anzeigen"
 
 msgid "Shows a gradient overlay at the edges of the carousel."
-msgstr "Zeigt einen Verlaufseffekt an den Rändern des Karussells."
+msgstr "Zeigt ein Verlaufs-Overlay an den Rändern des Karussells an."
 
 msgid "Overlay Color"
 msgstr "Overlay-Farbe"
@@ -97,7 +108,7 @@ msgid "Background color for overlay"
 msgstr "Hintergrundfarbe für Overlay"
 
 msgid "Logo Display"
-msgstr "Logo-Darstellung"
+msgstr "Logo-Anzeige"
 
 msgid "Convert to Black"
 msgstr "In Schwarz umwandeln"
@@ -122,3 +133,22 @@ msgstr "Dokumentation"
 
 msgid "WordPress Agentur"
 msgstr "WordPress Agentur"
+
+# PHP strings from logo-slider-block.php
+
+#: logo-slider-block.php:183
+#, php-format
+msgid "The <strong>Infinite Logo Carousel Block</strong> plugin requires WordPress 5.8 or higher. You are using WordPress %s."
+msgstr "Das Plugin <strong>Infinite Logo Carousel Block</strong> benötigt WordPress 5.8 oder höher. Sie verwenden WordPress %s."
+
+#: logo-slider-block.php:200
+msgid "This plugin requires WordPress 5.8 or higher."
+msgstr "Dieses Plugin benötigt WordPress 5.8 oder höher."
+
+#: logo-slider-block.php:201
+msgid "Plugin activation failed"
+msgstr "Plugin-Aktivierung fehlgeschlagen"
+
+# Missing string from JavaScript
+msgid "Logo"
+msgstr "Logo"

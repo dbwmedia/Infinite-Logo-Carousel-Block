@@ -1,0 +1,125 @@
+{
+  "translation-revision-date": "2024-01-01 12:00+0000",
+  "generator": "Manual",
+  "domain": "messages",
+  "locale_data": {
+    "messages": {
+      "": {
+        "domain": "messages",
+        "plural-forms": "nplurals=2; plural=(n != 1);",
+        "lang": "de_DE"
+      },
+      "Infinite Logo Carousel": [
+        "Infinite Logo Karussell"
+      ],
+      "Professional infinity logo carousel with customizable speed, spacing and hover-pause. Perfect for client, partner or sponsor logos.": [
+        "Professionelle Logo-Präsentation für WordPress mit anpassbarer Geschwindigkeit, Abständen und Hover-Pause. Perfekt für Kunden-, Partner- oder Sponsor-Logos."
+      ],
+      "Images": [
+        "Bilder"
+      ],
+      "Add logos to create your infinity carousel.": [
+        "Fügen Sie Logos hinzu, um Ihr Endlos-Karussell zu erstellen."
+      ],
+      "Speed": [
+        "Geschwindigkeit"
+      ],
+      "Carousel Speed": [
+        "Karussell-Geschwindigkeit"
+      ],
+      "Slow": [
+        "Langsam"
+      ],
+      "Medium": [
+        "Mittel"
+      ],
+      "Fast": [
+        "Schnell"
+      ],
+      "Logo Spacing": [
+        "Logo-Abstände"
+      ],
+      "Gap between logos": [
+        "Abstand zwischen Logos"
+      ],
+      "Small": [
+        "Klein"
+      ],
+      "Large": [
+        "Groß"
+      ],
+      "Margins": [
+        "Außenabstände"
+      ],
+      "Top/Bottom Margin": [
+        "Oben/Unten Außenabstand"
+      ],
+      "Small (25px)": [
+        "Klein (25px)"
+      ],
+      "Medium (50px)": [
+        "Mittel (50px)"
+      ],
+      "Large (75px)": [
+        "Groß (75px)"
+      ],
+      "Logo Size": [
+        "Logo-Größe"
+      ],
+      "Maximum Logo Height (px)": [
+        "Maximale Logo-Höhe (px)"
+      ],
+      "Sets the maximum height for logos. Width adjusts automatically.": [
+        "Legt die maximale Höhe für Logos fest. Die Breite wird automatisch angepasst."
+      ],
+      "Quick Select": [
+        "Schnellauswahl"
+      ],
+      "Small (40px)": [
+        "Klein (40px)"
+      ],
+      "Large (70px)": [
+        "Groß (70px)"
+      ],
+      "Extra Large (100px)": [
+        "Extra Groß (100px)"
+      ],
+      "Overlay Settings": [
+        "Overlay-Einstellungen"
+      ],
+      "Show Overlay": [
+        "Overlay anzeigen"
+      ],
+      "Shows a gradient overlay at the edges of the carousel.": [
+        "Zeigt ein Verlaufs-Overlay an den Rändern des Karussells an."
+      ],
+      "Overlay Color": [
+        "Overlay-Farbe"
+      ],
+      "Background color for overlay": [
+        "Hintergrundfarbe für Overlay"
+      ],
+      "Logo Display": [
+        "Logo-Anzeige"
+      ],
+      "Convert to Black": [
+        "In Schwarz umwandeln"
+      ],
+      "Converts all logos to black for a uniform appearance.": [
+        "Wandelt alle Logos in Schwarz um für ein einheitliches Erscheinungsbild."
+      ],
+      "Logo": [
+        "Logo"
+      ],
+      "Logo Link (optional)": [
+        "Logo-Link (optional)"
+      ],
+      "Remove": [
+        "Entfernen"
+      ],
+      "Add Images": [
+        "Bilder hinzufügen"
+      ]
+    }
+  }
+}
