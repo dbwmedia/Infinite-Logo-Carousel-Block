@@ -3,7 +3,7 @@
  * Plugin Name: Infinite Logo Carousel Block
  * Plugin URI: https://wordpress.org/plugins/infinite-logo-carousel-block/
  * Description: A professional infinity logo carousel Gutenberg block with customizable speed, spacing, hover-stop and optional links. Perfect for showcasing partner, client or sponsor logos.
- * Version: 1.0.3
+ * Version: 1.0.4
  * Requires at least: 5.8
  * Tested up to: 6.8
  * Requires PHP: 7.2
@@ -23,30 +23,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define plugin constants
-define( 'ILCB_VERSION', '1.0.3' );
+define( 'ILCB_VERSION', '1.0.4' );
 define( 'ILCB_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'ILCB_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'ILCB_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 
 /**
- * Load plugin textdomain for translations
- * Modern WordPress i18n implementation (WordPress 4.6+)
+ * Note: Translation loading removed for WordPress.org Plugin Check compliance
  *
- * Note: Since WordPress 4.6+, translations are loaded automatically
- * for plugins with proper Text Domain and Domain Path headers.
- * This function provides backward compatibility.
+ * Since WordPress 4.6+, translations are loaded automatically for plugins
+ * hosted on WordPress.org that have proper Text Domain and Domain Path headers.
+ * Manual load_plugin_textdomain() calls are discouraged by Plugin Check
+ * as they are not necessary and can cause issues.
+ *
+ * Plugin Headers ensure automatic translation loading:
+ * - Text Domain: infinite-logo-carousel-block
+ * - Domain Path: /languages
  */
-function ilcb_load_textdomain() {
-    // Only load if WordPress < 6.8 or translations not already loaded
-    if ( ! is_textdomain_loaded( 'infinite-logo-carousel-block' ) ) {
-        load_plugin_textdomain(
-            'infinite-logo-carousel-block',
-            false,
-            dirname( ILCB_PLUGIN_BASENAME ) . '/languages'
-        );
-    }
-}
-add_action( 'init', 'ilcb_load_textdomain' );
 
 /**
  * Register the Gutenberg Block
