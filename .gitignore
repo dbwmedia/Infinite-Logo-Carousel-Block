@@ -62,3 +62,6 @@ infinite-logo-carousel-block/
 
 # WordPress.org assets (lokal entwickelt)
 .wordpress-org/
+
+# Development documentation 
+.dev/
