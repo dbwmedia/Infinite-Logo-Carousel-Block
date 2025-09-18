@@ -4,7 +4,7 @@ Tags: logo carousel, infinite scroll, client logos, partner logos, gutenberg
 Requires at least: 5.8
 Tested up to: 6.8
 Requires PHP: 7.2
-Stable tag: 1.0.3
+Stable tag: 1.0.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -165,6 +165,13 @@ Yes, the plugin doesn't collect, store, or transmit any personal data. It's comp
 8. Logo size adjustment controls
 
 == Changelog ==
+
+= 1.0.4 =
+* FIXED: Plugin Check compliance - Removed load_plugin_textdomain() as discouraged by WordPress.org
+* WordPress.org plugins use automatic translation loading via Text Domain and Domain Path headers
+* Maintains JavaScript translation support via wp_set_script_translations()
+* Full Plugin Check compliance achieved for WordPress.org submission
+* No functionality changes - translations work automatically
 
 = 1.0.3 =
 * Fixed Plugin Check compliance issues with i18n implementation
