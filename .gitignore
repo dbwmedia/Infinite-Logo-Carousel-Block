@@ -2,10 +2,10 @@
 node_modules/
 vendor/
 
-# Build files (können generiert werden)
-# HINWEIS: Für WordPress.org müssen build files INKLUDIERT sein!
-# Kommentiere diese Zeilen aus wenn du zu WordPress.org hochlädst
-# build/
+# Build files - NUR für Git ignorieren
+# Für WordPress.org SVN MÜSSEN diese inkludiert sein!
+build/
+dist/
 
 # Development files
 .DS_Store
@@ -30,7 +30,7 @@ yarn-error.log*
 .Trashes
 ehthumbs.db
 
-# WordPress
+# WordPress specific
 wp-config.php
 .htaccess
 
@@ -56,3 +56,9 @@ phpunit.xml
 
 # Documentation source
 docs/
+
+# SVN Repository (wichtig!)
+infinite-logo-carousel-block/
+
+# WordPress.org assets (lokal entwickelt)
+.wordpress-org/
