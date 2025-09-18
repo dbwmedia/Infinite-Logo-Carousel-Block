@@ -1,0 +1,105 @@
+# Development Configuration für WordPress Plugin
+project_name: "Infinite Logo Carousel Block"
+project_type: "wordpress_plugin"
+version: "1.0.1"
+
+# Projektbeschreibung
+description: "Ein WordPress Gutenberg Block Plugin für infinite scrollende Logo Carousels"
+
+# Development Documentation (versteckt in .dev/)
+documentation_files:
+  - ".dev/project_guide.md"
+  - ".dev/tasks.md"
+  - ".dev/deployment.md"
+
+# Wichtige Dateien und Ordner
+important_files:
+  - "logo-slider-block.php" # Hauptdatei
+  - "readme.txt" # WordPress.org Dokumentation
+  - "src/" # Frontend JavaScript/CSS
+  - "uninstall.php" # Cleanup bei Deinstallation
+
+# Entwicklungskontext
+development_context: |
+  WordPress Plugin für Gutenberg Block Editor
+  - Block Name: infinite-logo-carousel-block
+  - Namespace: infinite-logo-carousel
+  - Zielgruppe: Websites die Kunden/Partner/Sponsor Logos anzeigen möchten
+  - Features: Infinite Scroll, Hover Pause, anpassbare Geschwindigkeit, flexible Abstände
+
+# Technische Details
+tech_stack:
+  - "WordPress 5.8+"
+  - "JavaScript (Gutenberg Block API)"
+  - "SCSS für Styling"
+  - "PHP für Backend Logic"
+
+# Coding Standards
+standards:
+  - "WordPress Coding Standards"
+  - "WordPress Plugin Guidelines"
+  - "Gutenberg Block Development Best Practices"
+
+# SVN Repository Info (für WordPress.org)
+wordpress_org:
+  svn_url: "https://plugins.svn.wordpress.org/infinite-logo-carousel-block"
+  username: "dbwmediadennis"
+
+# WordPress.org Deployment Context
+deployment_context: |
+  WICHTIGES DEPLOYMENT WISSEN:
+
+  1. DATEI-SYNCHRONISATION:
+     - Git Repository -> SVN trunk/ -> WordPress.org
+     - Nur diese Dateien kopieren: *.php, readme.txt, src/, uninstall.php
+     - NICHT kopieren: node_modules/, .git/, package*.json, SVN-repo/
+
+  2. VERSIONSNUMMERN (alle gleichzeitig updaten!):
+     - logo-slider-block.php: Plugin Header "Version: X.X.X"
+     - logo-slider-block.php: "Stable tag: X.X.X" 
+     - readme.txt: "Stable tag: X.X.X"
+     - package.json: "version": "X.X.X"
+
+  3. SVN WORKFLOW:
+     - Username: dbwmediadennis
+     - Repository: https://plugins.svn.wordpress.org/infinite-logo-carousel-block
+     - Trunk commit DANN Tag erstellen
+     - Tags sind eingefroren (nie ändern!)
+
+  4. CHANGELOG FORMAT (readme.txt):
+     = X.X.X =
+     * Added: Neue Features
+     * Changed: Geänderte Features  
+     * Fixed: Bug-Fixes
+     * Removed: Entfernte Features
+
+# Nützliche Kommandos
+commands:
+  build: "npm run build"
+  dev: "npm run start"
+  lint: "npm run lint"
+
+# WordPress.org Deployment Befehle Template
+deployment_commands_template: |
+  # Dateien zu SVN kopieren
+  cp logo-slider-block.php ../infinite-logo-carousel-block/trunk/
+  cp readme.txt ../infinite-logo-carousel-block/trunk/
+  cp uninstall.php ../infinite-logo-carousel-block/trunk/
+  cp -r src ../infinite-logo-carousel-block/trunk/
+
+  # SVN Commit  
+  cd ../infinite-logo-carousel-block
+  svn add trunk/* --force
+  svn commit -m "Version X.X.X" --username dbwmediadennis
+
+  # Tag erstellen
+  svn copy trunk tags/X.X.X
+  svn commit -m "Tag version X.X.X" --username dbwmediadennis
+
+# Ignorierte Dateien für Claude Code
+ignore_patterns:
+  - "node_modules/"
+  - "build/"
+  - "infinite-logo-carousel-block/" # SVN Repository
+  - ".git/"
+  - "*.log"
