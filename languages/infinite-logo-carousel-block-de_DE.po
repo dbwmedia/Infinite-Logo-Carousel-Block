@@ -4,7 +4,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Infinite Logo Carousel Block 1.0.4\n"
+"Project-Id-Version: Infinite Logo Carousel Block 1.1.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/infinite-logo-carousel-block/\n"
 "POT-Creation-Date: 2024-01-01 12:00+0000\n"
 "PO-Revision-Date: 2024-01-01 12:00+0000\n"
@@ -152,3 +152,34 @@ msgstr "Plugin-Aktivierung fehlgeschlagen"
 # Missing string from JavaScript
 msgid "Logo"
 msgstr "Logo"
+
+# Link-Einstellungen Panel
+msgid "Link-Einstellungen"
+msgstr "Link-Einstellungen"
+
+msgid "Link Target"
+msgstr "Link-Ziel"
+
+msgid "Bestimmt, wo Logo-Links geöffnet werden."
+msgstr "Bestimmt, wo Logo-Links geöffnet werden."
+
+msgid "Gleiches Fenster (_self)"
+msgstr "Gleiches Fenster (_self)"
+
+msgid "Neues Fenster (_blank)"
+msgstr "Neues Fenster (_blank)"
+
+msgid "Rel-Attribute"
+msgstr "Rel-Attribute"
+
+msgid "Mehrere Werte mit Leerzeichen trennen (z.B. 'nofollow sponsored')."
+msgstr "Mehrere Werte mit Leerzeichen trennen (z.B. 'nofollow sponsored')."
+
+msgid "Title-Attribut (optional)"
+msgstr "Title-Attribut (optional)"
+
+msgid "Tooltip-Text für alle Logo-Links."
+msgstr "Tooltip-Text für alle Logo-Links."
+
+msgid "Besuche unseren Partner"
+msgstr "Besuche unseren Partner"

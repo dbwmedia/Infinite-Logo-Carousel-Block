@@ -3,7 +3,7 @@
  * Plugin Name: Infinite Logo Carousel Block
  * Plugin URI: https://wordpress.org/plugins/infinite-logo-carousel-block/
  * Description: A professional infinity logo carousel Gutenberg block with customizable speed, spacing, hover-stop and optional links. Perfect for showcasing partner, client or sponsor logos.
- * Version: 1.0.4
+ * Version: 1.1.0
  * Requires at least: 5.8
  * Tested up to: 6.8
  * Requires PHP: 7.2
@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define plugin constants
-define( 'ILCB_VERSION', '1.0.4' );
+define( 'ILCB_VERSION', '1.1.0' );
 define( 'ILCB_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'ILCB_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'ILCB_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
@@ -139,6 +139,18 @@ function ilcb_register_block() {
             'blackLogos' => array(
                 'type' => 'boolean',
                 'default' => false,
+            ),
+            'linkTarget' => array(
+                'type' => 'string',
+                'default' => '_self',
+            ),
+            'linkRel' => array(
+                'type' => 'string',
+                'default' => '',
+            ),
+            'linkTitle' => array(
+                'type' => 'string',
+                'default' => '',
             ),
         ),
     ) );

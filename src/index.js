@@ -57,6 +57,18 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 			type: "boolean",
 			default: false,
 		},
+		linkTarget: {
+			type: "string",
+			default: "_self",
+		},
+		linkRel: {
+			type: "string",
+			default: "",
+		},
+		linkTitle: {
+			type: "string",
+			default: "",
+		},
 	},
 	edit: ({ attributes, setAttributes }) => {
 		const {
@@ -68,6 +80,9 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 			overlayEnabled,
 			overlayColor,
 			blackLogos,
+			linkTarget,
+			linkRel,
+			linkTitle,
 		} = attributes;
 
 		const addImage = (selection) => {
@@ -269,6 +284,42 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 							onChange={(value) => setAttributes({ blackLogos: value })}
 						/>
 					</PanelBody>
+
+					<PanelBody
+						title={__("Link-Einstellungen", "infinite-logo-carousel-block")}
+						initialOpen={false}
+					>
+						<SelectControl
+							label={__("Link Target", "infinite-logo-carousel-block")}
+							help={__("Bestimmt, wo Logo-Links geöffnet werden.", "infinite-logo-carousel-block")}
+							value={linkTarget}
+							options={[
+								{
+									label: __("Gleiches Fenster (_self)", "infinite-logo-carousel-block"),
+									value: "_self",
+								},
+								{
+									label: __("Neues Fenster (_blank)", "infinite-logo-carousel-block"),
+									value: "_blank",
+								},
+							]}
+							onChange={(newTarget) => setAttributes({ linkTarget: newTarget })}
+						/>
+						<TextControl
+							label={__("Rel-Attribute", "infinite-logo-carousel-block")}
+							help={__("Mehrere Werte mit Leerzeichen trennen (z.B. 'nofollow sponsored').", "infinite-logo-carousel-block")}
+							value={linkRel}
+							placeholder="nofollow noopener sponsored"
+							onChange={(newRel) => setAttributes({ linkRel: newRel })}
+						/>
+						<TextControl
+							label={__("Title-Attribut (optional)", "infinite-logo-carousel-block")}
+							help={__("Tooltip-Text für alle Logo-Links.", "infinite-logo-carousel-block")}
+							value={linkTitle}
+							placeholder={__("Besuche unseren Partner", "infinite-logo-carousel-block")}
+							onChange={(newTitle) => setAttributes({ linkTitle: newTitle })}
+						/>
+					</PanelBody>
 				</InspectorControls>
 
 				<div className="dbw-partner-slider-editor">
@@ -328,6 +379,9 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 			overlayEnabled,
 			overlayColor,
 			blackLogos,
+			linkTarget,
+			linkRel,
+			linkTitle,
 		} = attributes;
 
 		const speedMap = {
@@ -368,9 +422,10 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 						{image.link ? (
 							<a
 								href={image.link}
-								target="_blank"
-								rel="noopener noreferrer"
-								aria-label="Logo Link"
+								target={linkTarget || "_self"}
+								rel={linkTarget === "_blank" ? `noopener noreferrer${linkRel ? ` ${linkRel}` : ""}` : linkRel || undefined}
+								title={linkTitle || undefined}
+								aria-label={linkTitle || "Logo Link"}
 							>
 								{imgElement}
 							</a>
