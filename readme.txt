@@ -4,7 +4,7 @@ Tags: logo carousel, infinite scroll, client logos, partner logos, gutenberg
 Requires at least: 5.8
 Tested up to: 6.8
 Requires PHP: 7.2
-Stable tag: 1.0.4
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -166,28 +166,27 @@ Yes, the plugin doesn't collect, store, or transmit any personal data. It's comp
 
 == Changelog ==
 
-= 1.0.4 =
-* FIXED: Plugin Check compliance - Removed load_plugin_textdomain() as discouraged by WordPress.org
-* WordPress.org plugins use automatic translation loading via Text Domain and Domain Path headers
-* Maintains JavaScript translation support via wp_set_script_translations()
-* Full Plugin Check compliance achieved for WordPress.org submission
-* No functionality changes - translations work automatically
-
-= 1.0.3 =
-* Fixed Plugin Check compliance issues with i18n implementation
-* Updated load_plugin_textdomain() to use 'init' hook (WordPress 4.6+ standard)
-* Added is_textdomain_loaded() check for optimal performance
-* Added 'Tested up to: 6.8' for WordPress compatibility
-* Improved backward compatibility for translation loading
-* Enhanced Plugin Check validation compliance
+= 1.1.0 =
+* NEW: Centralized Link Settings panel - Configure all logo links from one location
+* NEW: Link Target option - Choose between same window (_self) or new window (_blank) for all logos
+* NEW: Rel Attributes control - Add custom rel attributes (nofollow, sponsored, noopener) to all logo links
+* NEW: Title Attribute option - Set tooltip text for all logo links
+* IMPROVED: Smart rel attribute handling - Automatically includes noopener noreferrer for _blank targets
+* IMPROVED: Enhanced German translations for all new link settings
+* IMPROVED: Better accessibility with configurable aria-labels for logo links
+* ENHANCED: Individual logo links now use centralized settings while maintaining backward compatibility
 
 = 1.0.2 =
-* Complete German translation implementation
-* Added load_plugin_textdomain() for PHP translations
-* Created German .po/.mo files for backend strings
-* Added JavaScript translation .json file for Gutenberg editor
-* All interface strings now available in German
-* Professional German WordPress terminology used
+* Complete German translation implementation with Plugin Check compliance
+* Full German translation support (43 translated strings)
+* Created German .po/.mo files for backend/PHP strings
+* Added JavaScript translation .json file for Gutenberg editor interface
+* Professional German WordPress terminology used throughout
+* FIXED: Plugin Check compliance - Removed load_plugin_textdomain() as discouraged by WordPress.org
+* WordPress.org automatic translation loading via Text Domain and Domain Path headers
+* Maintains JavaScript translation support via wp_set_script_translations()
+* Added 'Tested up to: 6.8' for latest WordPress compatibility
+* All interface strings available in German with zero functionality changes
 
 = 1.0.1 =
 * Added developer source files for JS and CSS to comply with WordPress.org guidelines
