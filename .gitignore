@@ -64,4 +64,5 @@ infinite-logo-carousel-block/
 .wordpress-org/
 
 # Development documentation 
-.dev/
+.dev/.claude_code.yaml
+.claude_code.yaml
