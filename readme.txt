@@ -2,9 +2,9 @@
 Contributors: dbwmediadennis
 Tags: logo carousel, infinite scroll, client logos, partner logos, gutenberg
 Requires at least: 5.8
-Tested up to: 6.8
+Tested up to: 6.9.1
 Requires PHP: 7.2
-Stable tag: 1.1.0
+Stable tag: 1.1.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -165,6 +165,10 @@ Yes, the plugin doesn't collect, store, or transmit any personal data. It's comp
 8. Logo size adjustment controls
 
 == Changelog ==
+
+= 1.1.1 =
+* Confirmed compatibility with WordPress 6.9.1 and 6.9.x.
+* Documented layout overflow issue in logo slider (.dbw-slider-track).
 
 = 1.1.0 =
 * NEW: Centralized Link Settings panel - Configure all logo links from one location
