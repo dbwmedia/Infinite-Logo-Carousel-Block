@@ -36,6 +36,10 @@
 			.components-base-control__field {
 				width: 100%;
 			}
+
+			.dbw-invalid-url input {
+				border-color: #cc1818 !important;
+			}
 		}
 	}
 

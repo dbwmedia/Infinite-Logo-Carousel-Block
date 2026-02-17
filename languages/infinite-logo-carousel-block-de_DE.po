@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Infinite Logo Carousel Block 1.1.0\n"
+"Project-Id-Version: Infinite Logo Carousel Block 1.2.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/infinite-logo-carousel-block/\n"
-"POT-Creation-Date: 2024-01-01 12:00+0000\n"
-"PO-Revision-Date: 2024-01-01 12:00+0000\n"
+"POT-Creation-Date: 2026-02-17 12:00+0000\n"
+"PO-Revision-Date: 2026-02-17 12:00+0000\n"
 "Last-Translator: dbw media <support@dbw-media.de>\n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -136,50 +136,56 @@ msgstr "WordPress Agentur"
 
 # PHP strings from logo-slider-block.php
 
-#: logo-slider-block.php:183
+#: logo-slider-block.php
 #, php-format
 msgid "The <strong>Infinite Logo Carousel Block</strong> plugin requires WordPress 5.8 or higher. You are using WordPress %s."
 msgstr "Das Plugin <strong>Infinite Logo Carousel Block</strong> benötigt WordPress 5.8 oder höher. Sie verwenden WordPress %s."
 
-#: logo-slider-block.php:200
+#: logo-slider-block.php
 msgid "This plugin requires WordPress 5.8 or higher."
 msgstr "Dieses Plugin benötigt WordPress 5.8 oder höher."
 
-#: logo-slider-block.php:201
+#: logo-slider-block.php
 msgid "Plugin activation failed"
 msgstr "Plugin-Aktivierung fehlgeschlagen"
 
-# Missing string from JavaScript
 msgid "Logo"
 msgstr "Logo"
 
-# Link-Einstellungen Panel
-msgid "Link-Einstellungen"
+# Link Settings Panel (now English base strings)
+msgid "Link Settings"
 msgstr "Link-Einstellungen"
 
 msgid "Link Target"
 msgstr "Link-Ziel"
 
-msgid "Bestimmt, wo Logo-Links geöffnet werden."
+msgid "Determines where logo links open."
 msgstr "Bestimmt, wo Logo-Links geöffnet werden."
 
-msgid "Gleiches Fenster (_self)"
+msgid "Same window (_self)"
 msgstr "Gleiches Fenster (_self)"
 
-msgid "Neues Fenster (_blank)"
+msgid "New window (_blank)"
 msgstr "Neues Fenster (_blank)"
 
-msgid "Rel-Attribute"
+msgid "Rel Attributes"
 msgstr "Rel-Attribute"
 
-msgid "Mehrere Werte mit Leerzeichen trennen (z.B. 'nofollow sponsored')."
+msgid "Separate multiple values with spaces (e.g. 'nofollow sponsored')."
 msgstr "Mehrere Werte mit Leerzeichen trennen (z.B. 'nofollow sponsored')."
 
-msgid "Title-Attribut (optional)"
+msgid "Title Attribute (optional)"
 msgstr "Title-Attribut (optional)"
 
-msgid "Tooltip-Text für alle Logo-Links."
+msgid "Tooltip text for all logo links."
 msgstr "Tooltip-Text für alle Logo-Links."
 
-msgid "Besuche unseren Partner"
+msgid "Visit our partner"
 msgstr "Besuche unseren Partner"
+
+# New strings for alt text and URL validation
+msgid "Alt Text (optional)"
+msgstr "Alt-Text (optional)"
+
+msgid "Describe this logo"
+msgstr "Beschreiben Sie dieses Logo"

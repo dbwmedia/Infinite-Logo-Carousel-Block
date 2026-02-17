@@ -4,7 +4,7 @@ Tags: logo carousel, infinite scroll, client logos, partner logos, gutenberg
 Requires at least: 5.8
 Tested up to: 6.9
 Requires PHP: 7.2
-Stable tag: 1.1.1
+Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -166,8 +166,23 @@ Yes, the plugin doesn't collect, store, or transmit any personal data. It's comp
 
 == Changelog ==
 
+= 1.2.0 =
+* NEW: Alt text field for each logo (accessibility & SEO)
+* NEW: Touch support - tap to pause/resume on mobile devices
+* NEW: URL validation indicator for logo links in editor
+* FIXED: Overlay gradient now works correctly with custom colors (no more white fallback)
+* FIXED: Layout overflow in nested containers (.dbw-slider-track) with max-width containment
+* FIXED: Removed non-functional CSS aspect-ratio: attr() declaration
+* IMPROVED: Smarter logo duplication for reliable infinite scroll with 20+ logos
+* IMPROVED: Per-slider style management instead of shared innerHTML (better performance)
+* IMPROVED: Lazy loading on all logo images (loading="lazy")
+* IMPROVED: Stable React keys using image IDs
+* IMPROVED: English base strings with proper German translations (i18n best practice)
+* IMPROVED: Backward compatibility via deprecated block save for existing installations
+* Confirmed compatibility with WordPress 6.9 and 6.9.x
+
 = 1.1.1 =
-* Confirmed compatibility with WordPress 6.9.1 and 6.9.x.
+* Confirmed compatibility with WordPress 6.9 and 6.9.x.
 * Documented layout overflow issue in logo slider (.dbw-slider-track).
 
 = 1.1.0 =

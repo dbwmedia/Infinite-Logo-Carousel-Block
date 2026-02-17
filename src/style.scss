@@ -2,7 +2,9 @@
 	position: relative;
 	overflow: hidden;
 	width: 100%;
-	min-height: 70px; // Mindesthöhe setzen
+	max-width: 100%;
+	min-width: 0;
+	min-height: 70px;
 	margin-top: var(--outer-margin, 50px);
 	margin-bottom: var(--outer-margin, 50px);
 
@@ -22,7 +24,7 @@
 		background: linear-gradient(
 			to right,
 			var(--overlay-color, #fff) 0%,
-			rgba(255, 255, 255, 0) 100%
+			transparent 100%
 		);
 	}
 
@@ -31,7 +33,7 @@
 		background: linear-gradient(
 			to left,
 			var(--overlay-color, #fff) 0%,
-			rgba(255, 255, 255, 0) 100%
+			transparent 100%
 		);
 	}
 
@@ -52,7 +54,9 @@
 
 .dbw-slider-wrapper {
 	width: 100%;
-	min-height: 70px; // Mindesthöhe
+	max-width: 100%;
+	min-width: 0;
+	min-height: 70px;
 	overflow: hidden;
 }
 
@@ -60,6 +64,7 @@
 	display: flex;
 	align-items: center;
 	width: max-content;
+	max-width: none;
 	animation: dbw-infinity-scroll var(--scroll-duration, 25s) linear infinite;
 	will-change: transform;
 }
@@ -70,16 +75,15 @@
 	align-items: center;
 	justify-content: center;
 	padding: 0 calc(var(--slide-gap, 40px) / 2);
-	min-height: var(--logo-height, 50px); // Mindesthöhe für Items
+	min-height: var(--logo-height, 50px);
 
 	img {
 		display: block;
 		max-height: var(--logo-height, 50px);
-		min-height: var(--logo-height, 50px); // NEU: min-height mit Variable
+		min-height: var(--logo-height, 50px);
 		width: auto;
 		height: auto;
 		object-fit: contain;
-		aspect-ratio: attr(width) / attr(height); // Aspect Ratio beibehalten
 	}
 
 	a {

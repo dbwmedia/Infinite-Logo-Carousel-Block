@@ -1,5 +1,5 @@
 {
-  "translation-revision-date": "2024-01-01 12:00+0000",
+  "translation-revision-date": "2026-02-17 12:00+0000",
   "generator": "Manual",
   "domain": "messages",
   "locale_data": {
@@ -13,7 +13,7 @@
         "Infinite Logo Karussell"
       ],
       "Professional infinity logo carousel with customizable speed, spacing and hover-pause. Perfect for client, partner or sponsor logos.": [
-        "Professionelle Logo-Präsentation für WordPress mit anpassbarer Geschwindigkeit, Abständen und Hover-Pause. Perfekt für Kunden-, Partner- oder Sponsor-Logos."
+        "Professionelles Endlos-Logo-Karussell mit anpassbarer Geschwindigkeit, Abständen und Hover-Pause. Perfekt für Kunden-, Partner- oder Sponsor-Logos."
       ],
       "Images": [
         "Bilder"
@@ -119,6 +119,42 @@
       ],
       "Add Images": [
         "Bilder hinzufügen"
+      ],
+      "Link Settings": [
+        "Link-Einstellungen"
+      ],
+      "Link Target": [
+        "Link-Ziel"
+      ],
+      "Determines where logo links open.": [
+        "Bestimmt, wo Logo-Links geöffnet werden."
+      ],
+      "Same window (_self)": [
+        "Gleiches Fenster (_self)"
+      ],
+      "New window (_blank)": [
+        "Neues Fenster (_blank)"
+      ],
+      "Rel Attributes": [
+        "Rel-Attribute"
+      ],
+      "Separate multiple values with spaces (e.g. 'nofollow sponsored').": [
+        "Mehrere Werte mit Leerzeichen trennen (z.B. 'nofollow sponsored')."
+      ],
+      "Title Attribute (optional)": [
+        "Title-Attribut (optional)"
+      ],
+      "Tooltip text for all logo links.": [
+        "Tooltip-Text für alle Logo-Links."
+      ],
+      "Visit our partner": [
+        "Besuche unseren Partner"
+      ],
+      "Alt Text (optional)": [
+        "Alt-Text (optional)"
+      ],
+      "Describe this logo": [
+        "Beschreiben Sie dieses Logo"
       ]
     }
   }
