@@ -5,7 +5,7 @@
  * Description: A professional infinity logo carousel Gutenberg block with customizable speed, spacing, hover-stop and optional links. Perfect for showcasing partner, client or sponsor logos.
  * Version: 1.1.1
  * Requires at least: 5.8
- * Tested up to: 6.9.1
+ * Tested up to: 6.9
  * Requires PHP: 7.2
  * Author: dbw media
  * Author URI: https://dbw-media.de

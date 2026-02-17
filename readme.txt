@@ -2,7 +2,7 @@
 Contributors: dbwmediadennis
 Tags: logo carousel, infinite scroll, client logos, partner logos, gutenberg
 Requires at least: 5.8
-Tested up to: 6.9.1
+Tested up to: 6.9
 Requires PHP: 7.2
 Stable tag: 1.1.1
 License: GPLv2 or later
