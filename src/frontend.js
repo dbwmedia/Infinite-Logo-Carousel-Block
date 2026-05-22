@@ -41,6 +41,56 @@
 	}
 
 	/**
+	 * Whether an element's resolved background colour is dark. getComputedStyle
+	 * always returns rgb()/rgba(), so this works for theme CSS variables,
+	 * named colours and hex alike — unlike a save-time hex-only check.
+	 *
+	 * @param {HTMLElement} el Element to inspect.
+	 * @return {boolean} True when the background is dark.
+	 */
+	function isBackgroundDark(el) {
+		var parts = getComputedStyle(el).backgroundColor.match(/[\d.]+/g);
+		if (!parts || parts.length < 3) {
+			return true;
+		}
+		var r = parseFloat(parts[0]);
+		var g = parseFloat(parts[1]);
+		var b = parseFloat(parts[2]);
+		return (0.299 * r + 0.587 * g + 0.114 * b) / 255 < 0.55;
+	}
+
+	/**
+	 * Give every filled capsule a logo colour that contrasts its actual
+	 * background. Outline capsules are skipped — they use an explicitly chosen
+	 * logo colour. Runs before the carousel is revealed, so there is no flash
+	 * of an invisible (white-on-white) logo.
+	 *
+	 * @param {HTMLElement} slider The .dbw-partner-slider element.
+	 */
+	function fixCapsuleContrast(slider) {
+		if (
+			!slider.classList.contains("dbw-capsules") ||
+			slider.classList.contains("dbw-cap-outline")
+		) {
+			return;
+		}
+		["dbw-cap-a", "dbw-cap-b"].forEach(function (colorClass) {
+			var sample = slider.querySelector("." + colorClass);
+			if (!sample) {
+				return;
+			}
+			var dark = isBackgroundDark(sample);
+			var add = dark ? "dbw-logo-light" : "dbw-logo-dark";
+			var remove = dark ? "dbw-logo-dark" : "dbw-logo-light";
+			var capsules = slider.querySelectorAll("." + colorClass);
+			for (var i = 0; i < capsules.length; i++) {
+				capsules[i].classList.add(add);
+				capsules[i].classList.remove(remove);
+			}
+		});
+	}
+
+	/**
 	 * Measure the combined width of one full logo set (the first `logoCount`
 	 * items of a track).
 	 *
@@ -243,6 +293,10 @@
 	 */
 	function initSlider(slider) {
 		var tracks = slider.querySelectorAll(".dbw-slider-track");
+
+		// Correct filled-capsule logo contrast against the resolved background
+		// colour — needed when the capsule colour is a theme CSS variable.
+		fixCapsuleContrast(slider);
 
 		// Reveal the carousel only once every track is ready (images loaded
 		// and animation applied). This prevents the visible build-up / shift

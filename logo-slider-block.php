@@ -1,9 +1,9 @@
 <?php
 /**
- * Plugin Name: Infinite Logo Carousel Block
+ * Plugin Name: Logo Slider – Infinite Carousel & Marquee Block
  * Plugin URI: https://wordpress.org/plugins/infinite-logo-carousel-block/
  * Description: A professional infinity logo carousel Gutenberg block with customizable speed, spacing, hover-stop and optional links. Perfect for showcasing partner, client or sponsor logos.
- * Version: 1.4.0
+ * Version: 1.5.0
  * Requires at least: 5.8
  * Tested up to: 7.0
  * Requires PHP: 7.2
@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define plugin constants
-define( 'ILCB_VERSION', '1.4.0' );
+define( 'ILCB_VERSION', '1.5.0' );
 define( 'ILCB_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'ILCB_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'ILCB_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );

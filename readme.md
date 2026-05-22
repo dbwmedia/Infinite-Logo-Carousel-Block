@@ -1,6 +1,6 @@
-# Infinite Logo Carousel Block
+# Logo Slider – Infinite Carousel & Marquee Block
 
-[![WordPress Plugin Version](https://img.shields.io/badge/version-1.4.0-blue)](https://wordpress.org/plugins/infinite-logo-carousel-block/)
+[![WordPress Plugin Version](https://img.shields.io/badge/version-1.5.0-blue)](https://wordpress.org/plugins/infinite-logo-carousel-block/)
 [![License](https://img.shields.io/badge/license-GPL%20v2-green)](https://www.gnu.org/licenses/gpl-2.0.html)
 [![WordPress](https://img.shields.io/badge/WordPress-5.8%2B-blue)](https://wordpress.org/)
 [![Tested up to](https://img.shields.io/badge/tested%20up%20to-7.0-blue)](https://wordpress.org/)
@@ -14,7 +14,7 @@ A professional infinity logo carousel Gutenberg block with customizable speed, s
 
 - **Infinite Scrolling** - Seamless, continuous loop without interruption
 - **Multi-Row Layout** - Spread large logo sets across 2-4 rows with alternating scroll direction and optional varied speeds
-- **Capsule Style** - Optional rounded containers behind logos, uniform or alternating black/white checkerboard
+- **Capsule Style** - Rounded containers behind logos: filled (uniform/alternating checkerboard) or outline, with an optional glow effect
 - **Hover-Pause** - Animation automatically pauses on mouse hover
 - **Touch Support** - Tap to pause/resume on mobile devices
 - **Customizable Speed** - Slow (40s), medium (25s), or fast (15s) scrolling
@@ -159,6 +159,15 @@ npm run format   # Code formatting
 [dbw media](https://dbw-media.de) is a WordPress agency specializing in custom development, Gutenberg blocks, and performance optimization.
 
 ## Changelog
+
+### 1.5.0
+
+- NEW: Outline capsule style - transparent capsules with a colored border instead of a filled background
+- NEW: Optional glow effect for capsules with adjustable intensity (neon-style logo walls)
+- NEW: Adjustable outline border width (Thin / Medium / Thick / Custom)
+- NEW: Logo color control for the outline style (Original / White / Black)
+- FIXED: Capsule logo contrast now works when capsule colors use theme palette variables
+- CHANGED: Plugin renamed to "Logo Slider – Infinite Carousel & Marquee Block"
 
 ### 1.4.0
 

@@ -124,6 +124,28 @@
 	.dbw-logo-dark img {
 		filter: brightness(0);
 	}
+
+	// Outline style: transparent fill with a colored border instead of a
+	// background. Higher specificity (slider has both classes) so it wins
+	// over the .dbw-cap-a/.dbw-cap-b background rules.
+	&.dbw-cap-outline .dbw-capsule {
+		background: transparent;
+		border: var(--capsule-border-width, 2px) solid
+			var(--capsule-color-a, #000000);
+	}
+
+	// Optional glow: a soft box-shadow around each capsule, in its own color.
+	&.dbw-cap-glow {
+		.dbw-cap-a {
+			box-shadow: 0 0 var(--capsule-glow-size, 14px)
+				var(--capsule-color-a, #000000);
+		}
+
+		.dbw-cap-b {
+			box-shadow: 0 0 var(--capsule-glow-size, 14px)
+				var(--capsule-color-b, #ffffff);
+		}
+	}
 }
 
 .dbw-slider-item {

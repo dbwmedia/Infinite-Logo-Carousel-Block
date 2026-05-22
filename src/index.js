@@ -44,6 +44,16 @@ const CAPSULE_PADDING_MAP = {
 };
 
 /**
+ * Border-width presets for the outline capsule style.
+ */
+const CAPSULE_BORDER_MAP = { thin: "1px", medium: "2px", thick: "4px" };
+
+/**
+ * Glow-size (box-shadow blur) presets for the optional capsule glow.
+ */
+const CAPSULE_GLOW_MAP = { subtle: "6px", medium: "14px", strong: "26px" };
+
+/**
  * Current block attributes (v1.4+).
  */
 const BLOCK_ATTRIBUTES = {
@@ -71,6 +81,12 @@ const BLOCK_ATTRIBUTES = {
 	capsulePaddingCustom: { type: "number", default: 12 },
 	capsuleColorA: { type: "string", default: "#000000" },
 	capsuleColorB: { type: "string", default: "#ffffff" },
+	capsuleBorderWidth: { type: "string", default: "medium" },
+	capsuleBorderWidthCustom: { type: "number", default: 2 },
+	capsuleLogoColor: { type: "string", default: "original" },
+	capsuleGlow: { type: "boolean", default: false },
+	capsuleGlowSize: { type: "string", default: "medium" },
+	capsuleGlowSizeCustom: { type: "number", default: 12 },
 };
 
 /**
@@ -113,7 +129,15 @@ function sliderClasses(attributes) {
 	if (attributes.layout === "rows") classes.push("dbw-layout-rows");
 	if (!attributes.overlayEnabled) classes.push("no-overlay");
 	if (attributes.blackLogos) classes.push("black-logos");
-	if (attributes.capsuleEnabled) classes.push("dbw-capsules");
+	if (attributes.capsuleEnabled) {
+		classes.push("dbw-capsules");
+		if (attributes.capsuleStyle === "outline") {
+			classes.push("dbw-cap-outline");
+		}
+		if (attributes.capsuleGlow) {
+			classes.push("dbw-cap-glow");
+		}
+	}
 	return classes.join(" ");
 }
 
@@ -139,6 +163,14 @@ function sliderStyle(attributes) {
 		const pad = getCapsulePadding(attributes);
 		style["--capsule-pad-y"] = pad.y;
 		style["--capsule-pad-x"] = pad.x;
+		// Emitted only for the styles that need them, so existing capsule
+		// content keeps producing identical output.
+		if (attributes.capsuleStyle === "outline") {
+			style["--capsule-border-width"] = getCapsuleBorderWidth(attributes);
+		}
+		if (attributes.capsuleGlow) {
+			style["--capsule-glow-size"] = getCapsuleGlowSize(attributes);
+		}
 	}
 	// Row gap is only emitted for a non-default value, so multi-row content
 	// created before this option still produces identical output.
@@ -177,6 +209,26 @@ function getCapsulePadding(attributes) {
 }
 
 /**
+ * Resolve the outline border width from the preset (or custom value).
+ */
+function getCapsuleBorderWidth(attributes) {
+	if (attributes.capsuleBorderWidth === "custom") {
+		return (parseInt(attributes.capsuleBorderWidthCustom, 10) || 0) + "px";
+	}
+	return CAPSULE_BORDER_MAP[attributes.capsuleBorderWidth] || "2px";
+}
+
+/**
+ * Resolve the glow size (box-shadow blur) from the preset (or custom value).
+ */
+function getCapsuleGlowSize(attributes) {
+	if (attributes.capsuleGlowSize === "custom") {
+		return (parseInt(attributes.capsuleGlowSizeCustom, 10) || 0) + "px";
+	}
+	return CAPSULE_GLOW_MAP[attributes.capsuleGlowSize] || "14px";
+}
+
+/**
  * Rough perceived-luminance check — used to pick a contrasting (black or
  * white) logo colour for a given capsule background.
  */
@@ -202,13 +254,26 @@ function wrapInCapsule(content, rowIndex, index, capsuleProps) {
 	const useB =
 		capsuleProps.style === "alternating" && (rowIndex + index) % 2 === 1;
 	const colorClass = useB ? "dbw-cap-b" : "dbw-cap-a";
-	const isDark = useB ? capsuleProps.colorBDark : capsuleProps.colorADark;
-	const logoClass = isDark ? "dbw-logo-light" : "dbw-logo-dark";
-	return (
-		<div className={"dbw-capsule " + colorClass + " " + logoClass}>
-			{content}
-		</div>
-	);
+
+	let logoClass;
+	if (capsuleProps.style === "outline") {
+		// Outline has no fill colour, so the logo colour is chosen explicitly.
+		logoClass =
+			capsuleProps.logoColor === "white"
+				? "dbw-logo-light"
+				: capsuleProps.logoColor === "black"
+					? "dbw-logo-dark"
+					: "";
+	} else {
+		// Filled capsule: auto-contrast the logo against the background.
+		const isDark = useB
+			? capsuleProps.colorBDark
+			: capsuleProps.colorADark;
+		logoClass = isDark ? "dbw-logo-light" : "dbw-logo-dark";
+	}
+
+	const className = ("dbw-capsule " + colorClass + " " + logoClass).trim();
+	return <div className={className}>{content}</div>;
 }
 
 /**
@@ -478,7 +543,7 @@ const deprecatedSaveV120 = ({ attributes }) => {
 /* -------------------------------------------------------------------------- */
 
 registerBlockType("infinite-logo-carousel-block/carousel", {
-	title: __("Infinite Logo Carousel", "infinite-logo-carousel-block"),
+	title: __("Logo Slider", "infinite-logo-carousel-block"),
 	description: __(
 		"Professional infinity logo carousel with customizable speed, spacing and hover-pause. Perfect for client, partner or sponsor logos.",
 		"infinite-logo-carousel-block"
@@ -524,6 +589,12 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 			capsulePaddingCustom,
 			capsuleColorA,
 			capsuleColorB,
+			capsuleBorderWidth,
+			capsuleBorderWidthCustom,
+			capsuleLogoColor,
+			capsuleGlow,
+			capsuleGlowSize,
+			capsuleGlowSizeCustom,
 		} = attributes;
 
 		const addImage = (selection) => {
@@ -807,6 +878,7 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 									options={[
 										{ label: __("Uniform", "infinite-logo-carousel-block"), value: "uniform" },
 										{ label: __("Alternating", "infinite-logo-carousel-block"), value: "alternating" },
+											{ label: __("Outline", "infinite-logo-carousel-block"), value: "outline" },
 									]}
 									onChange={(val) => setAttributes({ capsuleStyle: val })}
 								/>
@@ -877,7 +949,72 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 											  ]
 									}
 								/>
-								{capsuleStyle === "alternating" && (
+								{capsuleStyle === "outline" && (
+										<SelectControl
+											label={__("Border Width", "infinite-logo-carousel-block")}
+											value={capsuleBorderWidth}
+											options={[
+												{ label: __("Thin", "infinite-logo-carousel-block"), value: "thin" },
+												{ label: __("Medium", "infinite-logo-carousel-block"), value: "medium" },
+												{ label: __("Thick", "infinite-logo-carousel-block"), value: "thick" },
+												{ label: __("Custom", "infinite-logo-carousel-block"), value: "custom" },
+											]}
+											onChange={(val) => setAttributes({ capsuleBorderWidth: val })}
+										/>
+									)}
+									{capsuleStyle === "outline" && capsuleBorderWidth === "custom" && (
+										<RangeControl
+											label={__("Custom Border Width (px)", "infinite-logo-carousel-block")}
+											value={capsuleBorderWidthCustom}
+											onChange={(val) => setAttributes({ capsuleBorderWidthCustom: val })}
+											min={1}
+											max={10}
+											step={1}
+										/>
+									)}
+									{capsuleStyle === "outline" && (
+										<SelectControl
+											label={__("Logo Color", "infinite-logo-carousel-block")}
+											help={__("Outline capsules have no background - choose how the logos are colored.", "infinite-logo-carousel-block")}
+											value={capsuleLogoColor}
+											options={[
+												{ label: __("Original", "infinite-logo-carousel-block"), value: "original" },
+												{ label: __("White", "infinite-logo-carousel-block"), value: "white" },
+												{ label: __("Black", "infinite-logo-carousel-block"), value: "black" },
+											]}
+											onChange={(val) => setAttributes({ capsuleLogoColor: val })}
+										/>
+									)}
+									<ToggleControl
+										label={__("Glow Effect", "infinite-logo-carousel-block")}
+										help={__("Adds a soft colored glow around each capsule.", "infinite-logo-carousel-block")}
+										checked={capsuleGlow}
+										onChange={(val) => setAttributes({ capsuleGlow: val })}
+									/>
+									{capsuleGlow && (
+										<SelectControl
+											label={__("Glow Intensity", "infinite-logo-carousel-block")}
+											value={capsuleGlowSize}
+											options={[
+												{ label: __("Subtle", "infinite-logo-carousel-block"), value: "subtle" },
+												{ label: __("Medium", "infinite-logo-carousel-block"), value: "medium" },
+												{ label: __("Strong", "infinite-logo-carousel-block"), value: "strong" },
+												{ label: __("Custom", "infinite-logo-carousel-block"), value: "custom" },
+											]}
+											onChange={(val) => setAttributes({ capsuleGlowSize: val })}
+										/>
+									)}
+									{capsuleGlow && capsuleGlowSize === "custom" && (
+										<RangeControl
+											label={__("Custom Glow Size (px)", "infinite-logo-carousel-block")}
+											value={capsuleGlowSizeCustom}
+											onChange={(val) => setAttributes({ capsuleGlowSizeCustom: val })}
+											min={0}
+											max={60}
+											step={2}
+										/>
+									)}
+									{capsuleStyle === "alternating" && (
 									<p>
 										{__("For a flawless checkerboard, use an even total number of logos.", "infinite-logo-carousel-block")}
 									</p>
@@ -983,6 +1120,7 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 			capsuleStyle,
 			capsuleColorA,
 			capsuleColorB,
+			capsuleLogoColor,
 		} = attributes;
 
 		const linkProps = { linkTarget, linkRel, linkTitle };
@@ -991,6 +1129,7 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 			style: capsuleStyle,
 			colorADark: isColorDark(capsuleColorA),
 			colorBDark: isColorDark(capsuleColorB),
+			logoColor: capsuleLogoColor,
 		};
 
 		// A capsule checkerboard must alternate without two same-coloured

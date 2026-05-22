@@ -1,10 +1,10 @@
-=== Infinite Logo Carousel Block ===
+=== Logo Slider – Infinite Carousel & Marquee Block ===
 Contributors: dbwmediadennis
-Tags: logo carousel, infinite scroll, client logos, partner logos, gutenberg
+Tags: logo carousel, logo slider, logo showcase, logo marquee, client logos
 Requires at least: 5.8
 Tested up to: 7.0
 Requires PHP: 7.2
-Stable tag: 1.4.0
+Stable tag: 1.5.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,13 +12,13 @@ Infinity logo carousel for client, partner or sponsor logos with custom speed.
 
 == Description ==
 
-The **Infinite Logo Carousel Block** is a powerful and user-friendly Gutenberg block that displays your logos in an elegant, infinitely scrolling carousel. Perfect for showcasing client logos, partner brands, sponsors, or any collection of logos on your WordPress website.
+**Logo Slider** is a powerful and user-friendly Gutenberg block that displays your logos in an elegant, infinitely scrolling carousel. Perfect for showcasing client logos, partner brands, sponsors, or any collection of logos on your WordPress website.
 
 = Key Features =
 
 * **Infinite Scrolling** - Seamless, continuous loop without interruption
 * **Multi-Row Layout** - Spread large logo sets across 2-4 rows with alternating scroll direction
-* **Capsule Style** - Optional rounded containers behind logos, uniform or alternating checkerboard
+* **Capsule Style** - Rounded containers behind logos: filled (uniform or alternating checkerboard) or outline, with an optional glow effect
 * **Hover-Pause** - Animation automatically pauses on mouse hover
 * **Customizable Speed** - Choose between slow, medium, and fast scrolling
 * **Flexible Logo Spacing** - Small, medium, or large gaps between logos
@@ -168,6 +168,14 @@ Yes, the plugin doesn't collect, store, or transmit any personal data. It's comp
 
 == Changelog ==
 
+= 1.5.0 =
+* NEW: Outline capsule style - transparent capsules with a colored border instead of a filled background
+* NEW: Optional glow effect for capsules with adjustable intensity - ideal for neon-style logo walls
+* NEW: Adjustable outline border width (Thin / Medium / Thick / Custom)
+* NEW: Logo color control for the outline style (Original / White / Black)
+* FIXED: Capsule logo contrast now works correctly when capsule colors use theme palette variables
+* CHANGED: Plugin renamed to "Logo Slider – Infinite Carousel & Marquee Block" for clarity and discoverability
+
 = 1.4.0 =
 * NEW: Capsule style - place each logo inside a rounded background container
 * NEW: Corner style with Square / Rounded / Pill presets plus a custom radius
@@ -250,6 +258,9 @@ Yes, the plugin doesn't collect, store, or transmit any personal data. It's comp
 * WordPress 6.8 compatibility
 
 == Upgrade Notice ==
+
+= 1.5.0 =
+New outline capsule style with an optional glow effect. The plugin has also been renamed to "Logo Slider – Infinite Carousel & Marquee Block".
 
 = 1.4.0 =
 New capsule style: display your logos inside rounded containers, with a uniform or alternating checkerboard look.

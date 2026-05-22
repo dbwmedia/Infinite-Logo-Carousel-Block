@@ -4,7 +4,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Infinite Logo Carousel Block 1.4.0\n"
+"Project-Id-Version: Logo Slider 1.5.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/infinite-logo-carousel-block/\n"
 "POT-Creation-Date: 2026-05-22 12:00+0000\n"
 "PO-Revision-Date: 2026-05-22 12:00+0000\n"
@@ -287,3 +287,55 @@ msgstr "Eigene Geschwindigkeit (Sekunden)"
 
 msgid "A higher value means slower scrolling."
 msgstr "Ein höherer Wert bedeutet langsameres Scrollen."
+
+# New strings for v1.5 (outline style, glow, rename)
+msgid "Logo Slider"
+msgstr "Logo Slider"
+
+msgid "Outline"
+msgstr "Umriss"
+
+msgid "Border Width"
+msgstr "Rahmenstärke"
+
+msgid "Thin"
+msgstr "Dünn"
+
+msgid "Thick"
+msgstr "Dick"
+
+msgid "Custom Border Width (px)"
+msgstr "Eigene Rahmenstärke (px)"
+
+msgid "Logo Color"
+msgstr "Logo-Farbe"
+
+msgid "Outline capsules have no background - choose how the logos are colored."
+msgstr "Umriss-Kapseln haben keinen Hintergrund – wähle, wie die Logos eingefärbt werden."
+
+msgid "Original"
+msgstr "Original"
+
+msgid "White"
+msgstr "Weiß"
+
+msgid "Black"
+msgstr "Schwarz"
+
+msgid "Glow Effect"
+msgstr "Leucht-Effekt"
+
+msgid "Adds a soft colored glow around each capsule."
+msgstr "Fügt jeder Kapsel einen sanften farbigen Schein hinzu."
+
+msgid "Glow Intensity"
+msgstr "Leuchtstärke"
+
+msgid "Subtle"
+msgstr "Dezent"
+
+msgid "Strong"
+msgstr "Stark"
+
+msgid "Custom Glow Size (px)"
+msgstr "Eigene Leuchtstärke (px)"

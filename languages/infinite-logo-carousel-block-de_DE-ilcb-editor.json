@@ -251,6 +251,57 @@
       ],
       "A higher value means slower scrolling.": [
         "Ein höherer Wert bedeutet langsameres Scrollen."
+      ],
+      "Logo Slider": [
+        "Logo Slider"
+      ],
+      "Outline": [
+        "Umriss"
+      ],
+      "Border Width": [
+        "Rahmenstärke"
+      ],
+      "Thin": [
+        "Dünn"
+      ],
+      "Thick": [
+        "Dick"
+      ],
+      "Custom Border Width (px)": [
+        "Eigene Rahmenstärke (px)"
+      ],
+      "Logo Color": [
+        "Logo-Farbe"
+      ],
+      "Outline capsules have no background - choose how the logos are colored.": [
+        "Umriss-Kapseln haben keinen Hintergrund – wähle, wie die Logos eingefärbt werden."
+      ],
+      "Original": [
+        "Original"
+      ],
+      "White": [
+        "Weiß"
+      ],
+      "Black": [
+        "Schwarz"
+      ],
+      "Glow Effect": [
+        "Leucht-Effekt"
+      ],
+      "Adds a soft colored glow around each capsule.": [
+        "Fügt jeder Kapsel einen sanften farbigen Schein hinzu."
+      ],
+      "Glow Intensity": [
+        "Leuchtstärke"
+      ],
+      "Subtle": [
+        "Dezent"
+      ],
+      "Strong": [
+        "Stark"
+      ],
+      "Custom Glow Size (px)": [
+        "Eigene Leuchtstärke (px)"
       ]
     }
   }
