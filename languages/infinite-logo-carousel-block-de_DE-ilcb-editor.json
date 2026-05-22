@@ -1,5 +1,5 @@
 {
-  "translation-revision-date": "2026-02-17 12:00+0000",
+  "translation-revision-date": "2026-05-22 12:00+0000",
   "generator": "Manual",
   "domain": "messages",
   "locale_data": {
@@ -155,6 +155,36 @@
       ],
       "Describe this logo": [
         "Beschreiben Sie dieses Logo"
+      ],
+      "Layout": [
+        "Layout"
+      ],
+      "Display Mode": [
+        "Anzeigemodus"
+      ],
+      "Single Row": [
+        "Einzelne Reihe"
+      ],
+      "Multiple Rows": [
+        "Mehrere Reihen"
+      ],
+      "Number of Rows": [
+        "Anzahl der Reihen"
+      ],
+      "Row Speed": [
+        "Reihen-Geschwindigkeit"
+      ],
+      "Uniform": [
+        "Einheitlich"
+      ],
+      "Varied": [
+        "Variiert"
+      ],
+      "Uniform: all rows move at the same speed. Varied: each row moves slightly differently for a more dynamic look.": [
+        "Einheitlich: Alle Reihen bewegen sich gleich schnell. Variiert: Jede Reihe bewegt sich leicht unterschiedlich für ein dynamischeres Erscheinungsbild."
+      ],
+      "Logos are distributed evenly across the rows. Adjacent rows scroll in opposite directions.": [
+        "Die Logos werden gleichmäßig auf die Reihen verteilt. Benachbarte Reihen scrollen in entgegengesetzte Richtungen."
       ]
     }
   }

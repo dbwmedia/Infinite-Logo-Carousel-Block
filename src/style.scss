@@ -8,6 +8,20 @@
 	margin-top: var(--outer-margin, 50px);
 	margin-bottom: var(--outer-margin, 50px);
 
+	// Smooth initial load: start hidden and let the frontend script reveal
+	// the carousel (.dbw-ready) once every row is measured and its images
+	// are loaded. The delayed keyframe is a pure-CSS safety net that reveals
+	// the carousel even if the script never runs; a <noscript> rule keeps it
+	// visible when JavaScript is disabled.
+	opacity: 0;
+	animation: dbw-reveal-fallback 0.4s ease 5s forwards;
+
+	&.dbw-ready {
+		opacity: 1;
+		animation: none;
+		transition: opacity 0.4s ease;
+	}
+
 	&::before,
 	&::after {
 		content: "";
@@ -67,6 +81,19 @@
 	max-width: none;
 	animation: dbw-infinity-scroll var(--scroll-duration, 25s) linear infinite;
 	will-change: transform;
+
+	// Reverse-scrolling rows (no-JS fallback; the frontend script applies its
+	// own exact-width animation including direction).
+	&[data-direction="reverse"] {
+		animation-direction: reverse;
+	}
+}
+
+// Multi-row layout: each row is its own wrapper/track, stacked vertically.
+.dbw-layout-rows {
+	.dbw-slider-wrapper + .dbw-slider-wrapper {
+		margin-top: var(--row-gap, 24px);
+	}
 }
 
 .dbw-slider-item {
@@ -79,6 +106,10 @@
 
 	img {
 		display: block;
+		// max-width: none defeats the theme's global `img { max-width: 100% }`,
+		// which could otherwise squeeze wide logos. width stays driven purely
+		// by the logo's aspect ratio so nothing is ever cropped.
+		max-width: none;
 		max-height: var(--logo-height, 50px);
 		min-height: var(--logo-height, 50px);
 		width: auto;
@@ -98,5 +129,20 @@
 	}
 	100% {
 		transform: translateX(-50%);
+	}
+}
+
+// Pure-CSS safety net for the initial reveal (see .dbw-partner-slider).
+@keyframes dbw-reveal-fallback {
+	to {
+		opacity: 1;
+	}
+}
+
+// Accessibility: respect the reduced-motion preference. !important also
+// overrides the inline animation applied by the frontend script.
+@media (prefers-reduced-motion: reduce) {
+	.dbw-slider-track {
+		animation: none !important;
 	}
 }

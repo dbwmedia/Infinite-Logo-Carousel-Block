@@ -1,103 +1,308 @@
 /**
- * Logo Slider Block Frontend Script
- * Calculates exact width for perfect infinity loop
+ * Infinite Logo Carousel Block – Frontend Script
+ *
+ * Builds a per-track keyframe animation sized to exactly one logo set, so the
+ * loop is seamless regardless of logo count or individual image dimensions.
+ * Supports single-row and multi-row layouts (each row is its own track and can
+ * scroll in either direction).
+ *
+ * Key design points:
+ * - The carousel starts hidden (CSS) and is revealed only once every track is
+ *   ready, so the visitor never sees the layout build up / shift on load.
+ * - The width is measured only AFTER the first logo set of a track has finished
+ *   loading. Measuring earlier (e.g. with lazy-loaded, not-yet-loaded images)
+ *   yields zero-width images and therefore a frozen carousel.
+ * - A ResizeObserver keeps the animation correct when a track changes size
+ *   later on (responsive breakpoints, lazy/late-loading images, web fonts).
  */
-
 (function () {
 	"use strict";
 
-	function initLogoSliders() {
-		const sliders = document.querySelectorAll(".dbw-partner-slider");
+	var SETTLE_DELAY = 250; // Debounce (ms) for the no-ResizeObserver fallback.
 
-		sliders.forEach((slider) => {
-			if (slider.dataset.initialized === "true") return;
+	/**
+	 * Whether the visitor has asked for reduced motion. The carousel then stays
+	 * static (the matching CSS media query also disables the fallback animation).
+	 *
+	 * @return {boolean} True when reduced motion is preferred.
+	 */
+	function prefersReducedMotion() {
+		return (
+			typeof window.matchMedia === "function" &&
+			window.matchMedia("(prefers-reduced-motion: reduce)").matches
+		);
+	}
 
-			const track = slider.querySelector(".dbw-slider-track");
-			if (!track) return;
+	/**
+	 * Measure the combined width of one full logo set (the first `logoCount`
+	 * items of a track).
+	 *
+	 * @param {NodeList} items     All slider items inside the track.
+	 * @param {number}   logoCount Number of items that form one set.
+	 * @return {number} Width of one set in pixels.
+	 */
+	function measureSetWidth(items, logoCount) {
+		var width = 0;
+		for (var i = 0; i < logoCount && i < items.length; i++) {
+			width += items[i].getBoundingClientRect().width;
+		}
+		return width;
+	}
 
-			const items = track.querySelectorAll(".dbw-slider-item");
-			if (items.length === 0) return;
+	/**
+	 * Apply (or update) the scroll animation for a single track.
+	 *
+	 * Skips work when the measured width has not meaningfully changed, so the
+	 * animation does not restart on every sub-pixel layout fluctuation.
+	 *
+	 * @param {HTMLElement} track    The .dbw-slider-track element.
+	 * @param {number}      setWidth Width of one logo set in pixels.
+	 */
+	function applyAnimation(track, setWidth) {
+		// Without a usable measurement we leave the CSS fallback animation in place.
+		if (setWidth < 1) {
+			return;
+		}
 
-			const logoCount =
-				parseInt(slider.style.getPropertyValue("--logo-count")) || 0;
-			if (logoCount === 0) return;
+		// Ignore sub-pixel jitter so the animation does not restart needlessly.
+		if (Math.abs(setWidth - (track._dbwSetWidth || 0)) < 1) {
+			return;
+		}
+		track._dbwSetWidth = setWidth;
 
-			// Calculate width of one complete set of logos
-			let setWidth = 0;
-			for (let i = 0; i < logoCount && i < items.length; i++) {
-				setWidth += items[i].getBoundingClientRect().width;
+		// One stable keyframe name per track, reused across recalculations.
+		var animationName = track._dbwAnimName;
+		if (!animationName) {
+			animationName = "dbw-scroll-" + Math.random().toString(36).slice(2, 11);
+			track._dbwAnimName = animationName;
+		}
+
+		// A dedicated <style> element per track keeps the lifecycle clean.
+		var styleEl = track._dbwStyleEl;
+		if (!styleEl) {
+			styleEl = document.createElement("style");
+			document.head.appendChild(styleEl);
+			track._dbwStyleEl = styleEl;
+		}
+		styleEl.textContent =
+			"@keyframes " + animationName + "{" +
+			"0%{transform:translateX(0)}" +
+			"100%{transform:translateX(-" + setWidth + "px)}}";
+
+		var duration = (
+			getComputedStyle(track).getPropertyValue("--scroll-duration") || "25s"
+		).trim();
+		var reverse = track.dataset.direction === "reverse";
+		track.style.animation =
+			animationName + " " + duration + " linear infinite" +
+			(reverse ? " reverse" : "");
+	}
+
+	/**
+	 * Invoke `callback` once every image in `images` has finished loading
+	 * (or failed). Resolves immediately when there is nothing to wait for.
+	 *
+	 * @param {HTMLImageElement[]} images   Images to wait for.
+	 * @param {Function}           callback Called once when all images settled.
+	 */
+	function whenImagesReady(images, callback) {
+		var pending = images.length;
+		if (pending === 0) {
+			callback();
+			return;
+		}
+		var settle = function () {
+			pending--;
+			if (pending === 0) {
+				callback();
 			}
-
-			// Create specific keyframe animation for this slider
-			const animationName =
-				"dbw-scroll-" + Math.random().toString(36).substr(2, 9);
-
-			// Use dedicated style element per slider for clean lifecycle management
-			let styleEl = slider._dbwStyleEl;
-			if (!styleEl) {
-				styleEl = document.createElement("style");
-				document.head.appendChild(styleEl);
-				slider._dbwStyleEl = styleEl;
+		};
+		images.forEach(function (img) {
+			if (img.complete) {
+				settle();
+			} else {
+				img.addEventListener("load", settle, { once: true });
+				img.addEventListener("error", settle, { once: true });
 			}
-			styleEl.textContent =
-				"@keyframes " + animationName + " { " +
-				"0% { transform: translateX(0); } " +
-				"100% { transform: translateX(-" + setWidth + "px); } " +
-				"}";
-
-			// Apply animation
-			const duration =
-				getComputedStyle(slider).getPropertyValue("--scroll-duration") || "25s";
-			track.style.animation = animationName + " " + duration + " linear infinite";
-
-			// Hover pause
-			slider.addEventListener("mouseenter", function () {
-				track.style.animationPlayState = "paused";
-			});
-			slider.addEventListener("mouseleave", function () {
-				track.style.animationPlayState = "running";
-			});
-
-			// Touch support: tap to toggle pause
-			var touchPaused = false;
-			slider.addEventListener("touchstart", function (e) {
-				if (e.touches.length === 1) {
-					touchPaused = !touchPaused;
-					track.style.animationPlayState = touchPaused ? "paused" : "running";
-				}
-			}, { passive: true });
-
-			slider.dataset.initialized = "true";
 		});
 	}
 
-	// Initialize when DOM ready
+	/**
+	 * Initialise a single track: measure, animate and keep it self-healing.
+	 *
+	 * `onReady` is invoked exactly once as soon as the track is ready to be
+	 * shown – on every code path, so the slider can never stay hidden.
+	 *
+	 * @param {HTMLElement} track   The .dbw-slider-track element.
+	 * @param {HTMLElement} slider  The parent .dbw-partner-slider element.
+	 * @param {Function}    onReady Called once when this track is ready.
+	 */
+	function initTrack(track, slider, onReady) {
+		var items = track.querySelectorAll(".dbw-slider-item");
+		if (items.length === 0) {
+			onReady();
+			return;
+		}
+
+		// Logo count: per-track data attribute (v1.3+), with a fallback to the
+		// slider-level CSS variable for content saved before v1.3.
+		var logoCount = parseInt(track.dataset.logoCount, 10);
+		if (!logoCount) {
+			logoCount =
+				parseInt(slider.style.getPropertyValue("--logo-count"), 10) || 0;
+		}
+		if (logoCount === 0) {
+			onReady();
+			return;
+		}
+
+		// Respect the reduced-motion preference: leave the row completely
+		// static instead of building and applying a scroll animation.
+		if (prefersReducedMotion()) {
+			onReady();
+			return;
+		}
+
+		// Animation is only applied once the first logo set has loaded; before
+		// that any measurement would be wrong and freeze the carousel.
+		var imagesReady = false;
+
+		var recalc = function () {
+			if (!imagesReady) {
+				return;
+			}
+			applyAnimation(track, measureSetWidth(items, logoCount));
+		};
+
+		// Collect the images of the first set and start once they are loaded.
+		var firstSet = [];
+		for (var i = 0; i < logoCount && i < items.length; i++) {
+			var img = items[i].querySelector("img");
+			if (img) {
+				firstSet.push(img);
+			}
+		}
+		whenImagesReady(firstSet, function () {
+			imagesReady = true;
+			recalc();
+			onReady();
+		});
+
+		// Self-healing: re-measure whenever the track changes size – responsive
+		// breakpoints, lazy/late-loading images, web fonts swapping in, etc.
+		if (typeof ResizeObserver !== "undefined") {
+			var rafId;
+			var observer = new ResizeObserver(function () {
+				cancelAnimationFrame(rafId);
+				rafId = requestAnimationFrame(recalc);
+			});
+			observer.observe(track);
+			track._dbwObserver = observer;
+		} else {
+			// Fallback for browsers without ResizeObserver support.
+			var resizeTimer;
+			window.addEventListener("resize", function () {
+				clearTimeout(resizeTimer);
+				resizeTimer = setTimeout(recalc, SETTLE_DELAY);
+			});
+		}
+	}
+
+	/**
+	 * Pause or resume every track of a slider at once.
+	 *
+	 * @param {HTMLElement} slider The .dbw-partner-slider element.
+	 * @param {string}      state  "paused" or "running".
+	 */
+	function setPlayState(slider, state) {
+		var tracks = slider.querySelectorAll(".dbw-slider-track");
+		for (var i = 0; i < tracks.length; i++) {
+			tracks[i].style.animationPlayState = state;
+		}
+	}
+
+	/**
+	 * Initialise a slider: every track inside it, the shared hover/touch pause
+	 * behaviour, and the reveal once all tracks are ready.
+	 *
+	 * @param {HTMLElement} slider The .dbw-partner-slider element.
+	 */
+	function initSlider(slider) {
+		var tracks = slider.querySelectorAll(".dbw-slider-track");
+
+		// Reveal the carousel only once every track is ready (images loaded
+		// and animation applied). This prevents the visible build-up / shift
+		// while images and layout are still settling.
+		var revealed = false;
+		var reveal = function () {
+			if (revealed) {
+				return;
+			}
+			revealed = true;
+			slider.classList.add("dbw-ready");
+		};
+
+		if (tracks.length === 0) {
+			reveal();
+			return;
+		}
+
+		var pending = tracks.length;
+		var trackReady = function () {
+			pending--;
+			if (pending === 0) {
+				reveal();
+			}
+		};
+
+		tracks.forEach(function (track) {
+			initTrack(track, slider, trackReady);
+		});
+
+		// Pause on hover (desktop / pointer devices).
+		slider.addEventListener("mouseenter", function () {
+			setPlayState(slider, "paused");
+		});
+		slider.addEventListener("mouseleave", function () {
+			setPlayState(slider, "running");
+		});
+
+		// Tap to toggle pause (touch devices).
+		var touchPaused = false;
+		slider.addEventListener(
+			"touchstart",
+			function (e) {
+				if (e.touches.length === 1) {
+					touchPaused = !touchPaused;
+					setPlayState(slider, touchPaused ? "paused" : "running");
+				}
+			},
+			{ passive: true }
+		);
+	}
+
+	/**
+	 * Find and initialise every carousel on the page exactly once.
+	 */
+	function initLogoSliders() {
+		var sliders = document.querySelectorAll(".dbw-partner-slider");
+		sliders.forEach(function (slider) {
+			if (slider.dataset.initialized === "true") {
+				return;
+			}
+			slider.dataset.initialized = "true";
+			initSlider(slider);
+		});
+	}
+
+	// Initialise as soon as the DOM is ready.
 	if (document.readyState === "loading") {
 		document.addEventListener("DOMContentLoaded", initLogoSliders);
 	} else {
 		initLogoSliders();
 	}
 
-	// Re-initialize on resize (debounced)
-	var resizeTimeout;
-	window.addEventListener("resize", function () {
-		clearTimeout(resizeTimeout);
-		resizeTimeout = setTimeout(function () {
-			document.querySelectorAll(".dbw-partner-slider").forEach(function (slider) {
-				slider.dataset.initialized = "false";
-				var track = slider.querySelector(".dbw-slider-track");
-				if (track) {
-					track.style.animation = "";
-				}
-				if (slider._dbwStyleEl) {
-					slider._dbwStyleEl.textContent = "";
-				}
-			});
-			initLogoSliders();
-		}, 250);
-	});
-
-	// For Gutenberg live preview
+	// Gutenberg editor live preview (harmless on the front end).
 	if (window.wp && window.wp.domReady) {
 		window.wp.domReady(function () {
 			setTimeout(initLogoSliders, 100);

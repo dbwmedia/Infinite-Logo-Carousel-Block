@@ -2,9 +2,9 @@
 Contributors: dbwmediadennis
 Tags: logo carousel, infinite scroll, client logos, partner logos, gutenberg
 Requires at least: 5.8
-Tested up to: 6.9
+Tested up to: 7.0
 Requires PHP: 7.2
-Stable tag: 1.2.0
+Stable tag: 1.3.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -17,6 +17,7 @@ The **Infinite Logo Carousel Block** is a powerful and user-friendly Gutenberg b
 = Key Features =
 
 * **Infinite Scrolling** - Seamless, continuous loop without interruption
+* **Multi-Row Layout** - Spread large logo sets across 2-4 rows with alternating scroll direction
 * **Hover-Pause** - Animation automatically pauses on mouse hover
 * **Customizable Speed** - Choose between slow, medium, and fast scrolling
 * **Flexible Logo Spacing** - Small, medium, or large gaps between logos
@@ -166,6 +167,18 @@ Yes, the plugin doesn't collect, store, or transmit any personal data. It's comp
 
 == Changelog ==
 
+= 1.3.0 =
+* NEW: Multi-row layout - display logos across 2 to 4 rows, ideal for large logo collections
+* NEW: Alternating scroll direction - in multi-row layout, adjacent rows scroll in opposite directions
+* NEW: Row speed modes - choose uniform speed for all rows or varied speed for a livelier, more dynamic look
+* NEW: Respects the "prefers-reduced-motion" accessibility setting - the carousel stays static for visitors who prefer reduced motion
+* FIXED: Carousel could stay frozen when logo images were lazy-loaded (scroll width was measured before the images had loaded)
+* IMPROVED: Logo images now include width and height attributes - less layout shift (CLS) and better Core Web Vitals
+* IMPROVED: Frontend script re-measures automatically via ResizeObserver - self-healing animation on responsive changes and late-loading images
+* IMPROVED: Smoother initial load - the carousel now fades in once it is fully ready instead of visibly building up / shifting
+* IMPROVED: Corrected block category - the block now appears under "Media" in the block inserter
+* Confirmed compatibility with WordPress 7.0
+
 = 1.2.0 =
 * NEW: Alt text field for each logo (accessibility & SEO)
 * NEW: Touch support - tap to pause/resume on mobile devices
@@ -226,13 +239,11 @@ Yes, the plugin doesn't collect, store, or transmit any personal data. It's comp
 
 == Upgrade Notice ==
 
+= 1.3.0 =
+New multi-row layout for large logo collections, plus a fix for carousels that could freeze with lazy-loaded images.
+
 = 1.0.0 =
 Initial release of Infinite Logo Carousel Block. Start showcasing your client, partner, or sponsor logos professionally!
-
-== Source Code ==
-   
-   The source code for this plugin is available at:
-   https://github.com/dbw-media/Infinite-Logo-Carousel-Block
 
 == Source Code ==
 

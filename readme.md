@@ -1,9 +1,9 @@
 # Infinite Logo Carousel Block
 
-[![WordPress Plugin Version](https://img.shields.io/badge/version-1.2.0-blue)](https://wordpress.org/plugins/infinite-logo-carousel-block/)
+[![WordPress Plugin Version](https://img.shields.io/badge/version-1.3.0-blue)](https://wordpress.org/plugins/infinite-logo-carousel-block/)
 [![License](https://img.shields.io/badge/license-GPL%20v2-green)](https://www.gnu.org/licenses/gpl-2.0.html)
 [![WordPress](https://img.shields.io/badge/WordPress-5.8%2B-blue)](https://wordpress.org/)
-[![Tested up to](https://img.shields.io/badge/tested%20up%20to-6.9-blue)](https://wordpress.org/)
+[![Tested up to](https://img.shields.io/badge/tested%20up%20to-7.0-blue)](https://wordpress.org/)
 [![PHP](https://img.shields.io/badge/PHP-7.2%2B-purple)](https://php.net/)
 
 A professional infinity logo carousel Gutenberg block with customizable speed, spacing and hover-pause. Perfect for showcasing client, partner or sponsor logos.
@@ -13,6 +13,7 @@ A professional infinity logo carousel Gutenberg block with customizable speed, s
 ### Core Functionality
 
 - **Infinite Scrolling** - Seamless, continuous loop without interruption
+- **Multi-Row Layout** - Spread large logo sets across 2-4 rows with alternating scroll direction and optional varied speeds
 - **Hover-Pause** - Animation automatically pauses on mouse hover
 - **Touch Support** - Tap to pause/resume on mobile devices
 - **Customizable Speed** - Slow (40s), medium (25s), or fast (15s) scrolling
@@ -92,6 +93,8 @@ npm run build
 
 | Setting           | Options                                   | Default    |
 | ----------------- | ----------------------------------------- | ---------- |
+| Layout            | Single Row / Multiple Rows (2-4 rows)     | Single Row |
+| Row Speed         | Uniform / Varied (multi-row only)         | Uniform    |
 | Speed             | Slow (40s), Medium (25s), Fast (15s)      | Medium     |
 | Logo Spacing      | Small (20px), Medium (40px), Large (60px) | Medium     |
 | Logo Height       | 30px - 150px                              | 50px       |
@@ -104,7 +107,7 @@ npm run build
 
 ## Compatibility
 
-- WordPress 5.8 or higher (tested up to 6.9)
+- WordPress 5.8 or higher (tested up to 7.0)
 - PHP 7.2 or higher
 - Modern browsers (Chrome, Firefox, Safari, Edge)
 - Gutenberg editor (required)
@@ -155,6 +158,19 @@ npm run format   # Code formatting
 [dbw media](https://dbw-media.de) is a WordPress agency specializing in custom development, Gutenberg blocks, and performance optimization.
 
 ## Changelog
+
+### 1.3.0
+
+- NEW: Multi-row layout - display logos across 2 to 4 rows, ideal for large logo collections
+- NEW: Alternating scroll direction - adjacent rows scroll in opposite directions
+- NEW: Row speed modes - uniform speed for all rows, or varied speed for a livelier look
+- NEW: Respects the "prefers-reduced-motion" accessibility setting - carousel stays static for visitors who prefer reduced motion
+- FIXED: Carousel could stay frozen when logo images were lazy-loaded (scroll width measured before images loaded)
+- IMPROVED: Logo images now include width and height attributes - less layout shift (CLS), better Core Web Vitals
+- IMPROVED: Frontend script re-measures automatically via ResizeObserver (self-healing animation)
+- IMPROVED: Smoother initial load - the carousel fades in once fully ready instead of visibly building up
+- IMPROVED: Corrected block category - block now appears under "Media" in the inserter
+- Confirmed compatibility with WordPress 7.0
 
 ### 1.2.0
 

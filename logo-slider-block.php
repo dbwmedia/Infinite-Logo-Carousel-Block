@@ -3,9 +3,9 @@
  * Plugin Name: Infinite Logo Carousel Block
  * Plugin URI: https://wordpress.org/plugins/infinite-logo-carousel-block/
  * Description: A professional infinity logo carousel Gutenberg block with customizable speed, spacing, hover-stop and optional links. Perfect for showcasing partner, client or sponsor logos.
- * Version: 1.2.0
+ * Version: 1.3.0
  * Requires at least: 5.8
- * Tested up to: 6.9
+ * Tested up to: 7.0
  * Requires PHP: 7.2
  * Author: dbw media
  * Author URI: https://dbw-media.de
@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define plugin constants
-define( 'ILCB_VERSION', '1.2.0' );
+define( 'ILCB_VERSION', '1.3.0' );
 define( 'ILCB_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'ILCB_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'ILCB_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
@@ -254,6 +254,10 @@ function ilcb_add_inline_styles() {
                 min-height: var(--logo-height, 50px);
             }
         </style>';
+
+        // Keep the carousel visible when JavaScript is disabled. With JS the
+        // reveal is handled by the frontend script (adds the .dbw-ready class).
+        echo '<noscript><style>.dbw-partner-slider{opacity:1 !important;animation:none !important;}</style></noscript>';
     }
 }
 add_action( 'wp_head', 'ilcb_add_inline_styles', 5 );

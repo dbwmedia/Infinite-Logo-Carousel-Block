@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Infinite Logo Carousel Block 1.2.0\n"
+"Project-Id-Version: Infinite Logo Carousel Block 1.3.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/infinite-logo-carousel-block/\n"
-"POT-Creation-Date: 2026-02-17 12:00+0000\n"
-"PO-Revision-Date: 2026-02-17 12:00+0000\n"
+"POT-Creation-Date: 2026-05-22 12:00+0000\n"
+"PO-Revision-Date: 2026-05-22 12:00+0000\n"
 "Last-Translator: dbw media <support@dbw-media.de>\n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -189,3 +189,34 @@ msgstr "Alt-Text (optional)"
 
 msgid "Describe this logo"
 msgstr "Beschreiben Sie dieses Logo"
+
+# New strings for v1.3 multi-row layout
+msgid "Layout"
+msgstr "Layout"
+
+msgid "Display Mode"
+msgstr "Anzeigemodus"
+
+msgid "Single Row"
+msgstr "Einzelne Reihe"
+
+msgid "Multiple Rows"
+msgstr "Mehrere Reihen"
+
+msgid "Number of Rows"
+msgstr "Anzahl der Reihen"
+
+msgid "Row Speed"
+msgstr "Reihen-Geschwindigkeit"
+
+msgid "Uniform"
+msgstr "Einheitlich"
+
+msgid "Varied"
+msgstr "Variiert"
+
+msgid "Uniform: all rows move at the same speed. Varied: each row moves slightly differently for a more dynamic look."
+msgstr "Einheitlich: Alle Reihen bewegen sich gleich schnell. Variiert: Jede Reihe bewegt sich leicht unterschiedlich für ein dynamischeres Erscheinungsbild."
+
+msgid "Logos are distributed evenly across the rows. Adjacent rows scroll in opposite directions."
+msgstr "Die Logos werden gleichmäßig auf die Reihen verteilt. Benachbarte Reihen scrollen in entgegengesetzte Richtungen."
