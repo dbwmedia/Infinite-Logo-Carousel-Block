@@ -20,6 +20,7 @@ import "./style.scss";
 const SPEED_MAP = { slow: "40s", medium: "25s", fast: "15s" };
 const GAP_MAP = { small: "20px", medium: "40px", large: "60px" };
 const MARGIN_MAP = { small: "25px", medium: "50px", large: "75px" };
+const ROW_GAP_MAP = { small: "12px", medium: "24px", large: "48px" };
 
 /**
  * Per-row duration multipliers for the "varied" row speed mode. Adjacent rows
@@ -28,11 +29,27 @@ const MARGIN_MAP = { small: "25px", medium: "50px", large: "75px" };
 const ROW_SPEED_FACTORS = [1, 1.22, 0.86, 1.4];
 
 /**
- * Current block attributes (v1.3+).
+ * Border-radius presets for capsules ("custom" uses capsuleRadiusCustom).
+ */
+const CAPSULE_RADIUS_MAP = { square: "0", rounded: "14px", pill: "999px" };
+
+/**
+ * Capsule padding presets, as factors of the logo height (vertical / horizontal).
+ * "large" matches the original fixed padding; "custom" uses capsulePaddingCustom.
+ */
+const CAPSULE_PADDING_MAP = {
+	small: { y: 0.15, x: 0.3 },
+	medium: { y: 0.3, x: 0.55 },
+	large: { y: 0.45, x: 0.8 },
+};
+
+/**
+ * Current block attributes (v1.4+).
  */
 const BLOCK_ATTRIBUTES = {
 	images: { type: "array", default: [] },
 	speed: { type: "string", default: "medium" },
+	speedCustom: { type: "number", default: 60 },
 	gap: { type: "string", default: "medium" },
 	marginSize: { type: "string", default: "medium" },
 	logoHeight: { type: "string", default: "50" },
@@ -45,6 +62,15 @@ const BLOCK_ATTRIBUTES = {
 	layout: { type: "string", default: "single" },
 	rowCount: { type: "number", default: 3 },
 	rowSpeedMode: { type: "string", default: "uniform" },
+	rowGap: { type: "string", default: "medium" },
+	capsuleEnabled: { type: "boolean", default: false },
+	capsuleStyle: { type: "string", default: "alternating" },
+	capsuleRadius: { type: "string", default: "pill" },
+	capsuleRadiusCustom: { type: "number", default: 16 },
+	capsulePadding: { type: "string", default: "medium" },
+	capsulePaddingCustom: { type: "number", default: 12 },
+	capsuleColorA: { type: "string", default: "#000000" },
+	capsuleColorB: { type: "string", default: "#ffffff" },
 };
 
 /**
@@ -87,6 +113,7 @@ function sliderClasses(attributes) {
 	if (attributes.layout === "rows") classes.push("dbw-layout-rows");
 	if (!attributes.overlayEnabled) classes.push("no-overlay");
 	if (attributes.blackLogos) classes.push("black-logos");
+	if (attributes.capsuleEnabled) classes.push("dbw-capsules");
 	return classes.join(" ");
 }
 
@@ -95,14 +122,93 @@ function sliderClasses(attributes) {
  * count now lives per track (data-logo-count), not on the slider.
  */
 function sliderStyle(attributes) {
-	const { speed, gap, marginSize, overlayColor, logoHeight } = attributes;
-	return {
-		"--scroll-duration": SPEED_MAP[speed] || "25s",
+	const { gap, marginSize, overlayColor, logoHeight } = attributes;
+	const style = {
+		"--scroll-duration": getBaseDurationSeconds(attributes) + "s",
 		"--slide-gap": GAP_MAP[gap] || "40px",
 		"--outer-margin": MARGIN_MAP[marginSize] || "50px",
 		"--overlay-color": overlayColor || "#ffffff",
 		"--logo-height": logoHeight + "px",
 	};
+	// Capsule custom properties are only added when capsules are enabled, so
+	// that with capsules off the output stays identical to v1.3.
+	if (attributes.capsuleEnabled) {
+		style["--capsule-radius"] = getCapsuleRadius(attributes);
+		style["--capsule-color-a"] = attributes.capsuleColorA || "#000000";
+		style["--capsule-color-b"] = attributes.capsuleColorB || "#ffffff";
+		const pad = getCapsulePadding(attributes);
+		style["--capsule-pad-y"] = pad.y;
+		style["--capsule-pad-x"] = pad.x;
+	}
+	// Row gap is only emitted for a non-default value, so multi-row content
+	// created before this option still produces identical output.
+	if (attributes.layout === "rows" && attributes.rowGap !== "medium") {
+		style["--row-gap"] = ROW_GAP_MAP[attributes.rowGap] || "24px";
+	}
+	return style;
+}
+
+/**
+ * Resolve the capsule border-radius from the preset (or custom value).
+ */
+function getCapsuleRadius(attributes) {
+	if (attributes.capsuleRadius === "custom") {
+		return (parseInt(attributes.capsuleRadiusCustom, 10) || 0) + "px";
+	}
+	return CAPSULE_RADIUS_MAP[attributes.capsuleRadius] || "999px";
+}
+
+/**
+ * Resolve the capsule padding (vertical / horizontal) from the preset, or a
+ * uniform pixel value for the custom option.
+ */
+function getCapsulePadding(attributes) {
+	if (attributes.capsulePadding === "custom") {
+		const px = (parseInt(attributes.capsulePaddingCustom, 10) || 0) + "px";
+		return { y: px, x: px };
+	}
+	const f =
+		CAPSULE_PADDING_MAP[attributes.capsulePadding] ||
+		CAPSULE_PADDING_MAP.medium;
+	return {
+		y: "calc(var(--logo-height, 50px) * " + f.y + ")",
+		x: "calc(var(--logo-height, 50px) * " + f.x + ")",
+	};
+}
+
+/**
+ * Rough perceived-luminance check — used to pick a contrasting (black or
+ * white) logo colour for a given capsule background.
+ */
+function isColorDark(hex) {
+	if (typeof hex !== "string") return true;
+	let c = hex.replace("#", "").trim();
+	if (c.length === 3) {
+		c = c[0] + c[0] + c[1] + c[1] + c[2] + c[2];
+	}
+	if (c.length !== 6) return true;
+	const r = parseInt(c.slice(0, 2), 16);
+	const g = parseInt(c.slice(2, 4), 16);
+	const b = parseInt(c.slice(4, 6), 16);
+	return (0.299 * r + 0.587 * g + 0.114 * b) / 255 < 0.55;
+}
+
+/**
+ * Wrap a logo (or its link) in a capsule container. The A/B colour is chosen
+ * by position within the set so the pattern stays consistent across every
+ * duplicated copy — and offset per row for a checkerboard look.
+ */
+function wrapInCapsule(content, rowIndex, index, capsuleProps) {
+	const useB =
+		capsuleProps.style === "alternating" && (rowIndex + index) % 2 === 1;
+	const colorClass = useB ? "dbw-cap-b" : "dbw-cap-a";
+	const isDark = useB ? capsuleProps.colorBDark : capsuleProps.colorADark;
+	const logoClass = isDark ? "dbw-logo-light" : "dbw-logo-dark";
+	return (
+		<div className={"dbw-capsule " + colorClass + " " + logoClass}>
+			{content}
+		</div>
+	);
 }
 
 /**
@@ -119,12 +225,48 @@ function getRepeatCount(logoCount) {
 }
 
 /**
+ * Base scroll duration in seconds — from the speed preset, or the custom value.
+ */
+function getBaseDurationSeconds(attributes) {
+	if (attributes.speed === "custom") {
+		return parseInt(attributes.speedCustom, 10) || 60;
+	}
+	return parseFloat(SPEED_MAP[attributes.speed] || "25s");
+}
+
+/**
  * Duration for a single row in "varied" speed mode.
  */
-function getRowDuration(speed, rowIndex) {
-	const base = parseFloat(SPEED_MAP[speed] || "25s");
+function getRowDuration(baseSeconds, rowIndex) {
 	const factor = ROW_SPEED_FACTORS[rowIndex % ROW_SPEED_FACTORS.length];
-	return Math.round(base * factor * 10) / 10 + "s";
+	return Math.round(baseSeconds * factor * 10) / 10 + "s";
+}
+
+/**
+ * Distribute logos across `rowCount` rows. With `pairwise` the logos are handed
+ * out two at a time, so an even total produces only even-length rows — needed
+ * for a seamless capsule checkerboard. Otherwise they are interleaved.
+ */
+function distributeRows(images, rowCount, pairwise) {
+	const rows = [];
+	for (let r = 0; r < rowCount; r++) {
+		rows.push([]);
+	}
+	if (pairwise) {
+		let r = 0;
+		for (let i = 0; i < images.length; i += 2) {
+			rows[r].push(images[i]);
+			if (i + 1 < images.length) {
+				rows[r].push(images[i + 1]);
+			}
+			r = (r + 1) % rowCount;
+		}
+	} else {
+		images.forEach((image, i) => {
+			rows[i % rowCount].push(image);
+		});
+	}
+	return rows.filter((row) => row.length > 0);
 }
 
 /**
@@ -136,7 +278,14 @@ function getRowDuration(speed, rowIndex) {
  * @param {?string} duration Optional per-row scroll duration (varied mode).
  * @param {Object} linkProps linkTarget / linkRel / linkTitle.
  */
-function renderTrack(rowImages, rowIndex, direction, duration, linkProps) {
+function renderTrack(
+	rowImages,
+	rowIndex,
+	direction,
+	duration,
+	linkProps,
+	capsuleProps
+) {
 	const { linkTarget, linkRel, linkTitle } = linkProps;
 
 	const renderSet = (setIndex) =>
@@ -150,25 +299,28 @@ function renderTrack(rowImages, rowIndex, direction, duration, linkProps) {
 					loading="lazy"
 				/>
 			);
+			const content = image.link ? (
+				<a
+					href={image.link}
+					target={linkTarget || "_self"}
+					rel={
+						linkTarget === "_blank"
+							? `noopener noreferrer${linkRel ? ` ${linkRel}` : ""}`
+							: linkRel || undefined
+					}
+					title={linkTitle || undefined}
+					aria-label={linkTitle || "Logo Link"}
+				>
+					{imgElement}
+				</a>
+			) : (
+				imgElement
+			);
 			return (
 				<div key={"s" + setIndex + "-" + index} className="dbw-slider-item">
-					{image.link ? (
-						<a
-							href={image.link}
-							target={linkTarget || "_self"}
-							rel={
-								linkTarget === "_blank"
-									? `noopener noreferrer${linkRel ? ` ${linkRel}` : ""}`
-									: linkRel || undefined
-							}
-							title={linkTitle || undefined}
-							aria-label={linkTitle || "Logo Link"}
-						>
-							{imgElement}
-						</a>
-					) : (
-						imgElement
-					)}
+					{capsuleProps.enabled
+						? wrapInCapsule(content, rowIndex, index, capsuleProps)
+						: content}
 				</div>
 			);
 		});
@@ -350,6 +502,7 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 		const {
 			images,
 			speed,
+			speedCustom,
 			gap,
 			marginSize,
 			logoHeight,
@@ -362,6 +515,15 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 			layout,
 			rowCount,
 			rowSpeedMode,
+			rowGap,
+			capsuleEnabled,
+			capsuleStyle,
+			capsuleRadius,
+			capsuleRadiusCustom,
+			capsulePadding,
+			capsulePaddingCustom,
+			capsuleColorA,
+			capsuleColorB,
 		} = attributes;
 
 		const addImage = (selection) => {
@@ -369,19 +531,26 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 				? selection
 				: [selection];
 			const newImages = selectedImages.map((img) => {
+				// Prefer the "large" size over the full-size original to keep
+				// page weight down. WordPress only generates "large" when the
+				// original is bigger, so this never upscales a logo.
+				const sizes = img.sizes || {};
+				const chosen = sizes.large || sizes.full || {};
 				const imageUrl =
-					img.url || img.sizes?.full?.url || img.source_url || "";
+					chosen.url || img.url || img.source_url || "";
 				const image = {
 					id: img.id,
 					url: imageUrl,
 					link: "",
 					alt: img.alt || "",
 				};
-				// Store intrinsic dimensions when available so the front end
-				// can emit width/height (reduces layout shift / CLS).
-				if (img.width && img.height) {
-					image.width = img.width;
-					image.height = img.height;
+				// Store intrinsic dimensions matching the chosen size so the
+				// front end can emit width/height (reduces layout shift / CLS).
+				const width = chosen.width || img.width;
+				const height = chosen.height || img.height;
+				if (width && height) {
+					image.width = width;
+					image.height = height;
 				}
 				return image;
 			});
@@ -451,6 +620,21 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 								/>
 								<SelectControl
 									label={__(
+										"Row Gap",
+										"infinite-logo-carousel-block"
+									)}
+									value={rowGap}
+									options={[
+										{ label: __("Small", "infinite-logo-carousel-block"), value: "small" },
+										{ label: __("Medium", "infinite-logo-carousel-block"), value: "medium" },
+										{ label: __("Large", "infinite-logo-carousel-block"), value: "large" },
+									]}
+									onChange={(val) =>
+										setAttributes({ rowGap: val })
+									}
+								/>
+								<SelectControl
+									label={__(
 										"Row Speed",
 										"infinite-logo-carousel-block"
 									)}
@@ -499,9 +683,21 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 								{ label: __("Slow", "infinite-logo-carousel-block"), value: "slow" },
 								{ label: __("Medium", "infinite-logo-carousel-block"), value: "medium" },
 								{ label: __("Fast", "infinite-logo-carousel-block"), value: "fast" },
+								{ label: __("Custom", "infinite-logo-carousel-block"), value: "custom" },
 							]}
 							onChange={(val) => setAttributes({ speed: val })}
 						/>
+						{speed === "custom" && (
+							<RangeControl
+								label={__("Custom Speed (seconds)", "infinite-logo-carousel-block")}
+								help={__("A higher value means slower scrolling.", "infinite-logo-carousel-block")}
+								value={speedCustom}
+								onChange={(val) => setAttributes({ speedCustom: val })}
+								min={5}
+								max={300}
+								step={5}
+							/>
+						)}
 					</PanelBody>
 					<PanelBody
 						title={__("Logo Spacing", "infinite-logo-carousel-block")}
@@ -591,6 +787,103 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 							checked={blackLogos}
 							onChange={(val) => setAttributes({ blackLogos: val })}
 						/>
+					</PanelBody>
+					<PanelBody
+						title={__("Capsule Style", "infinite-logo-carousel-block")}
+						initialOpen={false}
+					>
+						<ToggleControl
+							label={__("Enable Capsules", "infinite-logo-carousel-block")}
+							help={__("Places each logo inside a rounded background container.", "infinite-logo-carousel-block")}
+							checked={capsuleEnabled}
+							onChange={(val) => setAttributes({ capsuleEnabled: val })}
+						/>
+						{capsuleEnabled && (
+							<Fragment>
+								<SelectControl
+									label={__("Background Style", "infinite-logo-carousel-block")}
+									help={__("Uniform: all capsules use one color. Alternating: capsules alternate between two colors in a checkerboard.", "infinite-logo-carousel-block")}
+									value={capsuleStyle}
+									options={[
+										{ label: __("Uniform", "infinite-logo-carousel-block"), value: "uniform" },
+										{ label: __("Alternating", "infinite-logo-carousel-block"), value: "alternating" },
+									]}
+									onChange={(val) => setAttributes({ capsuleStyle: val })}
+								/>
+								<SelectControl
+									label={__("Corner Style", "infinite-logo-carousel-block")}
+									value={capsuleRadius}
+									options={[
+										{ label: __("Square", "infinite-logo-carousel-block"), value: "square" },
+										{ label: __("Rounded", "infinite-logo-carousel-block"), value: "rounded" },
+										{ label: __("Pill", "infinite-logo-carousel-block"), value: "pill" },
+										{ label: __("Custom", "infinite-logo-carousel-block"), value: "custom" },
+									]}
+									onChange={(val) => setAttributes({ capsuleRadius: val })}
+								/>
+								{capsuleRadius === "custom" && (
+									<RangeControl
+										label={__("Custom Corner Radius (px)", "infinite-logo-carousel-block")}
+										value={capsuleRadiusCustom}
+										onChange={(val) => setAttributes({ capsuleRadiusCustom: val })}
+										min={0}
+										max={100}
+										step={1}
+									/>
+								)}
+								<SelectControl
+									label={__("Padding", "infinite-logo-carousel-block")}
+									value={capsulePadding}
+									options={[
+										{ label: __("Small", "infinite-logo-carousel-block"), value: "small" },
+										{ label: __("Medium", "infinite-logo-carousel-block"), value: "medium" },
+										{ label: __("Large", "infinite-logo-carousel-block"), value: "large" },
+										{ label: __("Custom", "infinite-logo-carousel-block"), value: "custom" },
+									]}
+									onChange={(val) => setAttributes({ capsulePadding: val })}
+								/>
+								{capsulePadding === "custom" && (
+									<RangeControl
+										label={__("Custom Padding (px)", "infinite-logo-carousel-block")}
+										value={capsulePaddingCustom}
+										onChange={(val) => setAttributes({ capsulePaddingCustom: val })}
+										min={0}
+										max={80}
+										step={2}
+									/>
+								)}
+								<PanelColorSettings
+									title={__("Capsule Colors", "infinite-logo-carousel-block")}
+									colorSettings={
+										capsuleStyle === "alternating"
+											? [
+													{
+														value: capsuleColorA,
+														onChange: (color) => setAttributes({ capsuleColorA: color || "#000000" }),
+														label: __("Color A", "infinite-logo-carousel-block"),
+													},
+													{
+														value: capsuleColorB,
+														onChange: (color) => setAttributes({ capsuleColorB: color || "#ffffff" }),
+														label: __("Color B", "infinite-logo-carousel-block"),
+													},
+											  ]
+											: [
+													{
+														value: capsuleColorA,
+														onChange: (color) => setAttributes({ capsuleColorA: color || "#000000" }),
+														label: __("Capsule color", "infinite-logo-carousel-block"),
+													},
+											  ]
+									}
+								/>
+								{capsuleStyle === "alternating" && (
+									<p>
+										{__("For a flawless checkerboard, use an even total number of logos.", "infinite-logo-carousel-block")}
+									</p>
+								)}
+							</Fragment>
+						)}
 					</PanelBody>
 					<PanelBody
 						title={__("Link Settings", "infinite-logo-carousel-block")}
@@ -683,30 +976,49 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 			layout,
 			rowCount,
 			rowSpeedMode,
-			speed,
 			linkTarget,
 			linkRel,
 			linkTitle,
+			capsuleEnabled,
+			capsuleStyle,
+			capsuleColorA,
+			capsuleColorB,
 		} = attributes;
 
 		const linkProps = { linkTarget, linkRel, linkTitle };
+		const capsuleProps = {
+			enabled: capsuleEnabled,
+			style: capsuleStyle,
+			colorADark: isColorDark(capsuleColorA),
+			colorBDark: isColorDark(capsuleColorB),
+		};
 
-		// Build the rows: in "rows" layout the logos are distributed evenly
-		// (interleaved) across 2–4 rows; otherwise a single row holds them all.
+		// A capsule checkerboard must alternate without two same-coloured
+		// capsules ever touching — which needs an even number of logos per row.
+		const capsuleAlternating =
+			capsuleEnabled && capsuleStyle === "alternating";
+
+		// Build the rows. In "rows" layout the logos are distributed across
+		// 2–4 rows; the checkerboard uses pair-based distribution so the rows
+		// come out even whenever the total is even.
 		let rows;
 		if (layout === "rows") {
 			const count = Math.min(
 				Math.max(parseInt(rowCount, 10) || 3, 2),
 				4
 			);
-			rows = [];
-			for (let r = 0; r < count; r++) rows.push([]);
-			images.forEach((image, i) => {
-				rows[i % count].push(image);
-			});
-			rows = rows.filter((row) => row.length > 0);
+			rows = distributeRows(images, count, capsuleAlternating);
 		} else {
 			rows = [images];
+		}
+
+		// Checkerboard safety net: any row with an odd count is duplicated so
+		// its loop length is even — guaranteeing two same-coloured capsules
+		// never touch, not even at the loop seam.
+		if (capsuleAlternating) {
+			rows = rows.map((row) =>
+				row.length % 2 === 1 ? row.concat(row) : row
+			);
 		}
 
 		return (
@@ -720,14 +1032,18 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 					// Per-row duration only in multi-row "varied" speed mode.
 					const duration =
 						layout === "rows" && rowSpeedMode === "varied"
-							? getRowDuration(speed, rowIndex)
+							? getRowDuration(
+									getBaseDurationSeconds(attributes),
+									rowIndex
+							  )
 							: null;
 					return renderTrack(
 						rowImages,
 						rowIndex,
 						direction,
 						duration,
-						linkProps
+						linkProps,
+						capsuleProps
 					);
 				})}
 			</div>

@@ -4,7 +4,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Infinite Logo Carousel Block 1.3.0\n"
+"Project-Id-Version: Infinite Logo Carousel Block 1.4.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/infinite-logo-carousel-block/\n"
 "POT-Creation-Date: 2026-05-22 12:00+0000\n"
 "PO-Revision-Date: 2026-05-22 12:00+0000\n"
@@ -220,3 +220,70 @@ msgstr "Einheitlich: Alle Reihen bewegen sich gleich schnell. Variiert: Jede Rei
 
 msgid "Logos are distributed evenly across the rows. Adjacent rows scroll in opposite directions."
 msgstr "Die Logos werden gleichmäßig auf die Reihen verteilt. Benachbarte Reihen scrollen in entgegengesetzte Richtungen."
+
+# New strings for v1.4 capsule style
+msgid "Capsule Style"
+msgstr "Kapsel-Stil"
+
+msgid "Enable Capsules"
+msgstr "Kapseln aktivieren"
+
+msgid "Places each logo inside a rounded background container."
+msgstr "Platziert jedes Logo in einem abgerundeten Hintergrund-Container."
+
+msgid "Background Style"
+msgstr "Hintergrund-Stil"
+
+msgid "Uniform: all capsules use one color. Alternating: capsules alternate between two colors in a checkerboard."
+msgstr "Einheitlich: Alle Kapseln verwenden eine Farbe. Abwechselnd: Die Kapseln wechseln im Schachbrettmuster zwischen zwei Farben."
+
+msgid "Alternating"
+msgstr "Abwechselnd"
+
+msgid "Corner Style"
+msgstr "Eckenform"
+
+msgid "Square"
+msgstr "Eckig"
+
+msgid "Rounded"
+msgstr "Abgerundet"
+
+msgid "Pill"
+msgstr "Pille"
+
+msgid "Custom"
+msgstr "Benutzerdefiniert"
+
+msgid "Custom Corner Radius (px)"
+msgstr "Eigene Eckenrundung (px)"
+
+msgid "Capsule Colors"
+msgstr "Kapsel-Farben"
+
+msgid "Color A"
+msgstr "Farbe A"
+
+msgid "Color B"
+msgstr "Farbe B"
+
+msgid "Capsule color"
+msgstr "Kapsel-Farbe"
+
+msgid "For a flawless checkerboard, use an even total number of logos."
+msgstr "Für ein lückenloses Schachbrettmuster eine gerade Gesamtanzahl an Logos verwenden."
+
+msgid "Row Gap"
+msgstr "Reihen-Abstand"
+
+msgid "Padding"
+msgstr "Innenabstand"
+
+msgid "Custom Padding (px)"
+msgstr "Eigener Innenabstand (px)"
+
+msgid "Custom Speed (seconds)"
+msgstr "Eigene Geschwindigkeit (Sekunden)"
+
+msgid "A higher value means slower scrolling."
+msgstr "Ein höherer Wert bedeutet langsameres Scrollen."

@@ -20,6 +20,13 @@
 
 	var SETTLE_DELAY = 250; // Debounce (ms) for the no-ResizeObserver fallback.
 
+	// Calibration width (px). For a carousel wider than this the scroll speed
+	// equals (this width / configured duration) pixels per second — so a
+	// SMALLER value here means a slower carousel overall. It also keeps the
+	// speed consistent regardless of the number of logos. Narrower carousels
+	// keep their plain configured duration.
+	var REFERENCE_WIDTH = 1000;
+
 	/**
 	 * Whether the visitor has asked for reduced motion. The carousel then stays
 	 * static (the matching CSS media query also disables the fallback animation).
@@ -89,9 +96,16 @@
 			"0%{transform:translateX(0)}" +
 			"100%{transform:translateX(-" + setWidth + "px)}}";
 
-		var duration = (
-			getComputedStyle(track).getPropertyValue("--scroll-duration") || "25s"
-		).trim();
+		// Scale the configured duration to the actual set width, so the visual
+		// speed stays consistent regardless of the number of logos. A wide set
+		// (many logos) would otherwise race past at the same fixed duration.
+		var baseDuration =
+			parseFloat(
+				getComputedStyle(track).getPropertyValue("--scroll-duration")
+			) || 25;
+		var durationSec = baseDuration * Math.max(1, setWidth / REFERENCE_WIDTH);
+		var duration = durationSec.toFixed(2) + "s";
+
 		var reverse = track.dataset.direction === "reverse";
 		track.style.animation =
 			animationName + " " + duration + " linear infinite" +

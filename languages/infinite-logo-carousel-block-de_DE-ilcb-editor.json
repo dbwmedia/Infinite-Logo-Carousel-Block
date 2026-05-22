@@ -185,6 +185,72 @@
       ],
       "Logos are distributed evenly across the rows. Adjacent rows scroll in opposite directions.": [
         "Die Logos werden gleichmäßig auf die Reihen verteilt. Benachbarte Reihen scrollen in entgegengesetzte Richtungen."
+      ],
+      "Capsule Style": [
+        "Kapsel-Stil"
+      ],
+      "Enable Capsules": [
+        "Kapseln aktivieren"
+      ],
+      "Places each logo inside a rounded background container.": [
+        "Platziert jedes Logo in einem abgerundeten Hintergrund-Container."
+      ],
+      "Background Style": [
+        "Hintergrund-Stil"
+      ],
+      "Uniform: all capsules use one color. Alternating: capsules alternate between two colors in a checkerboard.": [
+        "Einheitlich: Alle Kapseln verwenden eine Farbe. Abwechselnd: Die Kapseln wechseln im Schachbrettmuster zwischen zwei Farben."
+      ],
+      "Alternating": [
+        "Abwechselnd"
+      ],
+      "Corner Style": [
+        "Eckenform"
+      ],
+      "Square": [
+        "Eckig"
+      ],
+      "Rounded": [
+        "Abgerundet"
+      ],
+      "Pill": [
+        "Pille"
+      ],
+      "Custom": [
+        "Benutzerdefiniert"
+      ],
+      "Custom Corner Radius (px)": [
+        "Eigene Eckenrundung (px)"
+      ],
+      "Capsule Colors": [
+        "Kapsel-Farben"
+      ],
+      "Color A": [
+        "Farbe A"
+      ],
+      "Color B": [
+        "Farbe B"
+      ],
+      "Capsule color": [
+        "Kapsel-Farbe"
+      ],
+      "For a flawless checkerboard, use an even total number of logos.": [
+        "Für ein lückenloses Schachbrettmuster eine gerade Gesamtanzahl an Logos verwenden."
+      ],
+      "Row Gap": [
+        "Reihen-Abstand"
+      ],
+      "Padding": [
+        "Innenabstand"
+      ],
+      "Custom Padding (px)": [
+        "Eigener Innenabstand (px)"
+      ],
+      "Custom Speed (seconds)": [
+        "Eigene Geschwindigkeit (Sekunden)"
+      ],
+      "A higher value means slower scrolling.": [
+        "Ein höherer Wert bedeutet langsameres Scrollen."
       ]
     }
   }

@@ -96,6 +96,36 @@
 	}
 }
 
+// Capsule style: each logo sits inside a rounded background container.
+.dbw-capsules {
+	.dbw-capsule {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		box-sizing: border-box;
+		border-radius: var(--capsule-radius, 999px);
+		padding: var(--capsule-pad-y, calc(var(--logo-height, 50px) * 0.3))
+			var(--capsule-pad-x, calc(var(--logo-height, 50px) * 0.55));
+	}
+
+	.dbw-cap-a {
+		background: var(--capsule-color-a, #000000);
+	}
+
+	.dbw-cap-b {
+		background: var(--capsule-color-b, #ffffff);
+	}
+
+	// Monochrome logos, contrasting their capsule background.
+	.dbw-logo-light img {
+		filter: brightness(0) invert(1);
+	}
+
+	.dbw-logo-dark img {
+		filter: brightness(0);
+	}
+}
+
 .dbw-slider-item {
 	flex: 0 0 auto;
 	display: inline-flex;

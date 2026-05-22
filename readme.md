@@ -1,6 +1,6 @@
 # Infinite Logo Carousel Block
 
-[![WordPress Plugin Version](https://img.shields.io/badge/version-1.3.0-blue)](https://wordpress.org/plugins/infinite-logo-carousel-block/)
+[![WordPress Plugin Version](https://img.shields.io/badge/version-1.4.0-blue)](https://wordpress.org/plugins/infinite-logo-carousel-block/)
 [![License](https://img.shields.io/badge/license-GPL%20v2-green)](https://www.gnu.org/licenses/gpl-2.0.html)
 [![WordPress](https://img.shields.io/badge/WordPress-5.8%2B-blue)](https://wordpress.org/)
 [![Tested up to](https://img.shields.io/badge/tested%20up%20to-7.0-blue)](https://wordpress.org/)
@@ -14,6 +14,7 @@ A professional infinity logo carousel Gutenberg block with customizable speed, s
 
 - **Infinite Scrolling** - Seamless, continuous loop without interruption
 - **Multi-Row Layout** - Spread large logo sets across 2-4 rows with alternating scroll direction and optional varied speeds
+- **Capsule Style** - Optional rounded containers behind logos, uniform or alternating black/white checkerboard
 - **Hover-Pause** - Animation automatically pauses on mouse hover
 - **Touch Support** - Tap to pause/resume on mobile devices
 - **Customizable Speed** - Slow (40s), medium (25s), or fast (15s) scrolling
@@ -158,6 +159,18 @@ npm run format   # Code formatting
 [dbw media](https://dbw-media.de) is a WordPress agency specializing in custom development, Gutenberg blocks, and performance optimization.
 
 ## Changelog
+
+### 1.4.0
+
+- NEW: Capsule style - place each logo inside a rounded background container
+- NEW: Corner style with Square / Rounded / Pill presets plus a custom radius
+- NEW: Uniform or alternating (checkerboard) capsule backgrounds with custom colors
+- NEW: Capsule logos render monochrome and automatically contrast their background
+- NEW: Adjustable capsule padding (Small / Medium / Large / Custom)
+- NEW: Adjustable gap between rows in the multi-row layout
+- NEW: Custom carousel speed - set your own scroll duration when the presets are too fast or slow
+- IMPROVED: Scroll speed stays consistent regardless of the number of logos (large sets no longer scroll too fast)
+- IMPROVED: Newly added logos use an appropriately sized image instead of the full-size original (lighter pages, faster loading)
 
 ### 1.3.0
 

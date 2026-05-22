@@ -4,7 +4,7 @@ Tags: logo carousel, infinite scroll, client logos, partner logos, gutenberg
 Requires at least: 5.8
 Tested up to: 7.0
 Requires PHP: 7.2
-Stable tag: 1.3.0
+Stable tag: 1.4.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -18,6 +18,7 @@ The **Infinite Logo Carousel Block** is a powerful and user-friendly Gutenberg b
 
 * **Infinite Scrolling** - Seamless, continuous loop without interruption
 * **Multi-Row Layout** - Spread large logo sets across 2-4 rows with alternating scroll direction
+* **Capsule Style** - Optional rounded containers behind logos, uniform or alternating checkerboard
 * **Hover-Pause** - Animation automatically pauses on mouse hover
 * **Customizable Speed** - Choose between slow, medium, and fast scrolling
 * **Flexible Logo Spacing** - Small, medium, or large gaps between logos
@@ -167,6 +168,17 @@ Yes, the plugin doesn't collect, store, or transmit any personal data. It's comp
 
 == Changelog ==
 
+= 1.4.0 =
+* NEW: Capsule style - place each logo inside a rounded background container
+* NEW: Corner style with Square / Rounded / Pill presets plus a custom radius
+* NEW: Uniform or alternating (checkerboard) capsule backgrounds with custom colors
+* NEW: Capsule logos render monochrome and automatically contrast their background
+* NEW: Adjustable capsule padding (Small / Medium / Large / Custom)
+* NEW: Adjustable gap between rows in the multi-row layout
+* NEW: Custom carousel speed - set your own scroll duration when the presets are too fast or slow
+* IMPROVED: Scroll speed now stays consistent regardless of the number of logos - large sets (20+) no longer scroll too fast
+* IMPROVED: Newly added logos use an appropriately sized image instead of the full-size original - lighter pages and faster loading
+
 = 1.3.0 =
 * NEW: Multi-row layout - display logos across 2 to 4 rows, ideal for large logo collections
 * NEW: Alternating scroll direction - in multi-row layout, adjacent rows scroll in opposite directions
@@ -238,6 +250,9 @@ Yes, the plugin doesn't collect, store, or transmit any personal data. It's comp
 * WordPress 6.8 compatibility
 
 == Upgrade Notice ==
+
+= 1.4.0 =
+New capsule style: display your logos inside rounded containers, with a uniform or alternating checkerboard look.
 
 = 1.3.0 =
 New multi-row layout for large logo collections, plus a fix for carousels that could freeze with lazy-loaded images.
