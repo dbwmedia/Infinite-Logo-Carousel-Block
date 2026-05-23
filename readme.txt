@@ -4,7 +4,7 @@ Tags: logo carousel, logo slider, logo showcase, logo marquee, client logos
 Requires at least: 5.8
 Tested up to: 7.0
 Requires PHP: 7.2
-Stable tag: 1.5.0
+Stable tag: 1.5.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -168,6 +168,10 @@ Yes, the plugin doesn't collect, store, or transmit any personal data. It's comp
 
 == Changelog ==
 
+= 1.5.1 =
+* FIXED: Unwanted thin border around the slider container on some themes (caused by theme/WP-core resets that auto-apply `border-style: solid` whenever the inline style contains the substring "border-width" — our `--capsule-border-width` custom property accidentally matched)
+* IMPROVED: Capsule glow now extends vertically beyond the slider edge instead of being cut off (uses `overflow: clip` + `overflow-clip-margin-block` to keep horizontal logo clipping strict while allowing the glow to bleed out top and bottom)
+
 = 1.5.0 =
 * NEW: Outline capsule style - transparent capsules with a colored border instead of a filled background
 * NEW: Optional glow effect for capsules with adjustable intensity - ideal for neon-style logo walls
@@ -258,6 +262,9 @@ Yes, the plugin doesn't collect, store, or transmit any personal data. It's comp
 * WordPress 6.8 compatibility
 
 == Upgrade Notice ==
+
+= 1.5.1 =
+Bugfix release: removes an unwanted thin border that some themes drew around the slider in v1.5.0, and lets the capsule glow extend vertically instead of being cropped at the slider edge.
 
 = 1.5.0 =
 New outline capsule style with an optional glow effect. The plugin has also been renamed to "Logo Slider – Infinite Carousel & Marquee Block".

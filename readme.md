@@ -1,6 +1,6 @@
 # Logo Slider – Infinite Carousel & Marquee Block
 
-[![WordPress Plugin Version](https://img.shields.io/badge/version-1.5.0-blue)](https://wordpress.org/plugins/infinite-logo-carousel-block/)
+[![WordPress Plugin Version](https://img.shields.io/badge/version-1.5.1-blue)](https://wordpress.org/plugins/infinite-logo-carousel-block/)
 [![License](https://img.shields.io/badge/license-GPL%20v2-green)](https://www.gnu.org/licenses/gpl-2.0.html)
 [![WordPress](https://img.shields.io/badge/WordPress-5.8%2B-blue)](https://wordpress.org/)
 [![Tested up to](https://img.shields.io/badge/tested%20up%20to-7.0-blue)](https://wordpress.org/)
@@ -159,6 +159,11 @@ npm run format   # Code formatting
 [dbw media](https://dbw-media.de) is a WordPress agency specializing in custom development, Gutenberg blocks, and performance optimization.
 
 ## Changelog
+
+### 1.5.1
+
+- FIXED: Unwanted thin border around the slider container on some themes (theme/WP-core resets auto-applied `border-style: solid` because our `--capsule-border-width` inline custom property accidentally matched `[style*="border-width"]`)
+- IMPROVED: Capsule glow now extends vertically beyond the slider edge instead of being cut off (`overflow: clip` + `overflow-clip-margin-block`)
 
 ### 1.5.0
 

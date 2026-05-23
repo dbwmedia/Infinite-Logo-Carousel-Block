@@ -8,6 +8,16 @@
 	margin-top: var(--outer-margin, 50px);
 	margin-bottom: var(--outer-margin, 50px);
 
+	// Defensive: WordPress core / common theme resets use
+	//   html :where([style*="border-width"]) { border-style: solid; }
+	// to auto-enable borders for blocks with inline border-width styles.
+	// Our inline style emits the custom property --capsule-border-width,
+	// which contains the literal substring "border-width" and matches that
+	// attribute selector — turning on the browser default 3px border on
+	// the slider container. Explicitly resetting border = 0 here neutralises
+	// that and protects against similar future theme rules.
+	border: 0;
+
 	// Smooth initial load: start hidden and let the frontend script reveal
 	// the carousel (.dbw-ready) once every row is measured and its images
 	// are loaded. The delayed keyframe is a pure-CSS safety net that reveals
@@ -64,6 +74,19 @@
 	&:hover .dbw-slider-track {
 		animation-play-state: paused;
 	}
+
+	// Glow mode: allow the capsule box-shadow to escape vertically so it
+	// does not get cropped flat by the container's overflow:hidden. We use
+	// overflow:clip + overflow-clip-margin-block — that keeps horizontal
+	// clipping strict (essential, otherwise the off-screen part of the
+	// scrolling track would become visible past the edge overlay) while
+	// granting just enough vertical room for the configured glow radius.
+	// Older browsers that don't recognise overflow:clip / clip-margin
+	// silently fall back to the inherited overflow:hidden — no regression.
+	&.dbw-cap-glow {
+		overflow: clip;
+		overflow-clip-margin-block: var(--capsule-glow-size, 14px);
+	}
 }
 
 .dbw-slider-wrapper {
@@ -72,6 +95,14 @@
 	min-width: 0;
 	min-height: 70px;
 	overflow: hidden;
+
+	// Same vertical-glow exception as on the slider container — this inner
+	// wrapper otherwise clips the glow first, before it can reach the outer
+	// container's relaxed clip box.
+	.dbw-cap-glow & {
+		overflow: clip;
+		overflow-clip-margin-block: var(--capsule-glow-size, 14px);
+	}
 }
 
 .dbw-slider-track {
