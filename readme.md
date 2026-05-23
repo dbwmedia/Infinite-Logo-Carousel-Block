@@ -1,6 +1,6 @@
 # Logo Slider – Infinite Carousel & Marquee Block
 
-[![WordPress Plugin Version](https://img.shields.io/badge/version-1.5.2-blue)](https://wordpress.org/plugins/infinite-logo-carousel-block/)
+[![WordPress Plugin Version](https://img.shields.io/badge/version-1.5.3-blue)](https://wordpress.org/plugins/infinite-logo-carousel-block/)
 [![License](https://img.shields.io/badge/license-GPL%20v2-green)](https://www.gnu.org/licenses/gpl-2.0.html)
 [![WordPress](https://img.shields.io/badge/WordPress-5.8%2B-blue)](https://wordpress.org/)
 [![Tested up to](https://img.shields.io/badge/tested%20up%20to-7.0-blue)](https://wordpress.org/)
@@ -159,6 +159,10 @@ npm run format   # Code formatting
 [dbw media](https://dbw-media.de) is a WordPress agency specializing in custom development, Gutenberg blocks, and performance optimization.
 
 ## Changelog
+
+### 1.5.3
+
+- IMPROVED: Mobile carousel layout — below 600 px viewport each item is locked to `clamp(140px, 46vw, 220px)`, the capsule fills the item, and the image shrinks via `max-width: 100%` + `object-fit: contain`. Result: ~2 uniform capsules per row on phones, regardless of individual logo aspect ratios. Desktop layout is unchanged (capsules still shrink-fit to their logo's natural width).
 
 ### 1.5.2
 

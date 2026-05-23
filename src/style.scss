@@ -253,6 +253,36 @@
 	}
 }
 
+// Mobile responsive layout. The v1.5.2 clamp() on logo-height and the
+// min() cap on padding already shrink each capsule proportionally with
+// the viewport, but for extremely wide logos (5:1 / 6:1 aspect ratios)
+// a single height-shrunk logo can still produce an item wider than a
+// phone screen — see dbw-media.de's Academy slider where a 150 px
+// user-height logo at 6:1 fills an entire 390 px row.
+//
+// Below 600 px we therefore lock the item to a fluid uniform width so
+// ~2 capsules fit side by side, regardless of any individual logo's
+// aspect ratio. The capsule then stretches to fill the item, and the
+// image inside falls back to max-width:100% so very wide logos compress
+// horizontally (object-fit: contain keeps the aspect correct and lets
+// the min-height letterbox center them vertically). On wider viewports
+// the carousel falls back to the natural content-sized layout, so
+// desktop wide logos render at full natural width as before.
+@media (max-width: 600px) {
+	.dbw-slider-item {
+		width: clamp(140px, 46vw, 220px);
+	}
+
+	.dbw-capsules .dbw-capsule {
+		width: 100%;
+		justify-content: center;
+	}
+
+	.dbw-slider-item img {
+		max-width: 100%;
+	}
+}
+
 // Accessibility: respect the reduced-motion preference. !important also
 // overrides the inline animation applied by the frontend script.
 @media (prefers-reduced-motion: reduce) {

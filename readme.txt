@@ -4,7 +4,7 @@ Tags: logo carousel, logo slider, logo showcase, logo marquee, client logos
 Requires at least: 5.8
 Tested up to: 7.0
 Requires PHP: 7.2
-Stable tag: 1.5.2
+Stable tag: 1.5.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -168,6 +168,9 @@ Yes, the plugin doesn't collect, store, or transmit any personal data. It's comp
 
 == Changelog ==
 
+= 1.5.3 =
+* IMPROVED: Mobile carousel now shows ~2 uniform capsules per row instead of one oversized capsule. Below 600 px viewport the slider locks each item to a fluid width (`clamp(140px, 46vw, 220px)`) and lets the logo image shrink with `object-fit: contain`, so very wide logos (5:1+) no longer fill an entire phone row. Desktop behaviour is unchanged.
+
 = 1.5.2 =
 * IMPROVED: Logo size now scales down automatically on small viewports. The height you pick in the editor (30–150 px) is treated as the desktop ceiling — on phones and tablets the rendered logo (and its capsule padding) shrink with the viewport via a single `clamp(28px, 12vw, your-height)` formula, so capsules no longer overflow a phone screen with large logo heights.
 * No save-format change — existing logo blocks render with the new responsive behaviour without any update on your part.
@@ -266,6 +269,9 @@ Yes, the plugin doesn't collect, store, or transmit any personal data. It's comp
 * WordPress 6.8 compatibility
 
 == Upgrade Notice ==
+
+= 1.5.3 =
+Mobile layout now shows ~2 uniform capsules per row instead of one oversized capsule. Desktop is unchanged.
 
 = 1.5.2 =
 Logo height now scales down automatically on phones and tablets — the height you pick in the editor stays the desktop ceiling, smaller viewports shrink it via a single fluid formula. No action required.
