@@ -4,7 +4,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Logo Slider 1.5.1\n"
+"Project-Id-Version: Logo Slider 1.5.2\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/infinite-logo-carousel-block/\n"
 "POT-Creation-Date: 2026-05-22 12:00+0000\n"
 "PO-Revision-Date: 2026-05-22 12:00+0000\n"

@@ -1,6 +1,6 @@
 # Logo Slider – Infinite Carousel & Marquee Block
 
-[![WordPress Plugin Version](https://img.shields.io/badge/version-1.5.1-blue)](https://wordpress.org/plugins/infinite-logo-carousel-block/)
+[![WordPress Plugin Version](https://img.shields.io/badge/version-1.5.2-blue)](https://wordpress.org/plugins/infinite-logo-carousel-block/)
 [![License](https://img.shields.io/badge/license-GPL%20v2-green)](https://www.gnu.org/licenses/gpl-2.0.html)
 [![WordPress](https://img.shields.io/badge/WordPress-5.8%2B-blue)](https://wordpress.org/)
 [![Tested up to](https://img.shields.io/badge/tested%20up%20to-7.0-blue)](https://wordpress.org/)
@@ -159,6 +159,10 @@ npm run format   # Code formatting
 [dbw media](https://dbw-media.de) is a WordPress agency specializing in custom development, Gutenberg blocks, and performance optimization.
 
 ## Changelog
+
+### 1.5.2
+
+- IMPROVED: Responsive logo height — the value chosen in the editor (30–150 px) is now the desktop ceiling; on smaller viewports the logo height (and capsule padding) shrink fluidly via `clamp(28px, 12vw, --logo-height)` and a `min()`-capped padding. Large logos no longer overflow phone screens. No save-format change.
 
 ### 1.5.1
 

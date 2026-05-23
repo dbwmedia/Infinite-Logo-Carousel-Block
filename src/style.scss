@@ -135,8 +135,24 @@
 		justify-content: center;
 		box-sizing: border-box;
 		border-radius: var(--capsule-radius, 999px);
-		padding: var(--capsule-pad-y, calc(var(--logo-height, 50px) * 0.3))
-			var(--capsule-pad-x, calc(var(--logo-height, 50px) * 0.55));
+
+		// Padding stays proportional to the *rendered* logo height. The
+		// inline style sets --capsule-pad-y / -x from the user-chosen
+		// --logo-height (fine for desktop) — on small viewports we cap
+		// both sides against a fraction of the viewport so a large
+		// user-set height doesn't produce capsules wider than the phone.
+		// min() keeps the user/preset value as the upper bound; on wide
+		// screens the inline value is smaller than the vw expression and
+		// wins, on narrow screens the vw expression caps it.
+		padding:
+			min(
+				var(--capsule-pad-y, calc(var(--logo-height, 50px) * 0.3)),
+				calc(12vw * 0.3)
+			)
+			min(
+				var(--capsule-pad-x, calc(var(--logo-height, 50px) * 0.55)),
+				calc(12vw * 0.55)
+			);
 	}
 
 	.dbw-cap-a {
@@ -185,7 +201,22 @@
 	align-items: center;
 	justify-content: center;
 	padding: 0 calc(var(--slide-gap, 40px) / 2);
-	min-height: var(--logo-height, 50px);
+
+	// Responsive logo height. The user picks a value in the editor
+	// (30–150 px) which we treat as the desktop ceiling — on narrower
+	// viewports the logo scales down with the viewport so capsules + gaps
+	// don't overflow on phones. clamp(min, vw, user) is a single fluid
+	// formula, no media-query break points:
+	//   • below ~233 px viewport width the 28 px floor takes over
+	//   • from there up to ~user/0.12 the 12 vw track grows smoothly
+	//   • above that the user's chosen height caps it
+	//
+	// Example with --logo-height: 150 px
+	//   375 px iPhone  →  45 px logo  (12 vw)
+	//   768 px iPad    →  92 px logo  (12 vw)
+	//  1280 px laptop  → 150 px logo  (capped at user value)
+	//  1920 px desktop → 150 px logo  (capped at user value)
+	min-height: clamp(28px, 12vw, var(--logo-height, 50px));
 
 	img {
 		display: block;
@@ -193,8 +224,8 @@
 		// which could otherwise squeeze wide logos. width stays driven purely
 		// by the logo's aspect ratio so nothing is ever cropped.
 		max-width: none;
-		max-height: var(--logo-height, 50px);
-		min-height: var(--logo-height, 50px);
+		max-height: clamp(28px, 12vw, var(--logo-height, 50px));
+		min-height: clamp(28px, 12vw, var(--logo-height, 50px));
 		width: auto;
 		height: auto;
 		object-fit: contain;
