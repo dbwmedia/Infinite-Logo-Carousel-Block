@@ -4,7 +4,7 @@ Tags: logo carousel, logo slider, logo showcase, logo marquee, client logos
 Requires at least: 5.8
 Tested up to: 7.0
 Requires PHP: 7.2
-Stable tag: 1.5.3
+Stable tag: 1.6.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -25,7 +25,7 @@ Infinity logo carousel for client, partner or sponsor logos with custom speed.
 * **Optional Logo Links** - Link each logo individually to external websites
 * **Overlay Control** - Enable/disable edge overlay with custom colors
 * **Color Customization** - Adjust overlay color to match your design
-* **Black Logos Option** - Convert all logos to black for uniform appearance
+* **Logo Color Mode** - Convert all logos to black, white or a custom tint color
 * **Adjustable Logo Height** - Set custom height from 30px to 150px
 * **Responsive Design** - Perfect display on all devices and screen sizes
 * **SEO-Friendly** - Clean, semantic HTML markup
@@ -66,7 +66,7 @@ Infinity logo carousel for client, partner or sponsor logos with custom speed.
 **Visual Options:**
 - Enable/disable edge overlay
 - Custom overlay color picker
-- Black logos mode for uniform appearance
+- Logo color mode: Original, Black, White or Custom Color
 - Custom top/bottom margins
 - Adjustable logo height (30px to 150px)
 
@@ -127,9 +127,9 @@ Yes, each logo can be individually linked to any URL. Links open in a new tab by
 
 In the block settings sidebar, you'll find a color picker under "Overlay Settings" where you can choose any color to match your design.
 
-= What does the "Convert to Black" option do? =
+= What does the "Logo Color" option do? =
 
-This option converts all logos to black uniformly. It's particularly useful when you have colorful logos but want a consistent, monochrome appearance.
+This setting lets you convert all logos to a uniform color — Black, White, or a Custom Color of your choice. It's particularly useful when you have colorful logos but want a consistent, monochrome appearance.
 
 = Can I use SVG logos? =
 
@@ -167,6 +167,14 @@ Yes, the plugin doesn't collect, store, or transmit any personal data. It's comp
 8. Logo size adjustment controls
 
 == Changelog ==
+
+= 1.6.0 =
+* NEW: Logo Color mode — choose Original, Black, White or a Custom Color to tint all logos uniformly
+* NEW: Custom Color picker for logo tinting (CSS filter approximation — works with any image format)
+* NEW: Capsule Logo Color control now available for ALL capsule styles (uniform, alternating, outline)
+* NEW: "Original Colors" option for filled capsules — keep your logos unchanged inside capsules instead of the automatic black/white contrast
+* IMPROVED: "Logo Display" panel now uses a dropdown instead of a single toggle, replacing the old "Convert to Black" option
+* Fully backward-compatible — existing blocks produce identical output without re-saving
 
 = 1.5.3 =
 * IMPROVED: Mobile carousel now shows ~2 uniform capsules per row instead of one oversized capsule. Below 600 px viewport the slider locks each item to a fluid width (`clamp(140px, 46vw, 220px)`) and lets the logo image shrink with `object-fit: contain`, so very wide logos (5:1+) no longer fill an entire phone row. Desktop behaviour is unchanged.
@@ -269,6 +277,9 @@ Yes, the plugin doesn't collect, store, or transmit any personal data. It's comp
 * WordPress 6.8 compatibility
 
 == Upgrade Notice ==
+
+= 1.6.0 =
+Logo Color mode with Black, White and Custom Color options. Capsule Logo Color now available for all capsule styles including a new "Original Colors" option.
 
 = 1.5.3 =
 Mobile layout now shows ~2 uniform capsules per row instead of one oversized capsule. Desktop is unchanged.

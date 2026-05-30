@@ -70,7 +70,8 @@
 	function fixCapsuleContrast(slider) {
 		if (
 			!slider.classList.contains("dbw-capsules") ||
-			slider.classList.contains("dbw-cap-outline")
+			slider.classList.contains("dbw-cap-outline") ||
+			slider.classList.contains("dbw-cap-logo-manual")
 		) {
 			return;
 		}

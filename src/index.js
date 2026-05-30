@@ -11,6 +11,7 @@ import {
 	TextControl,
 	ToggleControl,
 	RangeControl,
+	ColorPalette,
 } from "@wordpress/components";
 import { Fragment } from "@wordpress/element";
 import { __ } from "@wordpress/i18n";
@@ -66,6 +67,8 @@ const BLOCK_ATTRIBUTES = {
 	overlayEnabled: { type: "boolean", default: true },
 	overlayColor: { type: "string", default: "#ffffff" },
 	blackLogos: { type: "boolean", default: false },
+	logoColorMode: { type: "string", default: "original" },
+	logoCustomColor: { type: "string", default: "#999999" },
 	linkTarget: { type: "string", default: "_self" },
 	linkRel: { type: "string", default: "" },
 	linkTitle: { type: "string", default: "" },
@@ -128,7 +131,13 @@ function sliderClasses(attributes) {
 	const classes = ["dbw-partner-slider"];
 	if (attributes.layout === "rows") classes.push("dbw-layout-rows");
 	if (!attributes.overlayEnabled) classes.push("no-overlay");
+	// General logo colour (backward-compat: blackLogos still emits the
+	// legacy class; new modes add their own class).
 	if (attributes.blackLogos) classes.push("black-logos");
+	if (!attributes.blackLogos && attributes.logoColorMode === "white")
+		classes.push("dbw-logos-white");
+	if (!attributes.blackLogos && attributes.logoColorMode === "custom")
+		classes.push("dbw-logos-custom");
 	if (attributes.capsuleEnabled) {
 		classes.push("dbw-capsules");
 		if (attributes.capsuleStyle === "outline") {
@@ -136,6 +145,15 @@ function sliderClasses(attributes) {
 		}
 		if (attributes.capsuleGlow) {
 			classes.push("dbw-cap-glow");
+		}
+		// When a filled capsule's logo colour is explicitly chosen (not the
+		// default auto-contrast), tell the frontend script to skip its
+		// runtime contrast fix.
+		if (
+			attributes.capsuleLogoColor !== "original" &&
+			attributes.capsuleStyle !== "outline"
+		) {
+			classes.push("dbw-cap-logo-manual");
 		}
 	}
 	return classes.join(" ");
@@ -154,6 +172,13 @@ function sliderStyle(attributes) {
 		"--overlay-color": overlayColor || "#ffffff",
 		"--logo-height": logoHeight + "px",
 	};
+	// Custom logo colour filter (emitted regardless of capsules — the
+	// capsule CSS reset neutralises it when capsules are active).
+	if (!attributes.blackLogos && attributes.logoColorMode === "custom") {
+		style["--logo-filter"] = computeColorFilter(
+			attributes.logoCustomColor
+		);
+	}
 	// Capsule custom properties are only added when capsules are enabled, so
 	// that with capsules off the output stays identical to v1.3.
 	if (attributes.capsuleEnabled) {
@@ -246,6 +271,52 @@ function isColorDark(hex) {
 }
 
 /**
+ * Compute a CSS filter string that tints any image to the given hex colour.
+ * Pipeline: black → white → sepia (warm brown) → adjust hue/saturation/
+ * brightness to reach the target. This is an approximation — perfectly exact
+ * conversion from hex to CSS filter values is not possible, but the result
+ * is close enough for logo tinting.
+ */
+function computeColorFilter(hex) {
+	if (!hex || typeof hex !== "string") return "none";
+	let c = hex.replace("#", "").trim();
+	if (c.length === 3) c = c[0] + c[0] + c[1] + c[1] + c[2] + c[2];
+	if (c.length !== 6) return "none";
+
+	const r = parseInt(c.slice(0, 2), 16) / 255;
+	const g = parseInt(c.slice(2, 4), 16) / 255;
+	const b = parseInt(c.slice(4, 6), 16) / 255;
+
+	const max = Math.max(r, g, b),
+		min = Math.min(r, g, b);
+	let h = 0,
+		s = 0;
+	const l = (max + min) / 2;
+	if (max !== min) {
+		const d = max - min;
+		s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+		if (max === r) h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
+		else if (max === g) h = ((b - r) / d + 2) / 6;
+		else h = ((r - g) / d + 4) / 6;
+	}
+
+	// CSS sepia base is approximately HSL(34, 100%, 78.4%).
+	const hueRotate = h * 360 - 34;
+	const saturate = Math.max(s, 0.01);
+	const brightness = Math.max(l / 0.784, 0.01);
+
+	return (
+		"brightness(0) invert(1) sepia(1) saturate(" +
+		saturate.toFixed(2) +
+		") hue-rotate(" +
+		hueRotate.toFixed(1) +
+		"deg) brightness(" +
+		brightness.toFixed(2) +
+		")"
+	);
+}
+
+/**
  * Wrap a logo (or its link) in a capsule container. The A/B colour is chosen
  * by position within the set so the pattern stays consistent across every
  * duplicated copy — and offset per row for a checkerboard look.
@@ -256,16 +327,18 @@ function wrapInCapsule(content, rowIndex, index, capsuleProps) {
 	const colorClass = useB ? "dbw-cap-b" : "dbw-cap-a";
 
 	let logoClass;
-	if (capsuleProps.style === "outline") {
-		// Outline has no fill colour, so the logo colour is chosen explicitly.
-		logoClass =
-			capsuleProps.logoColor === "white"
-				? "dbw-logo-light"
-				: capsuleProps.logoColor === "black"
-					? "dbw-logo-dark"
-					: "";
+	if (capsuleProps.logoColor === "none") {
+		// Explicit "keep original colours" — no filter on any style.
+		logoClass = "";
+	} else if (capsuleProps.logoColor === "white") {
+		logoClass = "dbw-logo-light";
+	} else if (capsuleProps.logoColor === "black") {
+		logoClass = "dbw-logo-dark";
+	} else if (capsuleProps.style === "outline") {
+		// Outline + default ("original") → no filter.
+		logoClass = "";
 	} else {
-		// Filled capsule: auto-contrast the logo against the background.
+		// Filled + default ("original") → auto-contrast against background.
 		const isDark = useB
 			? capsuleProps.colorBDark
 			: capsuleProps.colorADark;
@@ -574,6 +647,8 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 			overlayEnabled,
 			overlayColor,
 			blackLogos,
+			logoColorMode,
+			logoCustomColor,
 			linkTarget,
 			linkRel,
 			linkTitle,
@@ -852,12 +927,38 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 						title={__("Logo Display", "infinite-logo-carousel-block")}
 						initialOpen={false}
 					>
-						<ToggleControl
-							label={__("Convert to Black", "infinite-logo-carousel-block")}
-							help={__("Converts all logos to black for a uniform appearance.", "infinite-logo-carousel-block")}
-							checked={blackLogos}
-							onChange={(val) => setAttributes({ blackLogos: val })}
+						<SelectControl
+							label={__("Logo Color", "infinite-logo-carousel-block")}
+							help={__("Applies a uniform color to all logos for a cohesive look.", "infinite-logo-carousel-block")}
+							value={blackLogos ? "black" : logoColorMode}
+							options={[
+								{ label: __("Original", "infinite-logo-carousel-block"), value: "original" },
+								{ label: __("Black", "infinite-logo-carousel-block"), value: "black" },
+								{ label: __("White", "infinite-logo-carousel-block"), value: "white" },
+								{ label: __("Custom Color", "infinite-logo-carousel-block"), value: "custom" },
+							]}
+							onChange={(val) =>
+								setAttributes({
+									logoColorMode: val,
+									blackLogos: val === "black",
+								})
+							}
 						/>
+						{!blackLogos && logoColorMode === "custom" && (
+							<Fragment>
+								<p className="components-base-control__label">
+									{__("Custom Color", "infinite-logo-carousel-block")}
+								</p>
+								<ColorPalette
+									value={logoCustomColor}
+									onChange={(color) =>
+										setAttributes({
+											logoCustomColor: color || "#999999",
+										})
+									}
+								/>
+							</Fragment>
+						)}
 					</PanelBody>
 					<PanelBody
 						title={__("Capsule Style", "infinite-logo-carousel-block")}
@@ -972,19 +1073,30 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 											step={1}
 										/>
 									)}
-									{capsuleStyle === "outline" && (
-										<SelectControl
-											label={__("Logo Color", "infinite-logo-carousel-block")}
-											help={__("Outline capsules have no background - choose how the logos are colored.", "infinite-logo-carousel-block")}
-											value={capsuleLogoColor}
-											options={[
-												{ label: __("Original", "infinite-logo-carousel-block"), value: "original" },
-												{ label: __("White", "infinite-logo-carousel-block"), value: "white" },
-												{ label: __("Black", "infinite-logo-carousel-block"), value: "black" },
-											]}
-											onChange={(val) => setAttributes({ capsuleLogoColor: val })}
-										/>
-									)}
+									<SelectControl
+									label={__("Logo Color", "infinite-logo-carousel-block")}
+									help={
+										capsuleStyle === "outline"
+											? __("Outline capsules have no background — choose how the logos are colored.", "infinite-logo-carousel-block")
+											: __("Auto-Contrast picks white or black based on the capsule background. Choose Original Colors to keep your logos unchanged.", "infinite-logo-carousel-block")
+									}
+									value={capsuleLogoColor}
+									options={
+										capsuleStyle === "outline"
+											? [
+													{ label: __("Original Colors", "infinite-logo-carousel-block"), value: "original" },
+													{ label: __("White", "infinite-logo-carousel-block"), value: "white" },
+													{ label: __("Black", "infinite-logo-carousel-block"), value: "black" },
+											  ]
+											: [
+													{ label: __("Auto-Contrast", "infinite-logo-carousel-block"), value: "original" },
+													{ label: __("Original Colors", "infinite-logo-carousel-block"), value: "none" },
+													{ label: __("White", "infinite-logo-carousel-block"), value: "white" },
+													{ label: __("Black", "infinite-logo-carousel-block"), value: "black" },
+											  ]
+									}
+									onChange={(val) => setAttributes({ capsuleLogoColor: val })}
+								/>
 									<ToggleControl
 										label={__("Glow Effect", "infinite-logo-carousel-block")}
 										help={__("Adds a soft colored glow around each capsule.", "infinite-logo-carousel-block")}
@@ -1062,7 +1174,13 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 										src={image.url}
 										alt={image.alt || __("Logo", "infinite-logo-carousel-block")}
 										style={{
-											filter: blackLogos ? "brightness(0)" : "none",
+											filter: blackLogos
+												? "brightness(0)"
+												: logoColorMode === "white"
+													? "brightness(0) invert(1)"
+													: logoColorMode === "custom"
+														? computeColorFilter(logoCustomColor)
+														: "none",
 											maxHeight: logoHeight + "px",
 										}}
 									/>

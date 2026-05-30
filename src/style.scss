@@ -71,6 +71,16 @@
 		opacity: 0.8;
 	}
 
+	&.dbw-logos-white img {
+		filter: brightness(0) invert(1);
+		opacity: 0.8;
+	}
+
+	&.dbw-logos-custom img {
+		filter: var(--logo-filter, none);
+		opacity: 0.8;
+	}
+
 	&:hover .dbw-slider-track {
 		animation-play-state: paused;
 	}
@@ -161,6 +171,13 @@
 
 	.dbw-cap-b {
 		background: var(--capsule-color-b, #ffffff);
+	}
+
+	// Reset any general logo-color filter inside capsules so the
+	// per-capsule class (or "no filter") takes precedence.
+	.dbw-capsule img {
+		filter: none;
+		opacity: 1;
 	}
 
 	// Monochrome logos, contrasting their capsule background.
