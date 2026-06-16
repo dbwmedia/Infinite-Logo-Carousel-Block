@@ -4,7 +4,7 @@ Tags: logo carousel, logo slider, logo showcase, logo marquee, client logos
 Requires at least: 5.8
 Tested up to: 7.0
 Requires PHP: 7.2
-Stable tag: 1.6.0
+Stable tag: 1.6.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -151,6 +151,10 @@ Yes, you can add as many Infinite Logo Carousel blocks as you need on a single p
 
 Use the "Logo Size" setting in the block sidebar. You can set a maximum height from 30px to 150px, and all logos will scale proportionally.
 
+= My logos look too small on mobile. How can I fix that? =
+
+The logo height you set in the editor is treated as the desktop maximum. On smaller screens the logos scale down automatically to prevent overflow. If they appear too small on phones, simply increase the "Logo Size" value in the block sidebar (e.g. from 50 px to 80-100 px). The desktop ceiling rises, which also raises the mobile size proportionally.
+
 = Is it GDPR compliant? =
 
 Yes, the plugin doesn't collect, store, or transmit any personal data. It's completely GDPR compliant.
@@ -167,6 +171,9 @@ Yes, the plugin doesn't collect, store, or transmit any personal data. It's comp
 8. Logo size adjustment controls
 
 == Changelog ==
+
+= 1.6.1 =
+* FIXED: Carousel flashing at wrong speed on initial page load. Caused by `loading="lazy"` on images delaying width measurement. Images now use `loading="eager"` so the animation starts at the correct speed immediately. Existing posts are automatically fixed without re-saving. Props to Bernd for reporting!
 
 = 1.6.0 =
 * NEW: Logo Color mode — choose Original, Black, White or a Custom Color to tint all logos uniformly
@@ -277,6 +284,9 @@ Yes, the plugin doesn't collect, store, or transmit any personal data. It's comp
 * WordPress 6.8 compatibility
 
 == Upgrade Notice ==
+
+= 1.6.1 =
+Fixes the carousel briefly scrolling too fast on page load. No action needed — existing posts are patched automatically.
 
 = 1.6.0 =
 Logo Color mode with Black, White and Custom Color options. Capsule Logo Color now available for all capsule styles including a new "Original Colors" option.

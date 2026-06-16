@@ -422,7 +422,8 @@ function renderTrack(
 	direction,
 	duration,
 	linkProps,
-	capsuleProps
+	capsuleProps,
+	loading = "eager"
 ) {
 	const { linkTarget, linkRel, linkTitle } = linkProps;
 
@@ -434,7 +435,7 @@ function renderTrack(
 					alt={image.alt || ""}
 					width={image.width || undefined}
 					height={image.height || undefined}
-					loading="lazy"
+					loading={loading}
 				/>
 			);
 			const content = image.link ? (
@@ -611,6 +612,85 @@ const deprecatedSaveV120 = ({ attributes }) => {
 	);
 };
 
+/**
+ * Deprecated save v1.6.0 – images with loading="lazy" (causes fast-scroll
+ * flash on initial load because lazy images delay measurement).
+ */
+const deprecatedSaveV160 = ({ attributes }) => {
+	const {
+		images,
+		overlayEnabled,
+		blackLogos,
+		layout,
+		rowCount,
+		rowSpeedMode,
+		linkTarget,
+		linkRel,
+		linkTitle,
+		capsuleEnabled,
+		capsuleStyle,
+		capsuleColorA,
+		capsuleColorB,
+		capsuleLogoColor,
+	} = attributes;
+
+	const linkProps = { linkTarget, linkRel, linkTitle };
+	const capsuleProps = {
+		enabled: capsuleEnabled,
+		style: capsuleStyle,
+		colorADark: isColorDark(capsuleColorA),
+		colorBDark: isColorDark(capsuleColorB),
+		logoColor: capsuleLogoColor,
+	};
+
+	const capsuleAlternating =
+		capsuleEnabled && capsuleStyle === "alternating";
+
+	let rows;
+	if (layout === "rows") {
+		const count = Math.min(
+			Math.max(parseInt(rowCount, 10) || 3, 2),
+			4
+		);
+		rows = distributeRows(images, count, capsuleAlternating);
+	} else {
+		rows = [images];
+	}
+
+	if (capsuleAlternating) {
+		rows = rows.map((row) =>
+			row.length % 2 === 1 ? row.concat(row) : row
+		);
+	}
+
+	return (
+		<div
+			className={sliderClasses(attributes)}
+			style={sliderStyle(attributes)}
+		>
+			{rows.map((rowImages, rowIndex) => {
+				const direction = rowIndex % 2 === 1 ? "reverse" : "normal";
+				const duration =
+					layout === "rows" && rowSpeedMode === "varied"
+						? getRowDuration(
+								getBaseDurationSeconds(attributes),
+								rowIndex
+						  )
+						: null;
+				return renderTrack(
+					rowImages,
+					rowIndex,
+					direction,
+					duration,
+					linkProps,
+					capsuleProps,
+					"lazy"
+				);
+			})}
+		</div>
+	);
+};
+
 /* -------------------------------------------------------------------------- */
 /*  Block registration                                                        */
 /* -------------------------------------------------------------------------- */
@@ -626,6 +706,10 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 	attributes: BLOCK_ATTRIBUTES,
 
 	deprecated: [
+		{
+			attributes: BLOCK_ATTRIBUTES,
+			save: deprecatedSaveV160,
+		},
 		{
 			attributes: LEGACY_ATTRIBUTES,
 			save: deprecatedSaveV120,

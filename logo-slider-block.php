@@ -3,7 +3,7 @@
  * Plugin Name: Logo Slider – Infinite Carousel & Marquee Block
  * Plugin URI: https://wordpress.org/plugins/infinite-logo-carousel-block/
  * Description: A professional infinity logo carousel Gutenberg block with customizable speed, spacing, hover-stop and optional links. Perfect for showcasing partner, client or sponsor logos.
- * Version: 1.6.0
+ * Version: 1.6.1
  * Requires at least: 5.8
  * Tested up to: 7.0
  * Requires PHP: 7.2
@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define plugin constants
-define( 'ILCB_VERSION', '1.5.3' );
+define( 'ILCB_VERSION', '1.6.1' );
 define( 'ILCB_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'ILCB_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'ILCB_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
@@ -238,6 +238,23 @@ function ilcb_deactivate() {
     // Cleanup if needed
 }
 register_deactivation_hook( __FILE__, 'ilcb_deactivate' );
+
+/**
+ * Fix lazy-loaded images in saved carousel content.
+ *
+ * Older versions saved images with loading="lazy", which delays image loading
+ * and causes the carousel to flash at the wrong speed on initial page load.
+ * This filter replaces loading="lazy" with loading="eager" in the rendered
+ * block output so existing posts work correctly without being re-saved.
+ */
+function ilcb_fix_image_loading( $block_content, $block ) {
+    if ( 'infinite-logo-carousel-block/carousel' !== $block['blockName'] ) {
+        return $block_content;
+    }
+
+    return str_replace( 'loading="lazy"', 'loading="eager"', $block_content );
+}
+add_filter( 'render_block', 'ilcb_fix_image_loading', 10, 2 );
 
 /**
  * Add inline styles for initial rendering
