@@ -3,6 +3,7 @@ import {
 	InspectorControls,
 	MediaUpload,
 	PanelColorSettings,
+	useBlockProps,
 } from "@wordpress/block-editor";
 import {
 	PanelBody,
@@ -17,6 +18,7 @@ import { Fragment } from "@wordpress/element";
 import { __ } from "@wordpress/i18n";
 import "./editor.scss";
 import "./style.scss";
+import "./marquee.js";
 
 const SPEED_MAP = { slow: "40s", medium: "25s", fast: "15s" };
 const GAP_MAP = { small: "20px", medium: "40px", large: "60px", xlarge: "100px" };
@@ -76,6 +78,7 @@ const BLOCK_ATTRIBUTES = {
 	logoHeight: { type: "string", default: "50" },
 	logoHeightMobile: { type: "string", default: "" },
 	balanceLogos: { type: "boolean", default: false },
+	showPauseButton: { type: "boolean", default: false },
 	overlayEnabled: { type: "boolean", default: true },
 	overlayColor: { type: "string", default: "#ffffff" },
 	blackLogos: { type: "boolean", default: false },
@@ -151,6 +154,8 @@ function sliderClasses(attributes) {
 		classes.push("dbw-logos-white");
 	if (!attributes.blackLogos && attributes.logoColorMode === "custom")
 		classes.push("dbw-logos-custom");
+	if (!attributes.blackLogos && attributes.logoColorMode === "grayscale")
+		classes.push("dbw-logos-gray");
 	// Balanced logo sizes (area-based). Only added when enabled, so existing
 	// content keeps producing identical output.
 	if (attributes.balanceLogos) classes.push("dbw-balance");
@@ -466,6 +471,33 @@ function distributeRows(images, rowCount, pairwise) {
 }
 
 /**
+ * Build the per-row image lists for the given attributes. Shared by save(),
+ * the v1.8 deprecation and the editor live preview so all three stay in sync.
+ *
+ * In "rows" layout the logos are distributed across 2–4 rows; a capsule
+ * checkerboard uses pair-based distribution and duplicates odd rows so two
+ * same-coloured capsules never touch, not even at the loop seam.
+ */
+function buildSliderRows(attributes) {
+	const { images, layout, rowCount, capsuleEnabled, capsuleStyle } =
+		attributes;
+	const capsuleAlternating = capsuleEnabled && capsuleStyle === "alternating";
+	let rows;
+	if (layout === "rows") {
+		const count = Math.min(Math.max(parseInt(rowCount, 10) || 3, 2), 4);
+		rows = distributeRows(images, count, capsuleAlternating);
+	} else {
+		rows = [images];
+	}
+	if (capsuleAlternating) {
+		rows = rows.map((row) =>
+			row.length % 2 === 1 ? row.concat(row) : row
+		);
+	}
+	return rows;
+}
+
+/**
  * Render one scrolling track (one row).
  *
  * @param {Array}  rowImages Images belonging to this row.
@@ -473,6 +505,11 @@ function distributeRows(images, rowCount, pairwise) {
  * @param {string} direction "normal" or "reverse" scroll direction.
  * @param {?string} duration Optional per-row scroll duration (varied mode).
  * @param {Object} linkProps linkTarget / linkRel / linkTitle.
+ * @param {Object} capsuleProps Capsule rendering options.
+ * @param {string} loading   Image loading attribute.
+ * @param {Object} opts      Editor-preview-only options ({ balance, noLinks }).
+ *                           Never passed by save(), so saved markup stays
+ *                           byte-identical.
  */
 function renderTrack(
 	rowImages,
@@ -481,7 +518,8 @@ function renderTrack(
 	duration,
 	linkProps,
 	capsuleProps,
-	loading = "eager"
+	loading = "eager",
+	opts = {}
 ) {
 	const { linkTarget, linkRel, linkTitle } = linkProps;
 
@@ -496,7 +534,7 @@ function renderTrack(
 					loading={loading}
 				/>
 			);
-			const content = image.link ? (
+			const content = image.link && !opts.noLinks ? (
 				<a
 					href={image.link}
 					target={linkTarget || "_self"}
@@ -514,7 +552,15 @@ function renderTrack(
 				imgElement
 			);
 			return (
-				<div key={"s" + setIndex + "-" + index} className="dbw-slider-item">
+				<div
+					key={"s" + setIndex + "-" + index}
+					className="dbw-slider-item"
+					style={
+						opts.balance
+							? { "--logo-scale": getBalanceScale(image).toFixed(3) }
+							: undefined
+					}
+				>
 					{capsuleProps.enabled
 						? wrapInCapsule(content, rowIndex, index, capsuleProps)
 						: content}
@@ -749,11 +795,69 @@ const deprecatedSaveV160 = ({ attributes }) => {
 	);
 };
 
+/**
+ * Deprecated save v1.8.0 – identical output to the current save, but without
+ * the useBlockProps.save() wrapper (no wp-block-* class) and without the
+ * optional pause button. Matches all content saved between v1.6.1 and v1.8.x.
+ */
+const deprecatedSaveV180 = ({ attributes }) => {
+	const {
+		layout,
+		rowSpeedMode,
+		linkTarget,
+		linkRel,
+		linkTitle,
+		capsuleEnabled,
+		capsuleStyle,
+		capsuleColorA,
+		capsuleColorB,
+		capsuleLogoColor,
+	} = attributes;
+
+	const linkProps = { linkTarget, linkRel, linkTitle };
+	const capsuleProps = {
+		enabled: capsuleEnabled,
+		style: capsuleStyle,
+		colorADark: isColorDark(capsuleColorA),
+		colorBDark: isColorDark(capsuleColorB),
+		logoColor: capsuleLogoColor,
+	};
+
+	const rows = buildSliderRows(attributes);
+
+	return (
+		<div
+			className={sliderClasses(attributes)}
+			style={sliderStyle(attributes)}
+		>
+			{rows.map((rowImages, rowIndex) => {
+				const direction = rowIndex % 2 === 1 ? "reverse" : "normal";
+				const duration =
+					layout === "rows" && rowSpeedMode === "varied"
+						? getRowDuration(
+								getBaseDurationSeconds(attributes),
+								rowIndex
+						  )
+						: null;
+				return renderTrack(
+					rowImages,
+					rowIndex,
+					direction,
+					duration,
+					linkProps,
+					capsuleProps
+				);
+			})}
+		</div>
+	);
+};
+
 /* -------------------------------------------------------------------------- */
 /*  Block registration                                                        */
 /* -------------------------------------------------------------------------- */
 
 registerBlockType("infinite-logo-carousel-block/carousel", {
+	apiVersion: 3,
 	title: __("Logo Slider", "infinite-logo-carousel-block"),
 	description: __(
 		"Professional infinity logo carousel with customizable speed, spacing and hover-pause. Perfect for client, partner or sponsor logos.",
@@ -761,9 +865,17 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 	),
 	icon: "images-alt2",
 	category: "media",
+	supports: {
+		html: false,
+		align: ["wide", "full"],
+	},
 	attributes: BLOCK_ATTRIBUTES,
 
 	deprecated: [
+		{
+			attributes: BLOCK_ATTRIBUTES,
+			save: deprecatedSaveV180,
+		},
 		{
 			attributes: BLOCK_ATTRIBUTES,
 			save: deprecatedSaveV160,
@@ -789,6 +901,7 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 			logoHeight,
 			logoHeightMobile,
 			balanceLogos,
+			showPauseButton,
 			overlayEnabled,
 			overlayColor,
 			blackLogos,
@@ -859,8 +972,25 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 			setAttributes({ images: updated });
 		};
 
+		// Live preview: same markup and CSS as the front end, animated by the
+		// stylesheet's fallback animation. Links are disabled and the reveal
+		// class is pre-applied so the preview shows immediately.
+		const previewCapsuleProps = {
+			enabled: capsuleEnabled,
+			style: capsuleStyle,
+			colorADark: isColorDark(capsuleColorA),
+			colorBDark: isColorDark(capsuleColorB),
+			logoColor: capsuleLogoColor,
+		};
+		const previewLinkProps = { linkTarget, linkRel, linkTitle };
+		const previewRows = buildSliderRows(attributes);
+
+		const blockProps = useBlockProps({
+			className: "dbw-partner-slider-editor-wrapper",
+		});
+
 		return (
-			<div className="dbw-partner-slider-editor-wrapper">
+			<div {...blockProps}>
 				<InspectorControls>
 					<PanelBody title={__("Images", "infinite-logo-carousel-block")}>
 						<p>
@@ -1004,6 +1134,12 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 								step={5}
 							/>
 						)}
+						<ToggleControl
+							label={__("Show pause button", "infinite-logo-carousel-block")}
+							help={__("Adds a small pause/play button in the corner so visitors can stop the animation (recommended for accessibility).", "infinite-logo-carousel-block")}
+							checked={showPauseButton}
+							onChange={(val) => setAttributes({ showPauseButton: val })}
+						/>
 					</PanelBody>
 					<PanelBody
 						title={__("Logo Spacing", "infinite-logo-carousel-block")}
@@ -1145,6 +1281,7 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 								{ label: __("Original", "infinite-logo-carousel-block"), value: "original" },
 								{ label: __("Black", "infinite-logo-carousel-block"), value: "black" },
 								{ label: __("White", "infinite-logo-carousel-block"), value: "white" },
+								{ label: __("Grayscale (color on hover)", "infinite-logo-carousel-block"), value: "grayscale" },
 								{ label: __("Custom Color", "infinite-logo-carousel-block"), value: "custom" },
 							]}
 							onChange={(val) =>
@@ -1375,6 +1512,45 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 					</PanelBody>
 				</InspectorControls>
 
+				{images.length > 0 && (
+					<div
+						className={
+							sliderClasses(attributes) + " dbw-ready dbw-editor-preview"
+						}
+						style={sliderStyle(attributes)}
+					>
+						{previewRows.map((rowImages, rowIndex) => {
+							const direction =
+								rowIndex % 2 === 1 ? "reverse" : "normal";
+							const duration =
+								layout === "rows" && rowSpeedMode === "varied"
+									? getRowDuration(
+											getBaseDurationSeconds(attributes),
+											rowIndex
+									  )
+									: null;
+							return renderTrack(
+								rowImages,
+								rowIndex,
+								direction,
+								duration,
+								previewLinkProps,
+								previewCapsuleProps,
+								"eager",
+								{ balance: balanceLogos, noLinks: true }
+							);
+						})}
+						{showPauseButton && (
+							<button
+								className="dbw-pause-btn"
+								type="button"
+								aria-pressed="false"
+								tabIndex={-1}
+							></button>
+						)}
+					</div>
+				)}
+
 				<div className="dbw-partner-slider-editor">
 					<div className="dbw-partner-slider-images">
 						{images.map((image, index) => (
@@ -1388,9 +1564,11 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 												? "brightness(0)"
 												: logoColorMode === "white"
 													? "brightness(0) invert(1)"
-													: logoColorMode === "custom"
-														? computeColorFilter(logoCustomColor)
-														: "none",
+													: logoColorMode === "grayscale"
+														? "grayscale(1)"
+														: logoColorMode === "custom"
+															? computeColorFilter(logoCustomColor)
+															: "none",
 											maxHeight:
 												Math.round(
 													parseInt(logoHeight, 10) *
@@ -1441,11 +1619,7 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 
 	save: ({ attributes }) => {
 		const {
-			images,
-			overlayEnabled,
-			blackLogos,
 			layout,
-			rowCount,
 			rowSpeedMode,
 			linkTarget,
 			linkRel,
@@ -1455,6 +1629,7 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 			capsuleColorA,
 			capsuleColorB,
 			capsuleLogoColor,
+			showPauseButton,
 		} = attributes;
 
 		const linkProps = { linkTarget, linkRel, linkTitle };
@@ -1466,39 +1641,18 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 			logoColor: capsuleLogoColor,
 		};
 
-		// A capsule checkerboard must alternate without two same-coloured
-		// capsules ever touching — which needs an even number of logos per row.
-		const capsuleAlternating =
-			capsuleEnabled && capsuleStyle === "alternating";
+		const rows = buildSliderRows(attributes);
 
-		// Build the rows. In "rows" layout the logos are distributed across
-		// 2–4 rows; the checkerboard uses pair-based distribution so the rows
-		// come out even whenever the total is even.
-		let rows;
-		if (layout === "rows") {
-			const count = Math.min(
-				Math.max(parseInt(rowCount, 10) || 3, 2),
-				4
-			);
-			rows = distributeRows(images, count, capsuleAlternating);
-		} else {
-			rows = [images];
-		}
-
-		// Checkerboard safety net: any row with an odd count is duplicated so
-		// its loop length is even — guaranteeing two same-coloured capsules
-		// never touch, not even at the loop seam.
-		if (capsuleAlternating) {
-			rows = rows.map((row) =>
-				row.length % 2 === 1 ? row.concat(row) : row
-			);
-		}
+		// v2.0: the wrapper goes through useBlockProps.save() so block
+		// supports (wide/full alignment) work. Content saved before v2.0
+		// matches the deprecatedSaveV180 entry and is migrated on next edit.
+		const blockProps = useBlockProps.save({
+			className: sliderClasses(attributes),
+			style: sliderStyle(attributes),
+		});
 
 		return (
-			<div
-				className={sliderClasses(attributes)}
-				style={sliderStyle(attributes)}
-			>
+			<div {...blockProps}>
 				{rows.map((rowImages, rowIndex) => {
 					// Adjacent rows scroll in opposite directions.
 					const direction = rowIndex % 2 === 1 ? "reverse" : "normal";
@@ -1519,6 +1673,13 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 						capsuleProps
 					);
 				})}
+				{showPauseButton && (
+					<button
+						className="dbw-pause-btn"
+						type="button"
+						aria-pressed="false"
+					></button>
+				)}
 			</div>
 		);
 	},

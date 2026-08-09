@@ -139,9 +139,10 @@ info "Committing SVN tag..."
 svn commit -m "Tag version $VERSION" --username "$SVN_USERNAME" || error "SVN tag commit failed"
 success "SVN tag committed"
 
-# 10. Verification
+# 10. Verification (against the REMOTE repository — the local working copy
+# listing produced false negatives right after the tag commit)
 info "Verifying deployment..."
-if svn list tags/ | grep -q "$VERSION/"; then
+if svn list "https://plugins.svn.wordpress.org/infinite-logo-carousel-block/tags/" | grep -q "^$VERSION/$"; then
     success "Tag $VERSION successfully created"
 else
     error "Tag verification failed"

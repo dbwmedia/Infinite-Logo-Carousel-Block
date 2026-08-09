@@ -1,14 +1,14 @@
 === Logo Slider – Infinite Carousel & Marquee Block ===
 Contributors: dbwmediadennis
 Tags: logo carousel, logo slider, logo showcase, logo marquee, client logos
-Requires at least: 5.8
+Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.2
-Stable tag: 1.8.0
+Stable tag: 2.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Infinity logo carousel for client, partner or sponsor logos with custom speed.
+Infinity logo carousel and text marquee for client, partner or sponsor logos.
 
 == Description ==
 
@@ -29,6 +29,10 @@ Infinity logo carousel for client, partner or sponsor logos with custom speed.
 * **Adjustable Logo Height** - Set custom height from 30px to 150px
 * **Mobile Logo Height** - Optional separate logo height for phones, or fully automatic scaling
 * **Balanced Logo Sizes** - Optionally equalize the visual weight of wide and compact logos automatically
+* **Text Marquee Block** - Second block: infinitely scrolling text ticker for reviews, badges or announcements
+* **Pause Button** - Optional pause/play control for better accessibility (WCAG 2.2.2)
+* **Grayscale Hover Mode** - Logos run desaturated and regain full color on hover
+* **Wide & Full Alignment** - Native Gutenberg wide/full-width support
 * **Responsive Design** - Perfect display on all devices and screen sizes
 * **SEO-Friendly** - Clean, semantic HTML markup
 * **Lightweight** - Optimized for performance with minimal impact
@@ -161,6 +165,10 @@ Yes. In the "Logo Size" panel, enable "Custom height on phones" and pick a fixed
 
 Enable "Custom height on phones" in the "Logo Size" panel and set exactly the height you want for phones. The desktop size stays untouched.
 
+= What is the Text Marquee block? =
+
+A second block included since v2.0: an infinitely scrolling text ticker for reviews, badges, offers or announcements ("★ 5.0 Google Reviews ★ Since 2015 ★ ..."). It uses the same smooth animation engine as the Logo Slider, with its own text size, colors, separator and speed settings.
+
 = Is it GDPR compliant? =
 
 Yes, the plugin doesn't collect, store, or transmit any personal data. It's completely GDPR compliant.
@@ -177,6 +185,16 @@ Yes, the plugin doesn't collect, store, or transmit any personal data. It's comp
 8. Logo size adjustment controls
 
 == Changelog ==
+
+= 2.0.0 =
+* NEW: Text Marquee block — an infinitely scrolling text ticker (reviews, badges, offers) powered by the same seamless engine as the Logo Slider. Custom separator, text size, colors, uppercase mode, direction and speed.
+* NEW: Optional pause/play button on both blocks — visitors can stop the animation at any time (WCAG 2.2.2 accessibility)
+* NEW: Grayscale logo mode — logos run desaturated and regain their full color on hover
+* NEW: Live preview in the editor — the block now shows the real animated carousel while you edit, including capsules, balance mode and all spacing options
+* NEW: Wide and full alignment support for both blocks
+* IMPROVED: Modernized block registration (block.json, block API v3) — ready for the iframed post editor
+* CHANGED: Requires WordPress 6.0 or higher
+* Fully backward-compatible — existing sliders render identically; saved content is migrated automatically the next time you edit it
 
 = 1.8.0 =
 * NEW: Balance Logo Sizes — optional area-based size equalization. Wide wordmark logos render slightly smaller, compact/square logos slightly larger, so every logo carries similar visual weight in the carousel.
@@ -302,6 +320,9 @@ Yes, the plugin doesn't collect, store, or transmit any personal data. It's comp
 * WordPress 6.8 compatibility
 
 == Upgrade Notice ==
+
+= 2.0.0 =
+Major update: new Text Marquee block, accessibility pause button, grayscale hover mode, live editor preview and modernized block engine. Existing sliders keep working unchanged. Requires WordPress 6.0+.
 
 = 1.8.0 =
 New: Balance Logo Sizes evens out wide vs. compact logos, plus extra-large and custom gap options for logos and rows.

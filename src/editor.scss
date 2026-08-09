@@ -47,3 +47,41 @@
 		margin-top: 10px;
 	}
 }
+
+// Live preview inside the editor: cap the vertical footprint so a multi-row
+// slider doesn't push the management UI off screen, and keep the preview's
+// outer margins compact inside the editor card.
+.dbw-partner-slider-editor-wrapper .dbw-editor-preview,
+.dbw-marquee-editor-wrapper .dbw-editor-preview {
+	margin-top: 10px;
+	margin-bottom: 20px;
+}
+
+// Text marquee: item management list.
+.dbw-marquee-editor-wrapper {
+	border: 1px solid #ccc;
+	padding: 20px;
+	background: #f9f9f9;
+}
+
+.dbw-marquee-editor {
+	.dbw-marquee-editor-item {
+		display: flex;
+		align-items: flex-end;
+		gap: 10px;
+		background: #fff;
+		border: 1px solid #ddd;
+		padding: 10px;
+		margin-bottom: 10px;
+
+		.components-base-control {
+			flex: 1;
+			margin-bottom: 0;
+		}
+
+		.dbw-remove-button {
+			color: #b32d2e;
+			font-size: 12px;
+		}
+	}
+}

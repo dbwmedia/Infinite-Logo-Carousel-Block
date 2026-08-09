@@ -388,3 +388,80 @@ msgstr "Ausgewogene Logo-Größen"
 
 msgid "Compensates different logo proportions: wide logos render slightly smaller, compact logos slightly larger, so every logo carries similar visual weight."
 msgstr "Gleicht unterschiedliche Logo-Proportionen aus: Breite Logos werden etwas kleiner, kompakte etwas größer dargestellt, damit alle Logos ähnlich stark wirken."
+
+# New strings for v2.0 (marquee block, pause button, grayscale)
+msgid "Show pause button"
+msgstr "Pause-Button anzeigen"
+
+msgid "Adds a small pause/play button in the corner so visitors can stop the animation (recommended for accessibility)."
+msgstr "Fügt einen kleinen Pause/Play-Button in der Ecke hinzu, mit dem Besucher die Animation stoppen können (empfohlen für Barrierefreiheit)."
+
+msgid "Grayscale (color on hover)"
+msgstr "Graustufen (Farbe bei Hover)"
+
+msgid "Text Marquee"
+msgstr "Text-Laufband"
+
+msgid "Infinitely scrolling text ticker for reviews, badges, offers or announcements. Same smooth engine as the Logo Slider."
+msgstr "Endlos laufender Text-Ticker für Bewertungen, Badges, Angebote oder Ankündigungen. Gleiche flüssige Technik wie der Logo Slider."
+
+msgid "Scroll Speed"
+msgstr "Laufgeschwindigkeit"
+
+msgid "Direction"
+msgstr "Richtung"
+
+msgid "Right to left"
+msgstr "Rechts nach links"
+
+msgid "Left to right"
+msgstr "Links nach rechts"
+
+msgid "Text Style"
+msgstr "Text-Stil"
+
+msgid "Text Size"
+msgstr "Textgröße"
+
+msgid "Custom Text Size (px)"
+msgstr "Eigene Textgröße (px)"
+
+msgid "Uppercase"
+msgstr "Großbuchstaben"
+
+msgid "Separator"
+msgstr "Trennzeichen"
+
+msgid "Character(s) shown between the items, e.g. ★ • | /. Leave empty for none."
+msgstr "Zeichen zwischen den Einträgen, z.B. ★ • | /. Leer lassen für keins."
+
+msgid "Colors"
+msgstr "Farben"
+
+msgid "Text color"
+msgstr "Textfarbe"
+
+msgid "Separator color"
+msgstr "Trennzeichen-Farbe"
+
+msgid "Spacing"
+msgstr "Abstände"
+
+msgid "Gap between items"
+msgstr "Abstand zwischen Einträgen"
+
+msgid "Item"
+msgstr "Eintrag"
+
+msgid "e.g. ★ 5.0 Google Reviews"
+msgstr "z.B. ★ 5,0 Google Bewertungen"
+
+msgid "Add Text Item"
+msgstr "Text-Eintrag hinzufügen"
+
+msgid "The <strong>Logo Slider</strong> plugin requires WordPress 6.0 or higher. You are using WordPress %s."
+msgstr "Das Plugin <strong>Logo Slider</strong> benötigt WordPress 6.0 oder höher. Du verwendest WordPress %s."
+
+msgid "This plugin requires WordPress 6.0 or higher."
+msgstr "Dieses Plugin benötigt WordPress 6.0 oder höher."
+

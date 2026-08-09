@@ -372,19 +372,44 @@
 			initTrack(track, slider, trackReady);
 		});
 
+		// Optional pause/play button (accessibility). While button-paused
+		// (.dbw-paused) the hover/touch handlers below leave the state alone.
+		var pauseBtn = slider.querySelector(".dbw-pause-btn");
+		if (pauseBtn) {
+			pauseBtn.setAttribute("aria-label", "Pause animation");
+			pauseBtn.addEventListener("click", function () {
+				var paused = slider.classList.toggle("dbw-paused");
+				setPlayState(slider, paused ? "paused" : "running");
+				pauseBtn.setAttribute("aria-pressed", paused ? "true" : "false");
+				pauseBtn.setAttribute(
+					"aria-label",
+					paused ? "Resume animation" : "Pause animation"
+				);
+			});
+		}
+
 		// Pause on hover (desktop / pointer devices).
 		slider.addEventListener("mouseenter", function () {
 			setPlayState(slider, "paused");
 		});
 		slider.addEventListener("mouseleave", function () {
-			setPlayState(slider, "running");
+			if (!slider.classList.contains("dbw-paused")) {
+				setPlayState(slider, "running");
+			}
 		});
 
-		// Tap to toggle pause (touch devices).
+		// Tap to toggle pause (touch devices). Taps on the pause button are
+		// handled by its own click handler.
 		var touchPaused = false;
 		slider.addEventListener(
 			"touchstart",
 			function (e) {
+				if (pauseBtn && pauseBtn.contains(e.target)) {
+					return;
+				}
+				if (slider.classList.contains("dbw-paused")) {
+					return;
+				}
 				if (e.touches.length === 1) {
 					touchPaused = !touchPaused;
 					setPlayState(slider, touchPaused ? "paused" : "running");

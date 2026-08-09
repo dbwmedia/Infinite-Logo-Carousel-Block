@@ -3,8 +3,8 @@
  * Plugin Name: Logo Slider – Infinite Carousel & Marquee Block
  * Plugin URI: https://www.dennisbuchwald.de/apps/logo-slider
  * Description: A professional infinity logo carousel Gutenberg block with customizable speed, spacing, hover-stop and optional links. Perfect for showcasing partner, client or sponsor logos.
- * Version: 1.8.0
- * Requires at least: 5.8
+ * Version: 2.0.0
+ * Requires at least: 6.0
  * Tested up to: 7.0
  * Requires PHP: 7.2
  * Author: Dennis Buchwald
@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define plugin constants
-define( 'ILCB_VERSION', '1.8.0' );
+define( 'ILCB_VERSION', '2.0.0' );
 define( 'ILCB_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'ILCB_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'ILCB_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
@@ -107,51 +107,20 @@ function ilcb_register_block() {
         );
     }
 
-    // Register the block
-    register_block_type( 'infinite-logo-carousel-block/carousel', array(
+    // Register the Logo Slider block from its metadata. block.json holds the
+    // attribute definitions and references the script/style handles
+    // registered above.
+    register_block_type( ILCB_PLUGIN_DIR . 'block.json' );
+
+    // Register the Text Marquee block (v2.0). It shares the slider's scripts,
+    // styles and frontend engine; the attribute definitions live in
+    // src/marquee.js (static save, client-side registration).
+    register_block_type( 'infinite-logo-carousel-block/marquee', array(
+        'api_version'   => 3,
         'editor_script' => 'ilcb-editor',
         'editor_style'  => 'ilcb-editor-style',
         'style'         => 'ilcb-style',
         'script'        => 'ilcb-frontend',
-        // Kept in sync with BLOCK_ATTRIBUTES in src/index.js.
-        'attributes' => array(
-            'images'                   => array( 'type' => 'array',   'default' => array() ),
-            'speed'                    => array( 'type' => 'string',  'default' => 'medium' ),
-            'speedCustom'              => array( 'type' => 'number',  'default' => 60 ),
-            'gap'                      => array( 'type' => 'string',  'default' => 'medium' ),
-            'gapCustom'                => array( 'type' => 'number',  'default' => 40 ),
-            'marginSize'               => array( 'type' => 'string',  'default' => 'medium' ),
-            'logoHeight'               => array( 'type' => 'string',  'default' => '50' ),
-            'logoHeightMobile'         => array( 'type' => 'string',  'default' => '' ),
-            'balanceLogos'             => array( 'type' => 'boolean', 'default' => false ),
-            'overlayEnabled'           => array( 'type' => 'boolean', 'default' => true ),
-            'overlayColor'             => array( 'type' => 'string',  'default' => '#ffffff' ),
-            'blackLogos'               => array( 'type' => 'boolean', 'default' => false ),
-            'logoColorMode'            => array( 'type' => 'string',  'default' => 'original' ),
-            'logoCustomColor'          => array( 'type' => 'string',  'default' => '#999999' ),
-            'linkTarget'               => array( 'type' => 'string',  'default' => '_self' ),
-            'linkRel'                  => array( 'type' => 'string',  'default' => '' ),
-            'linkTitle'                => array( 'type' => 'string',  'default' => '' ),
-            'layout'                   => array( 'type' => 'string',  'default' => 'single' ),
-            'rowCount'                 => array( 'type' => 'number',  'default' => 3 ),
-            'rowSpeedMode'             => array( 'type' => 'string',  'default' => 'uniform' ),
-            'rowGap'                   => array( 'type' => 'string',  'default' => 'medium' ),
-            'rowGapCustom'             => array( 'type' => 'number',  'default' => 24 ),
-            'capsuleEnabled'           => array( 'type' => 'boolean', 'default' => false ),
-            'capsuleStyle'             => array( 'type' => 'string',  'default' => 'alternating' ),
-            'capsuleRadius'            => array( 'type' => 'string',  'default' => 'pill' ),
-            'capsuleRadiusCustom'      => array( 'type' => 'number',  'default' => 16 ),
-            'capsulePadding'           => array( 'type' => 'string',  'default' => 'medium' ),
-            'capsulePaddingCustom'     => array( 'type' => 'number',  'default' => 12 ),
-            'capsuleColorA'            => array( 'type' => 'string',  'default' => '#000000' ),
-            'capsuleColorB'            => array( 'type' => 'string',  'default' => '#ffffff' ),
-            'capsuleBorderWidth'       => array( 'type' => 'string',  'default' => 'medium' ),
-            'capsuleBorderWidthCustom' => array( 'type' => 'number',  'default' => 2 ),
-            'capsuleLogoColor'         => array( 'type' => 'string',  'default' => 'original' ),
-            'capsuleGlow'              => array( 'type' => 'boolean', 'default' => false ),
-            'capsuleGlowSize'          => array( 'type' => 'string',  'default' => 'medium' ),
-            'capsuleGlowSizeCustom'    => array( 'type' => 'number',  'default' => 12 ),
-        ),
     ) );
 
     // Set script translations
@@ -185,10 +154,10 @@ function ilcb_admin_notice() {
     if ( ! function_exists( 'register_block_type' ) ) {
         ?>
         <div class="notice notice-error">
-            <p><?php 
+            <p><?php
                 echo wp_kses_post( sprintf(
                     /* translators: %s: WordPress version */
-                    __( 'The <strong>Infinite Logo Carousel Block</strong> plugin requires WordPress 5.8 or higher. You are using WordPress %s.', 'infinite-logo-carousel-block' ),
+                    __( 'The <strong>Logo Slider</strong> plugin requires WordPress 6.0 or higher. You are using WordPress %s.', 'infinite-logo-carousel-block' ),
                     esc_html( get_bloginfo( 'version' ) )
                 ));
             ?></p>
@@ -202,10 +171,10 @@ add_action( 'admin_notices', 'ilcb_admin_notice' );
  * Activation hook
  */
 function ilcb_activate() {
-    if ( version_compare( get_bloginfo( 'version' ), '5.8', '<' ) ) {
+    if ( version_compare( get_bloginfo( 'version' ), '6.0', '<' ) ) {
         deactivate_plugins( ILCB_PLUGIN_BASENAME );
-        wp_die( 
-            esc_html__( 'This plugin requires WordPress 5.8 or higher.', 'infinite-logo-carousel-block' ),
+        wp_die(
+            esc_html__( 'This plugin requires WordPress 6.0 or higher.', 'infinite-logo-carousel-block' ),
             esc_html__( 'Plugin activation failed', 'infinite-logo-carousel-block' ),
             array( 'back_link' => true )
         );
@@ -242,7 +211,7 @@ add_filter( 'render_block', 'ilcb_fix_image_loading', 10, 2 );
  * Add inline styles for initial rendering
  */
 function ilcb_add_inline_styles() {
-    if ( has_block( 'infinite-logo-carousel-block/carousel' ) ) {
+    if ( has_block( 'infinite-logo-carousel-block/carousel' ) || has_block( 'infinite-logo-carousel-block/marquee' ) ) {
         echo '<style>
             .dbw-partner-slider { min-height: 70px; }
             .dbw-slider-wrapper { min-height: 70px; }
@@ -255,8 +224,9 @@ function ilcb_add_inline_styles() {
         </style>';
 
         // Keep the carousel visible when JavaScript is disabled. With JS the
-        // reveal is handled by the frontend script (adds the .dbw-ready class).
-        echo '<noscript><style>.dbw-partner-slider{opacity:1 !important;animation:none !important;}</style></noscript>';
+        // reveal is handled by the frontend script (adds the .dbw-ready
+        // class). The pause button needs JS, so it is hidden without it.
+        echo '<noscript><style>.dbw-partner-slider{opacity:1 !important;animation:none !important;}.dbw-pause-btn{display:none;}</style></noscript>';
     }
 }
 add_action( 'wp_head', 'ilcb_add_inline_styles', 5 );

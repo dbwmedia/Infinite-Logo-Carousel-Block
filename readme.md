@@ -1,8 +1,8 @@
 # Logo Slider – Infinite Carousel & Marquee Block
 
-[![WordPress Plugin Version](https://img.shields.io/badge/version-1.8.0-blue)](https://wordpress.org/plugins/infinite-logo-carousel-block/)
+[![WordPress Plugin Version](https://img.shields.io/badge/version-2.0.0-blue)](https://wordpress.org/plugins/infinite-logo-carousel-block/)
 [![License](https://img.shields.io/badge/license-GPL%20v2-green)](https://www.gnu.org/licenses/gpl-2.0.html)
-[![WordPress](https://img.shields.io/badge/WordPress-5.8%2B-blue)](https://wordpress.org/)
+[![WordPress](https://img.shields.io/badge/WordPress-6.0%2B-blue)](https://wordpress.org/)
 [![Tested up to](https://img.shields.io/badge/tested%20up%20to-7.0-blue)](https://wordpress.org/)
 [![PHP](https://img.shields.io/badge/PHP-7.2%2B-purple)](https://php.net/)
 
@@ -159,6 +159,15 @@ npm run format   # Code formatting
 Developed by [Dennis Buchwald](https://www.dennisbuchwald.de) — WordPress development, Gutenberg blocks and performance optimization.
 
 ## Changelog
+
+### 2.0.0
+
+- NEW: Text Marquee block — infinitely scrolling text ticker with separator, text size, colors, uppercase, direction and speed settings
+- NEW: Optional pause/play button on both blocks (WCAG 2.2.2)
+- NEW: Grayscale logo mode with color on hover
+- NEW: Live animated preview in the editor
+- NEW: Wide/full alignment support
+- IMPROVED: block.json + block API v3 registration; requires WordPress 6.0+
 
 ### 1.8.0
 
