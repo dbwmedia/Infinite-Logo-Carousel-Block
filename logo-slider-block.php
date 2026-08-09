@@ -1,14 +1,14 @@
 <?php
 /**
  * Plugin Name: Logo Slider – Infinite Carousel & Marquee Block
- * Plugin URI: https://wordpress.org/plugins/infinite-logo-carousel-block/
+ * Plugin URI: https://www.dennisbuchwald.de/apps/logo-slider
  * Description: A professional infinity logo carousel Gutenberg block with customizable speed, spacing, hover-stop and optional links. Perfect for showcasing partner, client or sponsor logos.
- * Version: 1.6.1
+ * Version: 1.7.0
  * Requires at least: 5.8
  * Tested up to: 7.0
  * Requires PHP: 7.2
- * Author: dbw media
- * Author URI: https://dbw-media.de
+ * Author: Dennis Buchwald
+ * Author URI: https://www.dennisbuchwald.de
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: infinite-logo-carousel-block
@@ -23,23 +23,29 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define plugin constants
-define( 'ILCB_VERSION', '1.6.1' );
+define( 'ILCB_VERSION', '1.7.0' );
 define( 'ILCB_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'ILCB_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'ILCB_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 
 /**
- * Note: Translation loading removed for WordPress.org Plugin Check compliance
+ * Load the plugin's bundled translations.
  *
- * Since WordPress 4.6+, translations are loaded automatically for plugins
- * hosted on WordPress.org that have proper Text Domain and Domain Path headers.
- * Manual load_plugin_textdomain() calls are discouraged by Plugin Check
- * as they are not necessary and can cause issues.
- *
- * Plugin Headers ensure automatic translation loading:
- * - Text Domain: infinite-logo-carousel-block
- * - Domain Path: /languages
+ * WordPress auto-loads translations only from wp-content/languages/plugins
+ * (the WordPress.org language packs). German language packs for this plugin
+ * are not complete on translate.wordpress.org yet, so the bundled files in
+ * /languages need an explicit load — this also makes the translated plugin
+ * Name/Description on the Plugins screen work. Language packs, when present,
+ * still take precedence over the bundled files.
  */
+function ilcb_load_textdomain() {
+    load_plugin_textdomain(
+        'infinite-logo-carousel-block',
+        false,
+        dirname( ILCB_PLUGIN_BASENAME ) . '/languages'
+    );
+}
+add_action( 'init', 'ilcb_load_textdomain' );
 
 /**
  * Register the Gutenberg Block
@@ -107,51 +113,41 @@ function ilcb_register_block() {
         'editor_style'  => 'ilcb-editor-style',
         'style'         => 'ilcb-style',
         'script'        => 'ilcb-frontend',
+        // Kept in sync with BLOCK_ATTRIBUTES in src/index.js.
         'attributes' => array(
-            'images' => array(
-                'type' => 'array',
-                'default' => array(),
-            ),
-            'speed' => array(
-                'type' => 'string',
-                'default' => 'medium',
-            ),
-            'gap' => array(
-                'type' => 'string',
-                'default' => 'medium',
-            ),
-            'marginSize' => array(
-                'type' => 'string',
-                'default' => 'medium',
-            ),
-            'logoHeight' => array(
-                'type' => 'string',
-                'default' => '50',
-            ),
-            'overlayEnabled' => array(
-                'type' => 'boolean',
-                'default' => true,
-            ),
-            'overlayColor' => array(
-                'type' => 'string',
-                'default' => '#ffffff',
-            ),
-            'blackLogos' => array(
-                'type' => 'boolean',
-                'default' => false,
-            ),
-            'linkTarget' => array(
-                'type' => 'string',
-                'default' => '_self',
-            ),
-            'linkRel' => array(
-                'type' => 'string',
-                'default' => '',
-            ),
-            'linkTitle' => array(
-                'type' => 'string',
-                'default' => '',
-            ),
+            'images'                   => array( 'type' => 'array',   'default' => array() ),
+            'speed'                    => array( 'type' => 'string',  'default' => 'medium' ),
+            'speedCustom'              => array( 'type' => 'number',  'default' => 60 ),
+            'gap'                      => array( 'type' => 'string',  'default' => 'medium' ),
+            'marginSize'               => array( 'type' => 'string',  'default' => 'medium' ),
+            'logoHeight'               => array( 'type' => 'string',  'default' => '50' ),
+            'logoHeightMobile'         => array( 'type' => 'string',  'default' => '' ),
+            'overlayEnabled'           => array( 'type' => 'boolean', 'default' => true ),
+            'overlayColor'             => array( 'type' => 'string',  'default' => '#ffffff' ),
+            'blackLogos'               => array( 'type' => 'boolean', 'default' => false ),
+            'logoColorMode'            => array( 'type' => 'string',  'default' => 'original' ),
+            'logoCustomColor'          => array( 'type' => 'string',  'default' => '#999999' ),
+            'linkTarget'               => array( 'type' => 'string',  'default' => '_self' ),
+            'linkRel'                  => array( 'type' => 'string',  'default' => '' ),
+            'linkTitle'                => array( 'type' => 'string',  'default' => '' ),
+            'layout'                   => array( 'type' => 'string',  'default' => 'single' ),
+            'rowCount'                 => array( 'type' => 'number',  'default' => 3 ),
+            'rowSpeedMode'             => array( 'type' => 'string',  'default' => 'uniform' ),
+            'rowGap'                   => array( 'type' => 'string',  'default' => 'medium' ),
+            'capsuleEnabled'           => array( 'type' => 'boolean', 'default' => false ),
+            'capsuleStyle'             => array( 'type' => 'string',  'default' => 'alternating' ),
+            'capsuleRadius'            => array( 'type' => 'string',  'default' => 'pill' ),
+            'capsuleRadiusCustom'      => array( 'type' => 'number',  'default' => 16 ),
+            'capsulePadding'           => array( 'type' => 'string',  'default' => 'medium' ),
+            'capsulePaddingCustom'     => array( 'type' => 'number',  'default' => 12 ),
+            'capsuleColorA'            => array( 'type' => 'string',  'default' => '#000000' ),
+            'capsuleColorB'            => array( 'type' => 'string',  'default' => '#ffffff' ),
+            'capsuleBorderWidth'       => array( 'type' => 'string',  'default' => 'medium' ),
+            'capsuleBorderWidthCustom' => array( 'type' => 'number',  'default' => 2 ),
+            'capsuleLogoColor'         => array( 'type' => 'string',  'default' => 'original' ),
+            'capsuleGlow'              => array( 'type' => 'boolean', 'default' => false ),
+            'capsuleGlowSize'          => array( 'type' => 'string',  'default' => 'medium' ),
+            'capsuleGlowSizeCustom'    => array( 'type' => 'number',  'default' => 12 ),
         ),
     ) );
 
@@ -178,23 +174,6 @@ function ilcb_plugin_links( $links ) {
     return array_merge( $links, $plugin_links );
 }
 add_filter( 'plugin_action_links_' . ILCB_PLUGIN_BASENAME, 'ilcb_plugin_links' );
-
-/**
- * Plugin meta links
- */
-function ilcb_plugin_meta( $links, $file ) {
-    if ( ILCB_PLUGIN_BASENAME === $file ) {
-        $row_meta = array(
-            'agency' => '<a href="' . esc_url( 'https://dbw-media.de' ) . '" style="font-weight: bold; color: #0073aa;">' . 
-                esc_html__( 'WordPress Agentur', 'infinite-logo-carousel-block' ) . '</a>',
-        );
-        
-        return array_merge( $links, $row_meta );
-    }
-    
-    return $links;
-}
-add_filter( 'plugin_row_meta', 'ilcb_plugin_meta', 10, 2 );
 
 /**
  * Admin notice for Gutenberg requirement

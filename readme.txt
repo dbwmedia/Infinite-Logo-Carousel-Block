@@ -4,7 +4,7 @@ Tags: logo carousel, logo slider, logo showcase, logo marquee, client logos
 Requires at least: 5.8
 Tested up to: 7.0
 Requires PHP: 7.2
-Stable tag: 1.6.1
+Stable tag: 1.7.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -27,6 +27,7 @@ Infinity logo carousel for client, partner or sponsor logos with custom speed.
 * **Color Customization** - Adjust overlay color to match your design
 * **Logo Color Mode** - Convert all logos to black, white or a custom tint color
 * **Adjustable Logo Height** - Set custom height from 30px to 150px
+* **Mobile Logo Height** - Optional separate logo height for phones, or fully automatic scaling
 * **Responsive Design** - Perfect display on all devices and screen sizes
 * **SEO-Friendly** - Clean, semantic HTML markup
 * **Lightweight** - Optimized for performance with minimal impact
@@ -151,9 +152,13 @@ Yes, you can add as many Infinite Logo Carousel blocks as you need on a single p
 
 Use the "Logo Size" setting in the block sidebar. You can set a maximum height from 30px to 150px, and all logos will scale proportionally.
 
-= My logos look too small on mobile. How can I fix that? =
+= Can I set a different logo size for mobile devices? =
 
-The logo height you set in the editor is treated as the desktop maximum. On smaller screens the logos scale down automatically to prevent overflow. If they appear too small on phones, simply increase the "Logo Size" value in the block sidebar (e.g. from 50 px to 80-100 px). The desktop ceiling rises, which also raises the mobile size proportionally.
+Yes. In the "Logo Size" panel, enable "Custom height on phones" and pick a fixed logo height for screens narrower than 600px. Without it, the height you set in the editor is treated as the desktop maximum and logos scale down automatically on smaller screens.
+
+= My logos look too small or too big on mobile. How can I fix that? =
+
+Enable "Custom height on phones" in the "Logo Size" panel and set exactly the height you want for phones. The desktop size stays untouched.
 
 = Is it GDPR compliant? =
 
@@ -171,6 +176,12 @@ Yes, the plugin doesn't collect, store, or transmit any personal data. It's comp
 8. Logo size adjustment controls
 
 == Changelog ==
+
+= 1.7.0 =
+* NEW: Mobile Logo Height — optionally set a fixed logo height for phones (screens narrower than 600px) instead of the automatic scaling. Capsule padding follows the mobile height proportionally.
+* IMPROVED: The uniform item width on phones (introduced in 1.5.3) is now applied only in capsule mode. Plain logo sliders keep their natural gap-based spacing on mobile again.
+* IMPROVED: Complete German translation — including the plugin description on the Plugins screen and all strings added in 1.6.0. Bundled translations are now loaded reliably.
+* CHANGED: Plugin website moved to dennisbuchwald.de/apps/logo-slider
 
 = 1.6.1 =
 * FIXED: Carousel flashing at wrong speed on initial page load. Caused by `loading="lazy"` on images delaying width measurement. Images now use `loading="eager"` so the animation starts at the correct speed immediately. Existing posts are automatically fixed without re-saving. Props to Bernd for reporting!
@@ -285,6 +296,9 @@ Yes, the plugin doesn't collect, store, or transmit any personal data. It's comp
 
 == Upgrade Notice ==
 
+= 1.7.0 =
+New: optional fixed logo height for phones, complete German translation, and natural mobile spacing for capsule-less sliders.
+
 = 1.6.1 =
 Fixes the carousel briefly scrolling too fast on page load. No action needed — existing posts are patched automatically.
 
@@ -315,7 +329,7 @@ Initial release of Infinite Logo Carousel Block. Start showcasing your client, p
 == Source Code ==
 
 The source code for this plugin is available at:
-https://github.com/dbw-media/Infinite-Logo-Carousel-Block
+https://github.com/dbwmedia/Infinite-Logo-Carousel-Block
 
 Build instructions:
 1. Clone the repository

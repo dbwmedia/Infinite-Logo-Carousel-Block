@@ -1,6 +1,6 @@
 # Logo Slider – Infinite Carousel & Marquee Block
 
-[![WordPress Plugin Version](https://img.shields.io/badge/version-1.5.3-blue)](https://wordpress.org/plugins/infinite-logo-carousel-block/)
+[![WordPress Plugin Version](https://img.shields.io/badge/version-1.7.0-blue)](https://wordpress.org/plugins/infinite-logo-carousel-block/)
 [![License](https://img.shields.io/badge/license-GPL%20v2-green)](https://www.gnu.org/licenses/gpl-2.0.html)
 [![WordPress](https://img.shields.io/badge/WordPress-5.8%2B-blue)](https://wordpress.org/)
 [![Tested up to](https://img.shields.io/badge/tested%20up%20to-7.0-blue)](https://wordpress.org/)
@@ -152,13 +152,28 @@ npm run format   # Code formatting
 
 - **Documentation**: Check the [plugin page](https://wordpress.org/plugins/infinite-logo-carousel-block/)
 - **Support Forum**: [WordPress.org Support](https://wordpress.org/support/plugin/infinite-logo-carousel-block/)
-- **Professional Support**: [dbw media](https://dbw-media.de/kontakt)
+- **Plugin Website**: [dennisbuchwald.de/apps/logo-slider](https://www.dennisbuchwald.de/apps/logo-slider)
 
-## About dbw media
+## Author
 
-[dbw media](https://dbw-media.de) is a WordPress agency specializing in custom development, Gutenberg blocks, and performance optimization.
+Developed by [Dennis Buchwald](https://www.dennisbuchwald.de) — WordPress development, Gutenberg blocks and performance optimization.
 
 ## Changelog
+
+### 1.7.0
+
+- NEW: Mobile Logo Height — optionally set a fixed logo height for phones (below 600 px viewport) instead of the automatic fluid scaling; capsule padding follows the mobile height proportionally
+- IMPROVED: The uniform mobile item width from 1.5.3 is now scoped to capsule mode — plain sliders keep natural gap-based spacing on phones
+- IMPROVED: Complete German translation, including the plugin description on the Plugins screen; bundled translations are loaded reliably again
+- CHANGED: Plugin website moved to dennisbuchwald.de/apps/logo-slider
+
+### 1.6.1
+
+- FIXED: Carousel flashing at wrong speed on initial page load (`loading="lazy"` delayed width measurement; images now load eagerly, existing posts patched automatically)
+
+### 1.6.0
+
+- NEW: Logo Color mode (Original / Black / White / Custom tint), Capsule Logo Color for all capsule styles, "Original Colors" option for filled capsules
 
 ### 1.5.3
 
@@ -263,4 +278,4 @@ GPL v2 or later. See [LICENSE](https://www.gnu.org/licenses/gpl-2.0.html) for de
 
 ---
 
-Developed by [dbw media](https://dbw-media.de) - Professional WordPress Development
+Developed by [Dennis Buchwald](https://www.dennisbuchwald.de) - Professional WordPress Development

@@ -4,11 +4,11 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Logo Slider 1.5.3\n"
+"Project-Id-Version: Logo Slider 1.7.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/infinite-logo-carousel-block/\n"
 "POT-Creation-Date: 2026-05-22 12:00+0000\n"
-"PO-Revision-Date: 2026-05-22 12:00+0000\n"
-"Last-Translator: dbw media <support@dbw-media.de>\n"
+"PO-Revision-Date: 2026-08-09 12:00+0000\n"
+"Last-Translator: Dennis Buchwald\n"
 "Language-Team: German\n"
 "Language: de_DE\n"
 "MIME-Version: 1.0\n"
@@ -310,7 +310,7 @@ msgstr "Eigene Rahmenstärke (px)"
 msgid "Logo Color"
 msgstr "Logo-Farbe"
 
-msgid "Outline capsules have no background - choose how the logos are colored."
+msgid "Outline capsules have no background — choose how the logos are colored."
 msgstr "Umriss-Kapseln haben keinen Hintergrund – wähle, wie die Logos eingefärbt werden."
 
 msgid "Original"
@@ -339,3 +339,36 @@ msgstr "Stark"
 
 msgid "Custom Glow Size (px)"
 msgstr "Eigene Leuchtstärke (px)"
+
+# Plugin header metadata (Plugins screen)
+msgid "A professional infinity logo carousel Gutenberg block with customizable speed, spacing, hover-stop and optional links. Perfect for showcasing partner, client or sponsor logos."
+msgstr "Ein professioneller Endlos-Logo-Karussell-Block für Gutenberg mit anpassbarer Geschwindigkeit, Abständen, Hover-Stopp und optionalen Links. Perfekt zur Präsentation von Partner-, Kunden- oder Sponsoren-Logos."
+
+# New strings for v1.6 (logo color mode)
+msgid "Applies a uniform color to all logos for a cohesive look."
+msgstr "Wendet eine einheitliche Farbe auf alle Logos an, für einen stimmigen Look."
+
+msgid "Custom Color"
+msgstr "Eigene Farbe"
+
+msgid "Auto-Contrast"
+msgstr "Auto-Kontrast"
+
+msgid "Auto-Contrast picks white or black based on the capsule background. Choose Original Colors to keep your logos unchanged."
+msgstr "Auto-Kontrast wählt Weiß oder Schwarz passend zum Kapsel-Hintergrund. Wähle Originalfarben, um deine Logos unverändert zu lassen."
+
+msgid "Original Colors"
+msgstr "Originalfarben"
+
+# New strings for v1.7 (mobile logo height)
+msgid "Custom height on phones"
+msgstr "Eigene Höhe auf Smartphones"
+
+msgid "By default, logos scale down automatically on small screens. Enable this to set a fixed logo height for phones instead."
+msgstr "Standardmäßig verkleinern sich Logos auf kleinen Bildschirmen automatisch. Aktiviere diese Option, um stattdessen eine feste Logo-Höhe für Smartphones festzulegen."
+
+msgid "Mobile Logo Height (px)"
+msgstr "Mobile Logo-Höhe (px)"
+
+msgid "Applies on screens narrower than 600px."
+msgstr "Gilt für Bildschirme schmaler als 600px."

@@ -64,6 +64,7 @@ const BLOCK_ATTRIBUTES = {
 	gap: { type: "string", default: "medium" },
 	marginSize: { type: "string", default: "medium" },
 	logoHeight: { type: "string", default: "50" },
+	logoHeightMobile: { type: "string", default: "" },
 	overlayEnabled: { type: "boolean", default: true },
 	overlayColor: { type: "string", default: "#ffffff" },
 	blackLogos: { type: "boolean", default: false },
@@ -172,6 +173,28 @@ function sliderStyle(attributes) {
 		"--overlay-color": overlayColor || "#ffffff",
 		"--logo-height": logoHeight + "px",
 	};
+	// Optional fixed logo height for phones. Only emitted when the user set a
+	// value, so existing content keeps producing identical output (the CSS
+	// falls back to the fluid clamp() formula when the property is absent).
+	const mobileHeight = parseInt(attributes.logoHeightMobile, 10);
+	if (mobileHeight > 0) {
+		style["--logo-height-mobile"] = mobileHeight + "px";
+		// Capsule padding presets are proportional to the logo height — emit
+		// mobile values matching the mobile height (custom padding is an
+		// absolute px value and stays as-is on phones).
+		if (
+			attributes.capsuleEnabled &&
+			attributes.capsulePadding !== "custom"
+		) {
+			const f =
+				CAPSULE_PADDING_MAP[attributes.capsulePadding] ||
+				CAPSULE_PADDING_MAP.medium;
+			style["--capsule-pad-y-mobile"] =
+				Math.round(mobileHeight * f.y * 10) / 10 + "px";
+			style["--capsule-pad-x-mobile"] =
+				Math.round(mobileHeight * f.x * 10) / 10 + "px";
+		}
+	}
 	// Custom logo colour filter (emitted regardless of capsules — the
 	// capsule CSS reset neutralises it when capsules are active).
 	if (!attributes.blackLogos && attributes.logoColorMode === "custom") {
@@ -728,6 +751,7 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 			gap,
 			marginSize,
 			logoHeight,
+			logoHeightMobile,
 			overlayEnabled,
 			overlayColor,
 			blackLogos,
@@ -983,6 +1007,38 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 							]}
 							onChange={(val) => setAttributes({ logoHeight: val })}
 						/>
+						<ToggleControl
+							label={__("Custom height on phones", "infinite-logo-carousel-block")}
+							help={__("By default, logos scale down automatically on small screens. Enable this to set a fixed logo height for phones instead.", "infinite-logo-carousel-block")}
+							checked={logoHeightMobile !== ""}
+							onChange={(val) =>
+								setAttributes({
+									logoHeightMobile: val
+										? String(
+												Math.max(
+													20,
+													Math.round(
+														(parseInt(logoHeight, 10) * 0.6) / 5
+													) * 5
+												)
+										  )
+										: "",
+								})
+							}
+						/>
+						{logoHeightMobile !== "" && (
+							<RangeControl
+								label={__("Mobile Logo Height (px)", "infinite-logo-carousel-block")}
+								help={__("Applies on screens narrower than 600px.", "infinite-logo-carousel-block")}
+								value={parseInt(logoHeightMobile, 10)}
+								onChange={(val) =>
+									setAttributes({ logoHeightMobile: val.toString() })
+								}
+								min={20}
+								max={120}
+								step={5}
+							/>
+						)}
 					</PanelBody>
 					<PanelBody
 						title={__("Overlay Settings", "infinite-logo-carousel-block")}

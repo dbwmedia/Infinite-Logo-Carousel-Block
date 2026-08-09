@@ -286,7 +286,10 @@
 // the carousel falls back to the natural content-sized layout, so
 // desktop wide logos render at full natural width as before.
 @media (max-width: 600px) {
-	.dbw-slider-item {
+	// v1.7.0: the uniform item width is now scoped to capsule mode — plain
+	// (capsule-less) sliders keep their natural gap-driven spacing on phones
+	// instead of being forced into 140–220 px cells with uneven gaps.
+	.dbw-capsules .dbw-slider-item {
 		width: clamp(140px, 46vw, 220px);
 	}
 
@@ -295,8 +298,58 @@
 		justify-content: center;
 	}
 
-	.dbw-slider-item img {
+	.dbw-capsules .dbw-slider-item img {
 		max-width: 100%;
+	}
+
+	// Safety net for capsule-less sliders: one very wide logo can never fill
+	// more than ~80% of a phone row (object-fit: contain keeps the aspect).
+	.dbw-slider-item img {
+		max-width: 80vw;
+	}
+
+	// Optional fixed mobile logo height (v1.7.0). The block only emits
+	// --logo-height-mobile when the user enabled the setting; without it the
+	// fluid clamp() formula from the base rules keeps applying via fallback.
+	.dbw-slider-item {
+		min-height: var(
+			--logo-height-mobile,
+			clamp(28px, 12vw, var(--logo-height, 50px))
+		);
+	}
+
+	.dbw-slider-item img {
+		max-height: var(
+			--logo-height-mobile,
+			clamp(28px, 12vw, var(--logo-height, 50px))
+		);
+		min-height: var(
+			--logo-height-mobile,
+			clamp(28px, 12vw, var(--logo-height, 50px))
+		);
+	}
+
+	// Capsule padding follows the mobile height when one is set (the block
+	// emits pre-computed mobile paddings for the proportional presets).
+	// The mobile variable appears in BOTH min() branches: when it is set the
+	// min() collapses to exactly that value (the user's explicit choice wins
+	// over the vw cap); when absent, the v1.5.2 formula applies unchanged.
+	.dbw-capsules .dbw-capsule {
+		padding:
+			min(
+				var(
+					--capsule-pad-y-mobile,
+					var(--capsule-pad-y, calc(var(--logo-height, 50px) * 0.3))
+				),
+				var(--capsule-pad-y-mobile, calc(12vw * 0.3))
+			)
+			min(
+				var(
+					--capsule-pad-x-mobile,
+					var(--capsule-pad-x, calc(var(--logo-height, 50px) * 0.55))
+				),
+				var(--capsule-pad-x-mobile, calc(12vw * 0.55))
+			);
 	}
 }
 
