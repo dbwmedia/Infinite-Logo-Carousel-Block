@@ -28,6 +28,7 @@
 		"blackLogos": { "type": "boolean", "default": false },
 		"logoColorMode": { "type": "string", "default": "original" },
 		"logoCustomColor": { "type": "string", "default": "#999999" },
+		"colorOnHover": { "type": "boolean", "default": false },
 		"linkTarget": { "type": "string", "default": "_self" },
 		"linkRel": { "type": "string", "default": "" },
 		"linkTitle": { "type": "string", "default": "" },

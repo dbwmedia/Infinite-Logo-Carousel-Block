@@ -81,16 +81,24 @@
 		opacity: 0.8;
 	}
 
-	// Grayscale mode: logos run desaturated and regain full color on hover.
+	// Grayscale mode: logos run desaturated.
 	&.dbw-logos-gray img {
 		filter: grayscale(1);
 		opacity: 0.7;
+	}
+
+	// Original colors on hover (v2.1) — an independent option that pairs with
+	// every color mode (black, white, grayscale, custom tint) and also works
+	// inside capsules. The selector carries four classes plus :hover, so it
+	// outranks both the color-mode rules above and the capsule logo-color
+	// rules further down without needing !important.
+	&.dbw-color-hover img {
 		transition:
 			filter 0.25s ease,
 			opacity 0.25s ease;
 	}
 
-	&.dbw-logos-gray .dbw-slider-item:hover img {
+	&.dbw-color-hover .dbw-slider-item:hover img {
 		filter: none;
 		opacity: 1;
 	}

@@ -84,6 +84,7 @@ const BLOCK_ATTRIBUTES = {
 	blackLogos: { type: "boolean", default: false },
 	logoColorMode: { type: "string", default: "original" },
 	logoCustomColor: { type: "string", default: "#999999" },
+	colorOnHover: { type: "boolean", default: false },
 	linkTarget: { type: "string", default: "_self" },
 	linkRel: { type: "string", default: "" },
 	linkTitle: { type: "string", default: "" },
@@ -156,6 +157,12 @@ function sliderClasses(attributes) {
 		classes.push("dbw-logos-custom");
 	if (!attributes.blackLogos && attributes.logoColorMode === "grayscale")
 		classes.push("dbw-logos-gray");
+	// Restore original logo colors on hover — works with every color mode.
+	if (
+		attributes.colorOnHover &&
+		(attributes.blackLogos || attributes.logoColorMode !== "original")
+	)
+		classes.push("dbw-color-hover");
 	// Balanced logo sizes (area-based). Only added when enabled, so existing
 	// content keeps producing identical output.
 	if (attributes.balanceLogos) classes.push("dbw-balance");
@@ -907,6 +914,7 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 			blackLogos,
 			logoColorMode,
 			logoCustomColor,
+			colorOnHover,
 			linkTarget,
 			linkRel,
 			linkTitle,
@@ -1281,7 +1289,7 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 								{ label: __("Original", "infinite-logo-carousel-block"), value: "original" },
 								{ label: __("Black", "infinite-logo-carousel-block"), value: "black" },
 								{ label: __("White", "infinite-logo-carousel-block"), value: "white" },
-								{ label: __("Grayscale (color on hover)", "infinite-logo-carousel-block"), value: "grayscale" },
+								{ label: __("Grayscale", "infinite-logo-carousel-block"), value: "grayscale" },
 								{ label: __("Custom Color", "infinite-logo-carousel-block"), value: "custom" },
 							]}
 							onChange={(val) =>
@@ -1305,6 +1313,14 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 									}
 								/>
 							</Fragment>
+						)}
+						{(blackLogos || logoColorMode !== "original") && (
+							<ToggleControl
+								label={__("Original colors on hover", "infinite-logo-carousel-block")}
+								help={__("The logo returns to its original colors when the visitor hovers over it. Works with every color mode.", "infinite-logo-carousel-block")}
+								checked={colorOnHover}
+								onChange={(val) => setAttributes({ colorOnHover: val })}
+							/>
 						)}
 					</PanelBody>
 					<PanelBody

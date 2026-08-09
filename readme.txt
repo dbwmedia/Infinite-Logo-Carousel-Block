@@ -4,7 +4,7 @@ Tags: logo carousel, logo slider, logo showcase, logo marquee, client logos
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.2
-Stable tag: 2.0.0
+Stable tag: 2.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -31,7 +31,8 @@ Infinity logo carousel and text marquee for client, partner or sponsor logos.
 * **Balanced Logo Sizes** - Optionally equalize the visual weight of wide and compact logos automatically
 * **Text Marquee Block** - Second block: infinitely scrolling text ticker for reviews, badges or announcements
 * **Pause Button** - Optional pause/play control for better accessibility (WCAG 2.2.2)
-* **Grayscale Hover Mode** - Logos run desaturated and regain full color on hover
+* **Grayscale Mode** - Logos run desaturated for a calm, uniform look
+* **Original Colors on Hover** - Optional: logos return to their original colors on hover, combinable with every color mode
 * **Wide & Full Alignment** - Native Gutenberg wide/full-width support
 * **Responsive Design** - Perfect display on all devices and screen sizes
 * **SEO-Friendly** - Clean, semantic HTML markup
@@ -169,6 +170,10 @@ Enable "Custom height on phones" in the "Logo Size" panel and set exactly the he
 
 A second block included since v2.0: an infinitely scrolling text ticker for reviews, badges, offers or announcements ("★ 5.0 Google Reviews ★ Since 2015 ★ ..."). It uses the same smooth animation engine as the Logo Slider, with its own text size, colors, separator and speed settings.
 
+= Can I show the original logo colors on hover? =
+
+Yes. In the "Logo Display" panel, enable "Original colors on hover". It works with every color mode — so you can show all logos in black, white, grayscale or a custom tint, and reveal the original colors when a visitor hovers over a logo.
+
 = Is it GDPR compliant? =
 
 Yes, the plugin doesn't collect, store, or transmit any personal data. It's completely GDPR compliant.
@@ -185,6 +190,10 @@ Yes, the plugin doesn't collect, store, or transmit any personal data. It's comp
 8. Logo size adjustment controls
 
 == Changelog ==
+
+= 2.1.0 =
+* NEW: "Original colors on hover" is now an independent toggle in the Logo Display panel. It works with every color mode — Black, White, Grayscale and Custom Color — and also inside capsules.
+* CHANGED: The Grayscale mode is now purely a color mode. If you used it in 2.0 and want the color-on-hover effect, enable the new toggle below the color selector.
 
 = 2.0.0 =
 * NEW: Text Marquee block — an infinitely scrolling text ticker (reviews, badges, offers) powered by the same seamless engine as the Logo Slider. Custom separator, text size, colors, uppercase mode, direction and speed.
@@ -320,6 +329,9 @@ Yes, the plugin doesn't collect, store, or transmit any personal data. It's comp
 * WordPress 6.8 compatibility
 
 == Upgrade Notice ==
+
+= 2.1.0 =
+"Original colors on hover" is now a separate toggle that works with every logo color mode, not just Grayscale. Using Grayscale from 2.0? Enable the new toggle to keep the hover effect.
 
 = 2.0.0 =
 Major update: new Text Marquee block, accessibility pause button, grayscale hover mode, live editor preview and modernized block engine. Existing sliders keep working unchanged. Requires WordPress 6.0+.

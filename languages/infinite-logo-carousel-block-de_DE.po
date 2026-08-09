@@ -396,8 +396,8 @@ msgstr "Pause-Button anzeigen"
 msgid "Adds a small pause/play button in the corner so visitors can stop the animation (recommended for accessibility)."
 msgstr "Fügt einen kleinen Pause/Play-Button in der Ecke hinzu, mit dem Besucher die Animation stoppen können (empfohlen für Barrierefreiheit)."
 
-msgid "Grayscale (color on hover)"
-msgstr "Graustufen (Farbe bei Hover)"
+msgid "Grayscale"
+msgstr "Graustufen"
 
 msgid "Text Marquee"
 msgstr "Text-Laufband"
@@ -464,4 +464,11 @@ msgstr "Das Plugin <strong>Logo Slider</strong> benötigt WordPress 6.0 oder hö
 
 msgid "This plugin requires WordPress 6.0 or higher."
 msgstr "Dieses Plugin benötigt WordPress 6.0 oder höher."
+
+# New strings for v2.1 (color-on-hover decoupled from grayscale)
+msgid "Original colors on hover"
+msgstr "Originalfarben bei Hover"
+
+msgid "The logo returns to its original colors when the visitor hovers over it. Works with every color mode."
+msgstr "Das Logo zeigt beim Überfahren mit der Maus wieder seine Originalfarben. Funktioniert mit jedem Farbmodus."
 
