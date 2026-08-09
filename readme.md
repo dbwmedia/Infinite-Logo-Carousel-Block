@@ -1,6 +1,6 @@
 # Logo Slider – Infinite Carousel & Marquee Block
 
-[![WordPress Plugin Version](https://img.shields.io/badge/version-1.7.0-blue)](https://wordpress.org/plugins/infinite-logo-carousel-block/)
+[![WordPress Plugin Version](https://img.shields.io/badge/version-1.8.0-blue)](https://wordpress.org/plugins/infinite-logo-carousel-block/)
 [![License](https://img.shields.io/badge/license-GPL%20v2-green)](https://www.gnu.org/licenses/gpl-2.0.html)
 [![WordPress](https://img.shields.io/badge/WordPress-5.8%2B-blue)](https://wordpress.org/)
 [![Tested up to](https://img.shields.io/badge/tested%20up%20to-7.0-blue)](https://wordpress.org/)
@@ -159,6 +159,11 @@ npm run format   # Code formatting
 Developed by [Dennis Buchwald](https://www.dennisbuchwald.de) — WordPress development, Gutenberg blocks and performance optimization.
 
 ## Changelog
+
+### 1.8.0
+
+- NEW: Balance Logo Sizes — optional area-based size equalization (wide logos slightly smaller, compact logos slightly larger, similar visual weight for all)
+- NEW: "Extra Large" preset + custom pixel value for logo gap (up to 200 px) and row gap (up to 150 px)
 
 ### 1.7.0
 

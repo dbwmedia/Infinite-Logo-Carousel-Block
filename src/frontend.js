@@ -91,6 +91,47 @@
 		});
 	}
 
+	// Balanced logo sizes: reference aspect ratio and scale bounds. Must match
+	// the values used for the editor preview in src/index.js.
+	var BALANCE_REF_RATIO = 2;
+	var BALANCE_MIN_SCALE = 0.65;
+	var BALANCE_MAX_SCALE = 1.4;
+
+	/**
+	 * Apply the balanced-size scale factor to every item of a track. The scale
+	 * equalises the logos' *area* instead of their height: sqrt(REF / ratio),
+	 * clamped — wide logos shrink a little, compact logos grow a little. Runs
+	 * after the first logo set has loaded (natural sizes are then available)
+	 * and before the track is measured for the scroll animation.
+	 *
+	 * @param {HTMLElement} track  The .dbw-slider-track element.
+	 * @param {HTMLElement} slider The parent .dbw-partner-slider element.
+	 */
+	function applyBalance(track, slider) {
+		if (!slider.classList.contains("dbw-balance")) {
+			return;
+		}
+		var items = track.querySelectorAll(".dbw-slider-item");
+		for (var i = 0; i < items.length; i++) {
+			var img = items[i].querySelector("img");
+			if (!img) {
+				continue;
+			}
+			var w = img.naturalWidth || parseInt(img.getAttribute("width"), 10);
+			var h =
+				img.naturalHeight || parseInt(img.getAttribute("height"), 10);
+			if (!w || !h) {
+				continue;
+			}
+			var scale = Math.sqrt(BALANCE_REF_RATIO / (w / h));
+			scale = Math.min(
+				BALANCE_MAX_SCALE,
+				Math.max(BALANCE_MIN_SCALE, scale)
+			);
+			items[i].style.setProperty("--logo-scale", scale.toFixed(3));
+		}
+	}
+
 	/**
 	 * Measure the combined width of one full logo set (the first `logoCount`
 	 * items of a track).
@@ -248,6 +289,9 @@
 			}
 		}
 		whenImagesReady(firstSet, function () {
+			// Balanced sizes change item widths, so apply them BEFORE the
+			// track is measured for the scroll animation.
+			applyBalance(track, slider);
 			imagesReady = true;
 			recalc();
 			onReady();

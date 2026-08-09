@@ -372,3 +372,19 @@ msgstr "Mobile Logo-Höhe (px)"
 
 msgid "Applies on screens narrower than 600px."
 msgstr "Gilt für Bildschirme schmaler als 600px."
+
+# New strings for v1.8 (balanced sizes, extra-large/custom gaps)
+msgid "Extra Large"
+msgstr "Extra groß"
+
+msgid "Custom Gap (px)"
+msgstr "Eigener Abstand (px)"
+
+msgid "Custom Row Gap (px)"
+msgstr "Eigener Zeilenabstand (px)"
+
+msgid "Balance logo sizes"
+msgstr "Ausgewogene Logo-Größen"
+
+msgid "Compensates different logo proportions: wide logos render slightly smaller, compact logos slightly larger, so every logo carries similar visual weight."
+msgstr "Gleicht unterschiedliche Logo-Proportionen aus: Breite Logos werden etwas kleiner, kompakte etwas größer dargestellt, damit alle Logos ähnlich stark wirken."

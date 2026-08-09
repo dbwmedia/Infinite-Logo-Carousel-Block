@@ -233,7 +233,13 @@
 	//   768 px iPad    →  92 px logo  (12 vw)
 	//  1280 px laptop  → 150 px logo  (capped at user value)
 	//  1920 px desktop → 150 px logo  (capped at user value)
-	min-height: clamp(28px, 12vw, var(--logo-height, 50px));
+	//
+	// --dbw-h is the resolved per-viewport height (the 600 px media query
+	// below swaps in the optional fixed mobile height). --logo-scale is the
+	// per-item balanced-size factor set by the frontend script (1 when the
+	// "Balance logo sizes" option is off).
+	--dbw-h: clamp(28px, 12vw, var(--logo-height, 50px));
+	min-height: var(--dbw-h);
 
 	img {
 		display: block;
@@ -241,8 +247,8 @@
 		// which could otherwise squeeze wide logos. width stays driven purely
 		// by the logo's aspect ratio so nothing is ever cropped.
 		max-width: none;
-		max-height: clamp(28px, 12vw, var(--logo-height, 50px));
-		min-height: clamp(28px, 12vw, var(--logo-height, 50px));
+		max-height: calc(var(--dbw-h) * var(--logo-scale, 1));
+		min-height: calc(var(--dbw-h) * var(--logo-scale, 1));
 		width: auto;
 		height: auto;
 		object-fit: contain;
@@ -310,20 +316,10 @@
 
 	// Optional fixed mobile logo height (v1.7.0). The block only emits
 	// --logo-height-mobile when the user enabled the setting; without it the
-	// fluid clamp() formula from the base rules keeps applying via fallback.
+	// fluid clamp() formula keeps applying via the fallback. All height rules
+	// read --dbw-h, so overriding the variable here is the whole story.
 	.dbw-slider-item {
-		min-height: var(
-			--logo-height-mobile,
-			clamp(28px, 12vw, var(--logo-height, 50px))
-		);
-	}
-
-	.dbw-slider-item img {
-		max-height: var(
-			--logo-height-mobile,
-			clamp(28px, 12vw, var(--logo-height, 50px))
-		);
-		min-height: var(
+		--dbw-h: var(
 			--logo-height-mobile,
 			clamp(28px, 12vw, var(--logo-height, 50px))
 		);

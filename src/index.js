@@ -19,9 +19,18 @@ import "./editor.scss";
 import "./style.scss";
 
 const SPEED_MAP = { slow: "40s", medium: "25s", fast: "15s" };
-const GAP_MAP = { small: "20px", medium: "40px", large: "60px" };
+const GAP_MAP = { small: "20px", medium: "40px", large: "60px", xlarge: "100px" };
 const MARGIN_MAP = { small: "25px", medium: "50px", large: "75px" };
-const ROW_GAP_MAP = { small: "12px", medium: "24px", large: "48px" };
+const ROW_GAP_MAP = { small: "12px", medium: "24px", large: "48px", xlarge: "72px" };
+
+/**
+ * Balanced logo sizes: reference aspect ratio and scale bounds. A logo's
+ * scale factor is sqrt(REF / ratio) — equal *area* instead of equal height —
+ * clamped so extreme shapes stay within sane bounds.
+ */
+const BALANCE_REF_RATIO = 2;
+const BALANCE_MIN_SCALE = 0.65;
+const BALANCE_MAX_SCALE = 1.4;
 
 /**
  * Per-row duration multipliers for the "varied" row speed mode. Adjacent rows
@@ -62,9 +71,11 @@ const BLOCK_ATTRIBUTES = {
 	speed: { type: "string", default: "medium" },
 	speedCustom: { type: "number", default: 60 },
 	gap: { type: "string", default: "medium" },
+	gapCustom: { type: "number", default: 40 },
 	marginSize: { type: "string", default: "medium" },
 	logoHeight: { type: "string", default: "50" },
 	logoHeightMobile: { type: "string", default: "" },
+	balanceLogos: { type: "boolean", default: false },
 	overlayEnabled: { type: "boolean", default: true },
 	overlayColor: { type: "string", default: "#ffffff" },
 	blackLogos: { type: "boolean", default: false },
@@ -77,6 +88,7 @@ const BLOCK_ATTRIBUTES = {
 	rowCount: { type: "number", default: 3 },
 	rowSpeedMode: { type: "string", default: "uniform" },
 	rowGap: { type: "string", default: "medium" },
+	rowGapCustom: { type: "number", default: 24 },
 	capsuleEnabled: { type: "boolean", default: false },
 	capsuleStyle: { type: "string", default: "alternating" },
 	capsuleRadius: { type: "string", default: "pill" },
@@ -139,6 +151,9 @@ function sliderClasses(attributes) {
 		classes.push("dbw-logos-white");
 	if (!attributes.blackLogos && attributes.logoColorMode === "custom")
 		classes.push("dbw-logos-custom");
+	// Balanced logo sizes (area-based). Only added when enabled, so existing
+	// content keeps producing identical output.
+	if (attributes.balanceLogos) classes.push("dbw-balance");
 	if (attributes.capsuleEnabled) {
 		classes.push("dbw-capsules");
 		if (attributes.capsuleStyle === "outline") {
@@ -168,7 +183,10 @@ function sliderStyle(attributes) {
 	const { gap, marginSize, overlayColor, logoHeight } = attributes;
 	const style = {
 		"--scroll-duration": getBaseDurationSeconds(attributes) + "s",
-		"--slide-gap": GAP_MAP[gap] || "40px",
+		"--slide-gap":
+			gap === "custom"
+				? (parseInt(attributes.gapCustom, 10) || 40) + "px"
+				: GAP_MAP[gap] || "40px",
 		"--outer-margin": MARGIN_MAP[marginSize] || "50px",
 		"--overlay-color": overlayColor || "#ffffff",
 		"--logo-height": logoHeight + "px",
@@ -223,7 +241,10 @@ function sliderStyle(attributes) {
 	// Row gap is only emitted for a non-default value, so multi-row content
 	// created before this option still produces identical output.
 	if (attributes.layout === "rows" && attributes.rowGap !== "medium") {
-		style["--row-gap"] = ROW_GAP_MAP[attributes.rowGap] || "24px";
+		style["--row-gap"] =
+			attributes.rowGap === "custom"
+				? (parseInt(attributes.rowGapCustom, 10) || 24) + "px"
+				: ROW_GAP_MAP[attributes.rowGap] || "24px";
 	}
 	return style;
 }
@@ -336,6 +357,20 @@ function computeColorFilter(hex) {
 		"deg) brightness(" +
 		brightness.toFixed(2) +
 		")"
+	);
+}
+
+/**
+ * Editor-preview approximation of the balanced logo scale. The front end
+ * computes the same factor from the image's natural size at runtime.
+ */
+function getBalanceScale(image) {
+	if (!image || !image.width || !image.height) return 1;
+	const ratio = image.width / image.height;
+	if (!(ratio > 0)) return 1;
+	return Math.min(
+		BALANCE_MAX_SCALE,
+		Math.max(BALANCE_MIN_SCALE, Math.sqrt(BALANCE_REF_RATIO / ratio))
 	);
 }
 
@@ -749,9 +784,11 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 			speed,
 			speedCustom,
 			gap,
+			gapCustom,
 			marginSize,
 			logoHeight,
 			logoHeightMobile,
+			balanceLogos,
 			overlayEnabled,
 			overlayColor,
 			blackLogos,
@@ -764,6 +801,7 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 			rowCount,
 			rowSpeedMode,
 			rowGap,
+			rowGapCustom,
 			capsuleEnabled,
 			capsuleStyle,
 			capsuleRadius,
@@ -882,11 +920,25 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 										{ label: __("Small", "infinite-logo-carousel-block"), value: "small" },
 										{ label: __("Medium", "infinite-logo-carousel-block"), value: "medium" },
 										{ label: __("Large", "infinite-logo-carousel-block"), value: "large" },
+										{ label: __("Extra Large", "infinite-logo-carousel-block"), value: "xlarge" },
+										{ label: __("Custom", "infinite-logo-carousel-block"), value: "custom" },
 									]}
 									onChange={(val) =>
 										setAttributes({ rowGap: val })
 									}
 								/>
+								{rowGap === "custom" && (
+									<RangeControl
+										label={__("Custom Row Gap (px)", "infinite-logo-carousel-block")}
+										value={rowGapCustom}
+										onChange={(val) =>
+											setAttributes({ rowGapCustom: val })
+										}
+										min={0}
+										max={150}
+										step={2}
+									/>
+								)}
 								<SelectControl
 									label={__(
 										"Row Speed",
@@ -964,9 +1016,21 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 								{ label: __("Small", "infinite-logo-carousel-block"), value: "small" },
 								{ label: __("Medium", "infinite-logo-carousel-block"), value: "medium" },
 								{ label: __("Large", "infinite-logo-carousel-block"), value: "large" },
+								{ label: __("Extra Large", "infinite-logo-carousel-block"), value: "xlarge" },
+								{ label: __("Custom", "infinite-logo-carousel-block"), value: "custom" },
 							]}
 							onChange={(val) => setAttributes({ gap: val })}
 						/>
+						{gap === "custom" && (
+							<RangeControl
+								label={__("Custom Gap (px)", "infinite-logo-carousel-block")}
+								value={gapCustom}
+								onChange={(val) => setAttributes({ gapCustom: val })}
+								min={0}
+								max={200}
+								step={5}
+							/>
+						)}
 					</PanelBody>
 					<PanelBody
 						title={__("Margins", "infinite-logo-carousel-block")}
@@ -1006,6 +1070,12 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 								{ label: __("Extra Large (100px)", "infinite-logo-carousel-block"), value: "100" },
 							]}
 							onChange={(val) => setAttributes({ logoHeight: val })}
+						/>
+						<ToggleControl
+							label={__("Balance logo sizes", "infinite-logo-carousel-block")}
+							help={__("Compensates different logo proportions: wide logos render slightly smaller, compact logos slightly larger, so every logo carries similar visual weight.", "infinite-logo-carousel-block")}
+							checked={balanceLogos}
+							onChange={(val) => setAttributes({ balanceLogos: val })}
 						/>
 						<ToggleControl
 							label={__("Custom height on phones", "infinite-logo-carousel-block")}
@@ -1321,7 +1391,13 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 													: logoColorMode === "custom"
 														? computeColorFilter(logoCustomColor)
 														: "none",
-											maxHeight: logoHeight + "px",
+											maxHeight:
+												Math.round(
+													parseInt(logoHeight, 10) *
+														(balanceLogos
+															? getBalanceScale(image)
+															: 1)
+												) + "px",
 										}}
 									/>
 								)}

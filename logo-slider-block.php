@@ -3,7 +3,7 @@
  * Plugin Name: Logo Slider – Infinite Carousel & Marquee Block
  * Plugin URI: https://www.dennisbuchwald.de/apps/logo-slider
  * Description: A professional infinity logo carousel Gutenberg block with customizable speed, spacing, hover-stop and optional links. Perfect for showcasing partner, client or sponsor logos.
- * Version: 1.7.0
+ * Version: 1.8.0
  * Requires at least: 5.8
  * Tested up to: 7.0
  * Requires PHP: 7.2
@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define plugin constants
-define( 'ILCB_VERSION', '1.7.0' );
+define( 'ILCB_VERSION', '1.8.0' );
 define( 'ILCB_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'ILCB_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'ILCB_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
@@ -119,9 +119,11 @@ function ilcb_register_block() {
             'speed'                    => array( 'type' => 'string',  'default' => 'medium' ),
             'speedCustom'              => array( 'type' => 'number',  'default' => 60 ),
             'gap'                      => array( 'type' => 'string',  'default' => 'medium' ),
+            'gapCustom'                => array( 'type' => 'number',  'default' => 40 ),
             'marginSize'               => array( 'type' => 'string',  'default' => 'medium' ),
             'logoHeight'               => array( 'type' => 'string',  'default' => '50' ),
             'logoHeightMobile'         => array( 'type' => 'string',  'default' => '' ),
+            'balanceLogos'             => array( 'type' => 'boolean', 'default' => false ),
             'overlayEnabled'           => array( 'type' => 'boolean', 'default' => true ),
             'overlayColor'             => array( 'type' => 'string',  'default' => '#ffffff' ),
             'blackLogos'               => array( 'type' => 'boolean', 'default' => false ),
@@ -134,6 +136,7 @@ function ilcb_register_block() {
             'rowCount'                 => array( 'type' => 'number',  'default' => 3 ),
             'rowSpeedMode'             => array( 'type' => 'string',  'default' => 'uniform' ),
             'rowGap'                   => array( 'type' => 'string',  'default' => 'medium' ),
+            'rowGapCustom'             => array( 'type' => 'number',  'default' => 24 ),
             'capsuleEnabled'           => array( 'type' => 'boolean', 'default' => false ),
             'capsuleStyle'             => array( 'type' => 'string',  'default' => 'alternating' ),
             'capsuleRadius'            => array( 'type' => 'string',  'default' => 'pill' ),

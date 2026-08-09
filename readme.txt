@@ -4,7 +4,7 @@ Tags: logo carousel, logo slider, logo showcase, logo marquee, client logos
 Requires at least: 5.8
 Tested up to: 7.0
 Requires PHP: 7.2
-Stable tag: 1.7.0
+Stable tag: 1.8.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -28,6 +28,7 @@ Infinity logo carousel for client, partner or sponsor logos with custom speed.
 * **Logo Color Mode** - Convert all logos to black, white or a custom tint color
 * **Adjustable Logo Height** - Set custom height from 30px to 150px
 * **Mobile Logo Height** - Optional separate logo height for phones, or fully automatic scaling
+* **Balanced Logo Sizes** - Optionally equalize the visual weight of wide and compact logos automatically
 * **Responsive Design** - Perfect display on all devices and screen sizes
 * **SEO-Friendly** - Clean, semantic HTML markup
 * **Lightweight** - Optimized for performance with minimal impact
@@ -177,6 +178,12 @@ Yes, the plugin doesn't collect, store, or transmit any personal data. It's comp
 
 == Changelog ==
 
+= 1.8.0 =
+* NEW: Balance Logo Sizes — optional area-based size equalization. Wide wordmark logos render slightly smaller, compact/square logos slightly larger, so every logo carries similar visual weight in the carousel.
+* NEW: "Extra Large" preset and free custom pixel value for the gap between logos (up to 200px)
+* NEW: "Extra Large" preset and free custom pixel value for the row gap in multi-row layout (up to 150px)
+* Fully backward-compatible — existing blocks produce identical output without re-saving
+
 = 1.7.0 =
 * NEW: Mobile Logo Height — optionally set a fixed logo height for phones (screens narrower than 600px) instead of the automatic scaling. Capsule padding follows the mobile height proportionally.
 * IMPROVED: The uniform item width on phones (introduced in 1.5.3) is now applied only in capsule mode. Plain logo sliders keep their natural gap-based spacing on mobile again.
@@ -295,6 +302,9 @@ Yes, the plugin doesn't collect, store, or transmit any personal data. It's comp
 * WordPress 6.8 compatibility
 
 == Upgrade Notice ==
+
+= 1.8.0 =
+New: Balance Logo Sizes evens out wide vs. compact logos, plus extra-large and custom gap options for logos and rows.
 
 = 1.7.0 =
 New: optional fixed logo height for phones, complete German translation, and natural mobile spacing for capsule-less sliders.
