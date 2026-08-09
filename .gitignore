@@ -67,3 +67,6 @@ infinite-logo-carousel-block/
 .dev/.claude_code.yaml
 .claude_code.yaml
 .claude_code.yaml
+
+# Internal dev notes
+.dev/
