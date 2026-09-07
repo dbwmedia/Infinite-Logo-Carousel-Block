@@ -1,6 +1,6 @@
 # Logo Slider – Infinite Carousel & Marquee Block
 
-[![WordPress Plugin Version](https://img.shields.io/badge/version-2.2.1-blue)](https://wordpress.org/plugins/infinite-logo-carousel-block/)
+[![WordPress Plugin Version](https://img.shields.io/badge/version-2.3.0-blue)](https://wordpress.org/plugins/infinite-logo-carousel-block/)
 [![License](https://img.shields.io/badge/license-GPL%20v2-green)](https://www.gnu.org/licenses/gpl-2.0.html)
 [![WordPress](https://img.shields.io/badge/WordPress-6.0%2B-blue)](https://wordpress.org/)
 [![Tested up to](https://img.shields.io/badge/tested%20up%20to-7.0-blue)](https://wordpress.org/)
@@ -15,6 +15,9 @@ A professional infinity logo carousel Gutenberg block with customizable speed, s
 - **Infinite Scrolling** - Seamless, continuous loop without interruption
 - **Multi-Row Layout** - Spread large logo sets across 2-4 rows with alternating scroll direction and optional varied speeds
 - **Spotlight Mode** - One logo at a time in a single slot; the logos hand over on a timer with a fade, a slide or a hard cut, in fixed or random order
+- **Alt Texts from the Media Library** - Missing alt texts are resolved from the attachment at render time, for existing content too
+- **Screen Reader Friendly Loop** - Repeated logo sets are aria-hidden and out of the tab order, so each logo is announced once
+- **Lazy Loading** - Logos load lazily; the animation is measured once the carousel comes into view
 - **Spotlight Color Cycle** - One brand color for every spotlight logo, or a rotating set of colors (applied through a mask, so the color is exact)
 - **Capsule Style** - Rounded containers behind logos: filled (uniform/alternating checkerboard) or outline, with an optional glow effect
 - **Hover-Pause** - Animation automatically pauses on mouse hover
@@ -115,6 +118,8 @@ npm run build
 | Original Colors on Hover | On/Off                                                              | Off        |
 | Capsule Style          | Off / Uniform / Alternating / Outline, corner, padding, glow          | Off        |
 | Pause Button           | On/Off (WCAG 2.2.2)                                                   | Off        |
+| Load Images Immediately | On/Off (off = lazy loading)                                          | Off        |
+| Screen Reader Label    | Free text, empty = no landmark                                        | Empty      |
 | Link Target            | Same window / New window                                              | Same       |
 | Rel Attributes         | Custom (nofollow, sponsored, etc.)                                    | None       |
 | Title Attribute        | Custom tooltip text                                                   | None       |
@@ -175,6 +180,16 @@ npm run format   # Code formatting
 Developed by [Dennis Buchwald](https://www.dennisbuchwald.de) — WordPress development, Gutenberg blocks and performance optimization.
 
 ## Changelog
+
+### 2.3.0
+
+- FIXED: Alt texts maintained in the media library never reached the front end (static markup froze the empty alt at save time). A `render_block` filter now fills missing alt texts from `_wp_attachment_image_alt`, using the attachment IDs the block already stores. Author-entered alt texts are never overwritten
+- FIXED: An image without any alt text is rendered without an `alt` attribute instead of `alt=""`, and reported once in the error log
+- FIXED: The repeated logo sets are `aria-hidden` with their links out of the tab order, so screen readers announce each logo once instead of once per copy (existing content included, via the same filter)
+- FIXED: Forced eager loading removed; images are lazy again. The frontend script initialises a carousel via IntersectionObserver and takes the images it measures out of lazy loading at that moment, so the old measuring bug cannot return
+- NEW: "Load images immediately" option, and an optional screen reader label for the carousel
+- IMPROVED: Reduced-motion users get a static grid of all logos instead of a stopped row; images carry `decoding="async"`
+- Existing blocks are migrated through a deprecation entry — no invalid-content warnings
 
 ### 2.2.1
 

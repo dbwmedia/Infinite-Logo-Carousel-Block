@@ -3,7 +3,7 @@
  * Plugin Name: Logo Slider – Infinite Carousel & Marquee Block
  * Plugin URI: https://www.dennisbuchwald.de/apps/logo-slider
  * Description: A professional infinity logo carousel Gutenberg block with customizable speed, spacing, hover-stop and optional links. Perfect for showcasing partner, client or sponsor logos.
- * Version: 2.2.1
+ * Version: 2.3.0
  * Requires at least: 6.0
  * Tested up to: 7.0
  * Requires PHP: 7.2
@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define plugin constants
-define( 'ILCB_VERSION', '2.2.1' );
+define( 'ILCB_VERSION', '2.3.0' );
 define( 'ILCB_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'ILCB_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'ILCB_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
@@ -191,21 +191,275 @@ function ilcb_deactivate() {
 register_deactivation_hook( __FILE__, 'ilcb_deactivate' );
 
 /**
- * Fix lazy-loaded images in saved carousel content.
+ * Resolve an attachment ID from an image URL, cached for the request.
  *
- * Older versions saved images with loading="lazy", which delays image loading
- * and causes the carousel to flash at the wrong speed on initial page load.
- * This filter replaces loading="lazy" with loading="eager" in the rendered
- * block output so existing posts work correctly without being re-saved.
+ * Only ever needed as a fallback: the block stores the attachment ID in its
+ * own attributes, so this runs at most for content saved by a version that
+ * did not, or for a logo whose URL no longer matches its attachment.
+ *
+ * @param string $url Image URL.
+ * @return int Attachment ID, or 0 when it cannot be resolved.
  */
-function ilcb_fix_image_loading( $block_content, $block ) {
-    if ( 'infinite-logo-carousel-block/carousel' !== $block['blockName'] ) {
+function ilcb_attachment_id_from_url( $url ) {
+    static $cache = array();
+
+    if ( ! $url ) {
+        return 0;
+    }
+    if ( isset( $cache[ $url ] ) ) {
+        return $cache[ $url ];
+    }
+
+    $id = attachment_url_to_postid( $url );
+    if ( ! $id ) {
+        // Intermediate sizes ("logo-300x120.png") do not resolve directly —
+        // try the original file name.
+        $original = preg_replace( '/-\d+x\d+(\.[a-zA-Z0-9]+)$/', '$1', $url );
+        if ( $original && $original !== $url ) {
+            $id = attachment_url_to_postid( $original );
+        }
+    }
+
+    $cache[ $url ] = $id ? (int) $id : 0;
+
+    return $cache[ $url ];
+}
+
+/**
+ * Report a logo that has no alt text anywhere, once per image and request.
+ *
+ * Silence is what made this problem invisible for so long: the markup simply
+ * carried alt="" and nobody noticed. An image with nothing to say is now
+ * rendered without an alt attribute at all and named here.
+ *
+ * @param string $src Image URL.
+ */
+function ilcb_log_missing_alt( $src ) {
+    static $reported = array();
+
+    if ( ! $src || isset( $reported[ $src ] ) ) {
+        return;
+    }
+    $reported[ $src ] = true;
+
+    error_log(
+        sprintf(
+            '[Logo Slider] No alt text for %s - add one to the attachment in the media library, or per logo in the block.',
+            $src
+        )
+    );
+}
+
+/**
+ * Repair and improve the saved carousel markup while it is rendered.
+ *
+ * The block saves static HTML, so everything below was frozen into the
+ * database at the last editor save. This filter keeps three things correct
+ * for content that nobody is going to open and re-save:
+ *
+ * 1. Alt texts. An empty or missing alt is filled from the attachment's
+ *    _wp_attachment_image_alt, so alt texts maintained in the media library
+ *    reach the front end. An alt that carries text is never touched — it is
+ *    the author's own wording, entered per logo in the block. When there is
+ *    no alt text anywhere the attribute is removed entirely (an empty alt
+ *    means "decorative", which a client logo is not) and the image is named
+ *    in the error log.
+ * 2. Screen reader duplicates. The seamless loop repeats every logo set
+ *    several times. Only the first set carries alt text; the copies are
+ *    marked aria-hidden and their links leave the tab order, so a client
+ *    name is announced once instead of once per copy.
+ * 3. Loading. Older versions of this plugin forced loading="eager" on every
+ *    logo to work around a measuring bug (see frontend.js). That made a
+ *    below-the-fold carousel compete with the content people actually came
+ *    for. Images are lazy again unless the block opts into eager loading.
+ *
+ * @param string $block_content Saved block markup.
+ * @param array  $block         Parsed block, including its attributes.
+ * @return string Filtered markup.
+ */
+function ilcb_filter_carousel_output( $block_content, $block ) {
+    if ( ! isset( $block['blockName'] ) || 'infinite-logo-carousel-block/carousel' !== $block['blockName'] ) {
+        return $block_content;
+    }
+    if ( false === strpos( $block_content, '<img' ) ) {
+        return $block_content;
+    }
+    // WP_HTML_Tag_Processor ships with WordPress 6.2. On 6.0/6.1 the markup is
+    // left exactly as saved rather than edited with something less safe.
+    if ( ! class_exists( 'WP_HTML_Tag_Processor' ) ) {
         return $block_content;
     }
 
-    return str_replace( 'loading="lazy"', 'loading="eager"', $block_content );
+    $attrs = isset( $block['attrs'] ) && is_array( $block['attrs'] ) ? $block['attrs'] : array();
+    $eager = ! empty( $attrs['eagerLoading'] );
+
+    // The block keeps the attachment ID next to every logo — no lookup needed.
+    $ids = array();
+    if ( ! empty( $attrs['images'] ) && is_array( $attrs['images'] ) ) {
+        foreach ( $attrs['images'] as $image ) {
+            if ( ! empty( $image['url'] ) && ! empty( $image['id'] ) ) {
+                $ids[ $image['url'] ] = (int) $image['id'];
+            }
+        }
+    }
+
+    $tags = new WP_HTML_Tag_Processor( $block_content );
+
+    $per_set    = 0;     // Logos in one set, from the track's data-logo-count.
+    $item_index = 0;     // Position of the current item inside its track.
+    $decorative = false; // Whether the current item is a repeated copy.
+
+    while ( $tags->next_tag() ) {
+        $tag   = $tags->get_tag();
+        $class = $tags->get_attribute( 'class' );
+        $class = is_string( $class ) ? $class : '';
+
+        if ( 'DIV' === $tag && false !== strpos( $class, 'dbw-slider-track' ) ) {
+            $count      = $tags->get_attribute( 'data-logo-count' );
+            $per_set    = is_string( $count ) ? (int) $count : 0;
+            $item_index = 0;
+            $decorative = false;
+            continue;
+        }
+
+        // The spotlight stage shows every logo once, so nothing there is a copy.
+        if ( 'DIV' === $tag && false !== strpos( $class, 'dbw-spotlight-stage' ) ) {
+            $per_set    = 0;
+            $item_index = 0;
+            $decorative = false;
+            continue;
+        }
+
+        if ( 'DIV' === $tag && false !== strpos( $class, 'dbw-slider-item' ) ) {
+            $item_index++;
+            $decorative = ( $per_set > 0 && $item_index > $per_set );
+            if ( $decorative && null === $tags->get_attribute( 'aria-hidden' ) ) {
+                $tags->set_attribute( 'aria-hidden', 'true' );
+            }
+            continue;
+        }
+
+        if ( 'A' === $tag && $decorative ) {
+            $tags->set_attribute( 'tabindex', '-1' );
+            continue;
+        }
+
+        if ( 'IMG' !== $tag ) {
+            continue;
+        }
+
+        $tags->set_attribute( 'loading', $eager ? 'eager' : 'lazy' );
+        if ( null === $tags->get_attribute( 'decoding' ) ) {
+            $tags->set_attribute( 'decoding', 'async' );
+        }
+
+        if ( $decorative ) {
+            // A copy is decoration: empty alt, and the item above hides it.
+            $tags->set_attribute( 'alt', '' );
+            continue;
+        }
+
+        $alt = $tags->get_attribute( 'alt' );
+        if ( is_string( $alt ) && '' !== trim( $alt ) ) {
+            continue; // Author's own alt text — leave it alone.
+        }
+
+        $src = $tags->get_attribute( 'src' );
+        $src = is_string( $src ) ? $src : '';
+
+        $id = isset( $ids[ $src ] ) ? $ids[ $src ] : ilcb_attachment_id_from_url( $src );
+
+        $resolved = '';
+        if ( $id ) {
+            $meta = get_post_meta( $id, '_wp_attachment_image_alt', true );
+            if ( is_string( $meta ) ) {
+                $resolved = trim( $meta );
+            }
+        }
+
+        if ( '' !== $resolved ) {
+            $tags->set_attribute( 'alt', $resolved );
+        } else {
+            // Better no alt attribute than an empty one: an empty alt tells
+            // assistive technology the image carries no information.
+            $tags->remove_attribute( 'alt' );
+            ilcb_log_missing_alt( $src );
+        }
+    }
+
+    return $tags->get_updated_html();
 }
-add_filter( 'render_block', 'ilcb_fix_image_loading', 10, 2 );
+add_filter( 'render_block', 'ilcb_filter_carousel_output', 10, 2 );
+
+/**
+ * Fill empty alt attributes from the attachment meta.
+ *
+ * Static blocks bake alt="" into the saved HTML at edit time. If the
+ * attachment had no alt back then, every subsequent render carries an
+ * empty alt — even after someone fills it in on the attachment. This
+ * filter patches the gap at render time so the fix works on every site
+ * that uses the plugin, not just the one where someone remembered.
+ *
+ * - Only runs on this plugin's blocks, not globally.
+ * - Never overwrites a non-empty alt that was saved in the block.
+ * - Resolves the attachment ID from the wp-image-<ID> class.
+ * - Logs a notice when an attachment has no alt either.
+ */
+function ilcb_fill_image_alt( $block_content, $block ) {
+	if ( 'infinite-logo-carousel-block/carousel' !== ( $block['blockName'] ?? '' )
+		&& 'infinite-logo-carousel-block/marquee' !== ( $block['blockName'] ?? '' )
+	) {
+		return $block_content;
+	}
+
+	return preg_replace_callback(
+		'/<img\b([^>]*)>/i',
+		function ( $match ) {
+			$tag = $match[1];
+
+			// Already has a non-empty alt? Leave it alone.
+			if ( preg_match( '/\balt="([^"]+)"/', $tag ) ) {
+				return $match[0];
+			}
+
+			// Extract attachment ID from wp-image-<ID> class.
+			if ( ! preg_match( '/\bwp-image-(\d+)\b/', $tag, $id_match ) ) {
+				return $match[0];
+			}
+
+			$att_id  = (int) $id_match[1];
+			$alt     = get_post_meta( $att_id, '_wp_attachment_image_alt', true );
+			$alt     = is_string( $alt ) ? trim( $alt ) : '';
+
+			if ( $alt === '' ) {
+				$src = '';
+				if ( preg_match( '/\bsrc="([^"]*)"/', $tag, $src_match ) ) {
+					$src = $src_match[1];
+				}
+				error_log( sprintf(
+					'[infinite-logo-carousel] Attachment %d has no alt text (%s).',
+					$att_id,
+					$src
+				) );
+				// Remove the empty alt entirely rather than asserting emptiness.
+				$tag = preg_replace( '/\s*alt=""/', '', $tag );
+				return '<img' . $tag . '>';
+			}
+
+			// Replace alt="" with the attachment value.
+			if ( strpos( $tag, 'alt=""' ) !== false ) {
+				$tag = str_replace( 'alt=""', 'alt="' . esc_attr( $alt ) . '"', $tag );
+			} else {
+				// No alt attribute at all — add one.
+				$tag .= ' alt="' . esc_attr( $alt ) . '"';
+			}
+
+			return '<img' . $tag . '>';
+		},
+		$block_content
+	);
+}
+add_filter( 'render_block', 'ilcb_fill_image_alt', 11, 2 );
 
 /**
  * Add inline styles for initial rendering

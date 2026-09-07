@@ -545,3 +545,18 @@ msgstr "Spotlight"
 
 msgid "One color, or a color cycle that gives every logo its own color in turn."
 msgstr "Eine Farbe, oder ein Farbwechsel, der jedem Logo nacheinander eine eigene Farbe gibt."
+
+msgid "Load images immediately"
+msgstr "Bilder sofort laden"
+
+msgid "Logos load lazily by default, which keeps the page fast. Turn this on only if the carousel sits at the very top of the page, above the fold."
+msgstr "Logos werden standardmäßig verzögert geladen, das hält die Seite schnell. Nur einschalten, wenn das Karussell ganz oben auf der Seite steht."
+
+msgid "Screen reader label (optional)"
+msgstr "Beschriftung für Screenreader (optional)"
+
+msgid "Gives the carousel a name for screen readers, e.g. \"Our clients\". Leave empty to add no landmark at all."
+msgstr "Gibt dem Karussell einen Namen für Screenreader, z. B. \"Unsere Kunden\". Leer lassen, wenn keine Landmarke gesetzt werden soll."
+
+msgid "Our clients"
+msgstr "Unsere Kunden"

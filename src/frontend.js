@@ -210,6 +210,27 @@
 	}
 
 	/**
+	 * Take the images this slider has to measure out of lazy loading.
+	 *
+	 * Images are saved with loading="lazy" because a logo carousel usually
+	 * sits below the fold. A lazy image that has not started loading has no
+	 * width, and measuring it would produce a frozen or far too fast
+	 * carousel — the very bug the old forced eager loading worked around.
+	 * Initialisation only happens once the slider is close to the viewport
+	 * (see initLogoSliders), so switching these images to eager here loads
+	 * them exactly when they are about to be seen.
+	 *
+	 * @param {HTMLImageElement[]} images Images that will be measured.
+	 */
+	function forceLoad(images) {
+		images.forEach(function (img) {
+			if (!img.complete && img.loading === "lazy") {
+				img.loading = "eager";
+			}
+		});
+	}
+
+	/**
 	 * Invoke `callback` once every image in `images` has finished loading
 	 * (or failed). Resolves immediately when there is nothing to wait for.
 	 *
@@ -293,6 +314,7 @@
 				firstSet.push(img);
 			}
 		}
+		forceLoad(firstSet);
 		whenImagesReady(firstSet, function () {
 			// Balanced sizes change item widths, so apply them BEFORE the
 			// track is measured for the scroll animation.
@@ -492,6 +514,7 @@
 				images.push(img);
 			}
 		}
+		forceLoad(images);
 		whenImagesReady(images, function () {
 			applyBalance(stage, slider);
 			// Tint before revealing, so no logo is ever seen in the wrong
@@ -617,18 +640,61 @@
 		);
 	}
 
+	// How far ahead of the viewport a slider is initialised (and its images
+	// pulled out of lazy loading).
+	var INIT_MARGIN = "300px 0px";
+
 	/**
 	 * Find and initialise every carousel on the page exactly once.
+	 *
+	 * A slider is only initialised once it comes close to the viewport. That
+	 * keeps the work (and the image loading) off the critical path for
+	 * carousels further down the page, and it is what makes lazy-loaded logos
+	 * safe to measure: by the time we measure, the images are loading.
+	 * Browsers without IntersectionObserver initialise everything right away,
+	 * exactly as before.
 	 */
 	function initLogoSliders() {
 		var sliders = document.querySelectorAll(".dbw-partner-slider");
+		var supportsObserver = typeof IntersectionObserver !== "undefined";
+		var observer = supportsObserver
+			? new IntersectionObserver(
+					function (entries) {
+						entries.forEach(function (entry) {
+							if (!entry.isIntersecting) {
+								return;
+							}
+							observer.unobserve(entry.target);
+							startSlider(entry.target);
+						});
+					},
+					{ rootMargin: INIT_MARGIN }
+			  )
+			: null;
+
 		sliders.forEach(function (slider) {
 			if (slider.dataset.initialized === "true") {
 				return;
 			}
-			slider.dataset.initialized = "true";
-			initSlider(slider);
+			if (observer) {
+				observer.observe(slider);
+			} else {
+				startSlider(slider);
+			}
 		});
+	}
+
+	/**
+	 * Initialise one slider, guarding against a second run.
+	 *
+	 * @param {HTMLElement} slider The .dbw-partner-slider element.
+	 */
+	function startSlider(slider) {
+		if (slider.dataset.initialized === "true") {
+			return;
+		}
+		slider.dataset.initialized = "true";
+		initSlider(slider);
 	}
 
 	// Initialise as soon as the DOM is ready.

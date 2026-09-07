@@ -585,8 +585,21 @@
 // overrides the inline animation applied by the frontend script. The pause
 // button is pointless on a static carousel, so it is hidden too.
 @media (prefers-reduced-motion: reduce) {
+	// A stopped track would only ever show its first few logos, with the rest
+	// cut off past the container edge. Wrap the row into a static grid
+	// instead and drop the duplicated sets, so every logo is visible exactly
+	// once. The duplicates are recognised by the aria-hidden they carry for
+	// screen readers (v2.3; older saved markup gets it from the PHP filter).
 	.dbw-slider-track {
 		animation: none !important;
+		flex-wrap: wrap;
+		justify-content: center;
+		width: auto;
+		row-gap: 12px;
+	}
+
+	.dbw-slider-track > [aria-hidden="true"] {
+		display: none;
 	}
 
 	.dbw-pause-btn {

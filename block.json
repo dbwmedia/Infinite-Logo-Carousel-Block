@@ -23,6 +23,8 @@
 		"logoHeightMobile": { "type": "string", "default": "" },
 		"balanceLogos": { "type": "boolean", "default": false },
 		"showPauseButton": { "type": "boolean", "default": false },
+		"eagerLoading": { "type": "boolean", "default": false },
+		"ariaLabel": { "type": "string", "default": "" },
 		"overlayEnabled": { "type": "boolean", "default": true },
 		"overlayColor": { "type": "string", "default": "#ffffff" },
 		"blackLogos": { "type": "boolean", "default": false },

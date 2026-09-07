@@ -92,6 +92,8 @@ const BLOCK_ATTRIBUTES = {
 	logoHeightMobile: { type: "string", default: "" },
 	balanceLogos: { type: "boolean", default: false },
 	showPauseButton: { type: "boolean", default: false },
+	eagerLoading: { type: "boolean", default: false },
+	ariaLabel: { type: "string", default: "" },
 	overlayEnabled: { type: "boolean", default: true },
 	overlayColor: { type: "string", default: "#ffffff" },
 	blackLogos: { type: "boolean", default: false },
@@ -653,15 +655,19 @@ function buildSliderRows(attributes) {
  * @param {Object} opts      Editor-preview-only options ({ noLinks }).
  * @return {Object} The logo element.
  */
-function renderLogoContent(image, linkProps, loading, opts) {
+function renderLogoContent(image, linkProps, loading, opts, decorative) {
 	const { linkTarget, linkRel, linkTitle } = linkProps;
 	const imgElement = (
 		<img
 			src={image.url}
-			alt={image.alt || ""}
+			// Repeated sets exist for the visual loop only. They carry no alt
+			// text, so a screen reader announces every logo exactly once
+			// instead of once per copy.
+			alt={decorative ? "" : image.alt || ""}
 			width={image.width || undefined}
 			height={image.height || undefined}
 			loading={loading}
+			decoding="async"
 		/>
 	);
 	return image.link && !opts.noLinks ? (
@@ -675,6 +681,9 @@ function renderLogoContent(image, linkProps, loading, opts) {
 			}
 			title={linkTitle || undefined}
 			aria-label={linkTitle || "Logo Link"}
+			// A duplicated link must leave the tab order — its item is
+			// aria-hidden, and focusable content inside that is an error.
+			tabIndex={decorative ? -1 : undefined}
 		>
 			{imgElement}
 		</a>
@@ -721,8 +730,9 @@ function renderSpotlight(
 					const content = renderLogoContent(
 						image,
 						linkProps,
-						"eager",
-						opts
+						opts.loading || "lazy",
+						opts,
+						false
 					);
 					const style = getSpotlightItemStyle(attributes, index) || {};
 					if (opts.balance) {
@@ -783,12 +793,174 @@ function renderTrack(
 	duration,
 	linkProps,
 	capsuleProps,
+	loading = "lazy",
+	opts = {}
+) {
+	const renderSet = (setIndex) =>
+		rowImages.map((image, index) => {
+			// Everything past the first set is a visual copy.
+			const decorative = setIndex > 0;
+			const content = renderLogoContent(
+				image,
+				linkProps,
+				loading,
+				opts,
+				decorative
+			);
+			return (
+				<div
+					key={"s" + setIndex + "-" + index}
+					className="dbw-slider-item"
+					aria-hidden={decorative ? "true" : undefined}
+					style={
+						opts.balance
+							? { "--logo-scale": getBalanceScale(image).toFixed(3) }
+							: undefined
+					}
+				>
+					{capsuleProps.enabled
+						? wrapInCapsule(content, rowIndex, index, capsuleProps)
+						: content}
+				</div>
+			);
+		});
+
+	const repeats = getRepeatCount(rowImages.length);
+	let items = [];
+	for (let i = 0; i < repeats; i++) {
+		items = items.concat(renderSet(i));
+	}
+
+	return (
+		<div className="dbw-slider-wrapper" key={"dbw-row-" + rowIndex}>
+			<div
+				className="dbw-slider-track"
+				data-logo-count={rowImages.length}
+				data-direction={direction}
+				style={duration ? { "--scroll-duration": duration } : undefined}
+			>
+				{items}
+			</div>
+		</div>
+	);
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Frozen renderers for the deprecations (do not modify)                     */
+/*                                                                            */
+/*  These are verbatim copies of the v2.2.x renderers. The deprecated saves    */
+/*  below MUST keep producing exactly the markup their version shipped, or     */
+/*  every existing block on every installation is flagged as invalid content   */
+/*  the next time an editor opens the post. Changes to the live renderers      */
+/*  (accessibility attributes, lazy loading, ...) therefore never reach these. */
+/* -------------------------------------------------------------------------- */
+
+function frozenLogoContent(image, linkProps, loading, opts) {
+	const { linkTarget, linkRel, linkTitle } = linkProps;
+	const imgElement = (
+		<img
+			src={image.url}
+			alt={image.alt || ""}
+			width={image.width || undefined}
+			height={image.height || undefined}
+			loading={loading}
+		/>
+	);
+	return image.link && !opts.noLinks ? (
+		<a
+			href={image.link}
+			target={linkTarget || "_self"}
+			rel={
+				linkTarget === "_blank"
+					? `noopener noreferrer${linkRel ? ` ${linkRel}` : ""}`
+					: linkRel || undefined
+			}
+			title={linkTitle || undefined}
+			aria-label={linkTitle || "Logo Link"}
+		>
+			{imgElement}
+		</a>
+	) : (
+		imgElement
+	);
+}
+function frozenSpotlight(
+	attributes,
+	linkProps,
+	capsuleProps,
+	activeIndex = 0,
+	opts = {}
+) {
+	const images = attributes.images || [];
+
+	return (
+		<div className="dbw-slider-wrapper">
+			<div
+				className="dbw-spotlight-stage"
+				data-duration={getSpotlightDurationMs(attributes)}
+				data-order={
+					attributes.spotlightOrder === "random"
+						? "random"
+						: "sequence"
+				}
+			>
+				{images.map((image, index) => {
+					const content = frozenLogoContent(
+						image,
+						linkProps,
+						"eager",
+						opts
+					);
+					const style = getSpotlightItemStyle(attributes, index) || {};
+					if (opts.balance) {
+						style["--logo-scale"] = getBalanceScale(image).toFixed(3);
+					}
+					// On the front end the script attaches the mask: the URL
+					// must not travel inside the saved markup, where post
+					// filtering can strip url() values. The editor preview is
+					// never saved, so it can mask right away.
+					if (opts.mask && image.url) {
+						style["--dbw-mask"] = 'url("' + image.url + '")';
+					}
+					return (
+						<div
+							key={"spot-" + index}
+							className={
+								"dbw-slider-item" +
+								(index === activeIndex
+									? " dbw-spot-active"
+									: "") +
+								(opts.mask && image.url
+									? " dbw-spot-masked"
+									: "")
+							}
+							style={
+								Object.keys(style).length > 0 ? style : undefined
+							}
+						>
+							{capsuleProps.enabled
+								? wrapInCapsule(content, 0, index, capsuleProps)
+								: content}
+						</div>
+					);
+				})}
+			</div>
+		</div>
+	);
+}
+function frozenTrack(
+	rowImages,
+	rowIndex,
+	direction,
+	duration,
+	linkProps,
+	capsuleProps,
 	loading = "eager",
 	opts = {}
 ) {
 	const renderSet = (setIndex) =>
 		rowImages.map((image, index) => {
-			const content = renderLogoContent(image, linkProps, loading, opts);
+			const content = frozenLogoContent(image, linkProps, loading, opts);
 			return (
 				<div
 					key={"s" + setIndex + "-" + index}
@@ -1019,7 +1191,7 @@ const deprecatedSaveV160 = ({ attributes }) => {
 								rowIndex
 						  )
 						: null;
-				return renderTrack(
+				return frozenTrack(
 					rowImages,
 					rowIndex,
 					direction,
@@ -1077,7 +1249,7 @@ const deprecatedSaveV180 = ({ attributes }) => {
 								rowIndex
 						  )
 						: null;
-				return renderTrack(
+				return frozenTrack(
 					rowImages,
 					rowIndex,
 					direction,
@@ -1086,6 +1258,89 @@ const deprecatedSaveV180 = ({ attributes }) => {
 					capsuleProps
 				);
 			})}
+		</div>
+	);
+};
+
+/**
+ * Deprecated save v2.2.1 – the markup shipped from v2.0.0 through v2.2.1:
+ * images with loading="eager", no decoding hint, and no aria-hidden on the
+ * repeated logo sets. Content saved by those versions is matched here and
+ * migrated the next time the block is edited.
+ */
+const deprecatedSaveV221 = ({ attributes }) => {
+	const {
+		layout,
+		rowSpeedMode,
+		linkTarget,
+		linkRel,
+		linkTitle,
+		capsuleEnabled,
+		capsuleStyle,
+		capsuleColorA,
+		capsuleColorB,
+		capsuleLogoColor,
+		showPauseButton,
+	} = attributes;
+
+	const linkProps = { linkTarget, linkRel, linkTitle };
+	const capsuleProps = {
+		enabled: capsuleEnabled,
+		style: capsuleStyle,
+		colorADark: isColorDark(capsuleColorA),
+		colorBDark: isColorDark(capsuleColorB),
+		logoColor: capsuleLogoColor,
+	};
+
+	const rows = buildSliderRows(attributes);
+
+	const blockProps = useBlockProps.save({
+		className: sliderClasses(attributes),
+		style: sliderStyle(attributes),
+	});
+
+	if (layout === "spotlight") {
+		return (
+			<div {...blockProps}>
+				{frozenSpotlight(attributes, linkProps, capsuleProps)}
+				{showPauseButton && (
+					<button
+						className="dbw-pause-btn"
+						type="button"
+						aria-pressed="false"
+					></button>
+				)}
+			</div>
+		);
+	}
+
+	return (
+		<div {...blockProps}>
+			{rows.map((rowImages, rowIndex) => {
+				const direction = rowIndex % 2 === 1 ? "reverse" : "normal";
+				const duration =
+					layout === "rows" && rowSpeedMode === "varied"
+						? getRowDuration(
+								getBaseDurationSeconds(attributes),
+								rowIndex
+						  )
+						: null;
+				return frozenTrack(
+					rowImages,
+					rowIndex,
+					direction,
+					duration,
+					linkProps,
+					capsuleProps
+				);
+			})}
+			{showPauseButton && (
+				<button
+					className="dbw-pause-btn"
+					type="button"
+					aria-pressed="false"
+				></button>
+			)}
 		</div>
 	);
 };
@@ -1110,6 +1365,10 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 	attributes: BLOCK_ATTRIBUTES,
 
 	deprecated: [
+		{
+			attributes: BLOCK_ATTRIBUTES,
+			save: deprecatedSaveV221,
+		},
 		{
 			attributes: BLOCK_ATTRIBUTES,
 			save: deprecatedSaveV180,
@@ -1140,6 +1399,8 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 			logoHeightMobile,
 			balanceLogos,
 			showPauseButton,
+			eagerLoading,
+			ariaLabel,
 			overlayEnabled,
 			overlayColor,
 			blackLogos,
@@ -1559,6 +1820,19 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 							help={__("Adds a small pause/play button in the corner so visitors can stop the animation (recommended for accessibility).", "infinite-logo-carousel-block")}
 							checked={showPauseButton}
 							onChange={(val) => setAttributes({ showPauseButton: val })}
+						/>
+						<ToggleControl
+							label={__("Load images immediately", "infinite-logo-carousel-block")}
+							help={__("Logos load lazily by default, which keeps the page fast. Turn this on only if the carousel sits at the very top of the page, above the fold.", "infinite-logo-carousel-block")}
+							checked={eagerLoading}
+							onChange={(val) => setAttributes({ eagerLoading: val })}
+						/>
+						<TextControl
+							label={__("Screen reader label (optional)", "infinite-logo-carousel-block")}
+							help={__("Gives the carousel a name for screen readers, e.g. \"Our clients\". Leave empty to add no landmark at all.", "infinite-logo-carousel-block")}
+							value={ariaLabel}
+							placeholder={__("Our clients", "infinite-logo-carousel-block")}
+							onChange={(val) => setAttributes({ ariaLabel: val })}
 						/>
 					</PanelBody>
 					<PanelBody
@@ -2143,19 +2417,31 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 
 		const rows = buildSliderRows(attributes);
 
+		// A logo carousel usually sits below the fold, so its images are lazy
+		// by default. The frontend script switches the images it has to
+		// measure to eager the moment the slider comes into view, so lazy
+		// loading can no longer break the scroll speed (see frontend.js).
+		const loading = attributes.eagerLoading ? "eager" : "lazy";
+
 		// v2.0: the wrapper goes through useBlockProps.save() so block
 		// supports (wide/full alignment) work. Content saved before v2.0
 		// matches the deprecatedSaveV180 entry and is migrated on next edit.
 		const blockProps = useBlockProps.save({
 			className: sliderClasses(attributes),
 			style: sliderStyle(attributes),
+			// Only a labelled carousel becomes a landmark. An unlabelled
+			// region would just add an anonymous entry to the landmark list.
+			role: attributes.ariaLabel ? "region" : undefined,
+			"aria-label": attributes.ariaLabel || undefined,
 		});
 
 		// Spotlight mode shows one logo at a time instead of scrolling tracks.
 		if (layout === "spotlight") {
 			return (
 				<div {...blockProps}>
-					{renderSpotlight(attributes, linkProps, capsuleProps)}
+					{renderSpotlight(attributes, linkProps, capsuleProps, 0, {
+						loading,
+					})}
 					{showPauseButton && (
 						<button
 							className="dbw-pause-btn"
@@ -2186,7 +2472,8 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 						direction,
 						duration,
 						linkProps,
-						capsuleProps
+						capsuleProps,
+						loading
 					);
 				})}
 				{showPauseButton && (

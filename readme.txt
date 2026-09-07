@@ -4,7 +4,7 @@ Tags: logo carousel, logo slider, logo marquee, text marquee, client logos
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.2
-Stable tag: 2.2.1
+Stable tag: 2.3.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -33,6 +33,9 @@ Infinity logo carousel and text marquee for client, partner or sponsor logos.
 * **Balanced Logo Sizes** - Optionally equalize the visual weight of wide and compact logos automatically
 * **Text Marquee Block** - Second block: infinitely scrolling text ticker for reviews, badges or announcements
 * **Pause Button** - Optional pause/play control for better accessibility (WCAG 2.2.2)
+* **Alt Texts from the Media Library** - Missing alt texts are filled in from the attachment while the page renders, so alt texts maintained in the media library reach the front end without touching the block
+* **Screen Reader Friendly Loop** - The repeated logo sets are hidden from assistive technology, so a client name is announced once instead of once per copy
+* **Lazy Loading** - Logos load lazily by default and are only measured once the carousel comes into view, which keeps them off the critical path
 * **Grayscale Mode** - Logos run desaturated for a calm, uniform look
 * **Original Colors on Hover** - Optional: logos return to their original colors on hover, combinable with every color mode
 * **Wide & Full Alignment** - Native Gutenberg wide/full-width support
@@ -150,6 +153,18 @@ Yes, each logo can be individually linked to any URL. Links open in a new tab by
 
 In the block settings sidebar, you'll find a color picker under "Overlay Settings" where you can choose any color to match your design.
 
+= My logos have no alt text in the front end. What now? =
+
+Since version 2.3.0 the plugin fills missing alt texts in while the page is rendered: it reads the alt text from the attachment in the media library. Maintain the alt text there and reload the page - no need to open or re-save the block. An alt text you typed into the block itself always wins, it is never overwritten. If an image has no alt text anywhere, it is rendered without an alt attribute (an empty alt would tell screen readers the logo is decorative) and the file is named in the PHP error log, so the gap is visible instead of silent.
+
+= Is the carousel usable with a screen reader? =
+
+Yes. The seamless loop repeats every logo several times; only the first set carries alt text, all copies are hidden from assistive technology and their links are out of the tab order. A client name is therefore announced exactly once. You can give the whole carousel a name under "Speed" -> "Screen reader label", for example "Our clients". Visitors who ask their system to reduce motion get a static grid of all logos instead of a moving row.
+
+= When do the logo images load? =
+
+Lazily, which is what you want for a carousel below the fold. The animation is only measured once the carousel comes close to the viewport, and the images it needs are loaded at that moment. If your carousel sits at the very top of the page, switch on "Load images immediately" under "Speed".
+
 = What is the Spotlight mode? =
 
 Instead of a scrolling row it shows one logo at a time in a single slot. The logos hand over on a timer, so a single strong reference logo carries the whole spot. You set the time per logo, the transition (fade, slide up, hard cut), the order and the alignment in the "Spotlight" panel. It works well next to a headline and needs only a handful of logos to look complete.
@@ -214,6 +229,17 @@ Yes, the plugin doesn't collect, store, or transmit any personal data. It's comp
 8. Logo size adjustment controls
 
 == Changelog ==
+
+= 2.3.0 =
+* FIXED: Alt texts maintained in the media library never reached the front end. The block saves its markup once, so an alt text added to the attachment afterwards was ignored - the images went out with alt="". Missing alt texts are now filled in from the attachment while the page renders, for existing content too, without opening a single block. An alt text entered in the block is never overwritten.
+* FIXED: An image with no alt text anywhere is rendered without an alt attribute instead of alt="", and is named in the PHP error log. An empty alt tells assistive technology that an image is decorative, which a client logo is not.
+* FIXED: Screen readers announced every logo once per copy. The seamless loop repeats each set several times; those copies are now hidden from assistive technology (aria-hidden) and their links leave the tab order, so each name is announced exactly once. Applies to existing content as well.
+* FIXED: Logos were forced to load eagerly, which put a carousel below the fold in competition with the content above it. Images are lazy again by default. The scroll animation is only measured once the carousel comes into view, so the measuring bug that eager loading used to paper over cannot come back.
+* NEW: "Load images immediately" for a carousel that really does sit above the fold (off by default).
+* NEW: Optional screen reader label for the carousel, e.g. "Our clients". Left empty, no landmark is added.
+* IMPROVED: With "reduce motion" enabled the carousel now shows every logo once as a static grid, instead of a stopped row that cut off most of the logos.
+* IMPROVED: Images carry decoding="async".
+* Existing blocks keep working and are migrated silently - no "unexpected or invalid content" in the editor.
 
 = 2.2.1 =
 * IMPROVED: The spotlight settings now live in their own "Spotlight" panel instead of being tucked into the layout options.
@@ -365,6 +391,9 @@ Yes, the plugin doesn't collect, store, or transmit any personal data. It's comp
 * WordPress 6.8 compatibility
 
 == Upgrade Notice ==
+
+= 2.3.0 =
+Accessibility and performance release. Alt texts from the media library now reach the front end (existing content included, nothing to re-save), screen readers announce each logo once instead of once per copy, and logos load lazily again. Existing blocks are migrated silently.
 
 = 2.2.1 =
 Editor cleanup for the new Spotlight mode: own settings panel, and the spotlight colors moved into the regular Logo Color selector instead of a second control. Your saved sliders are unaffected.
