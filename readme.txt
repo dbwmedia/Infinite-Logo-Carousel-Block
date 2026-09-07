@@ -4,7 +4,7 @@ Tags: logo carousel, logo slider, logo marquee, text marquee, client logos
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.2
-Stable tag: 2.1.0
+Stable tag: 2.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -18,6 +18,8 @@ Infinity logo carousel and text marquee for client, partner or sponsor logos.
 
 * **Infinite Scrolling** - Seamless, continuous loop without interruption
 * **Multi-Row Layout** - Spread large logo sets across 2-4 rows with alternating scroll direction
+* **Spotlight Mode** - Show one logo at a time in a single slot: the logos take turns with a fade, a slide or a hard cut. Ideal next to a headline, or for a handful of strong reference logos
+* **Spotlight Color Cycle** - Tint the spotlight logos in one brand color, or let them rotate through a whole color set
 * **Capsule Style** - Rounded containers behind logos: filled (uniform or alternating checkerboard) or outline, with an optional glow effect
 * **Hover-Pause** - Animation automatically pauses on mouse hover
 * **Customizable Speed** - Choose between slow, medium, and fast scrolling
@@ -191,6 +193,12 @@ Yes, the plugin doesn't collect, store, or transmit any personal data. It's comp
 
 == Changelog ==
 
+= 2.2.0 =
+* NEW: Spotlight display mode — instead of a scrolling carousel, one logo at a time takes the stage and the logos hand over on a timer. Adjustable hold time, three transitions (fade, slide up, hard cut), fixed or random order and left/center/right alignment.
+* NEW: Color cycle for the spotlight — tint every logo in one brand color, or let the logos rotate through a set of colors. The tint is applied through a mask, so the logos take the exact color you picked.
+* Accessibility: with "reduce motion" enabled the spotlight shows all logos side by side instead of hiding everything but one; the pause button and hover-pause work in spotlight mode too.
+* Fully backward-compatible — existing sliders produce identical output without re-saving.
+
 = 2.1.0 =
 * NEW: "Original colors on hover" is now an independent toggle in the Logo Display panel. It works with every color mode — Black, White, Grayscale and Custom Color — and also inside capsules.
 * CHANGED: The Grayscale mode is now purely a color mode. If you used it in 2.0 and want the color-on-hover effect, enable the new toggle below the color selector.
@@ -329,6 +337,9 @@ Yes, the plugin doesn't collect, store, or transmit any personal data. It's comp
 * WordPress 6.8 compatibility
 
 == Upgrade Notice ==
+
+= 2.2.0 =
+New Spotlight mode: one logo at a time instead of a scrolling row, with fade/slide/hard-cut transitions and an optional brand color cycle. Existing sliders keep working unchanged.
 
 = 2.1.0 =
 "Original colors on hover" is now a separate toggle that works with every logo color mode, not just Grayscale. Using Grayscale from 2.0? Enable the new toggle to keep the hover effect.

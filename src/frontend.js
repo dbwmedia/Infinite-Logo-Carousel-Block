@@ -27,6 +27,11 @@
 	// keep their plain configured duration.
 	var REFERENCE_WIDTH = 1000;
 
+	// Spotlight mode: how long the cross-fade / slide takes. Must match the
+	// --spot-fade value in style.scss — the script waits for it before
+	// resetting an outgoing logo to its starting position.
+	var SPOT_TRANSITION_MS = 450;
+
 	/**
 	 * Whether the visitor has asked for reduced motion. The carousel then stays
 	 * static (the matching CSS media query also disables the fallback animation).
@@ -318,12 +323,200 @@
 	}
 
 	/**
+	 * Pick the next logo for the random order — never the current one, so a
+	 * logo is never "replaced" by itself.
+	 *
+	 * @param {number} count   Number of logos.
+	 * @param {number} current Index currently on screen.
+	 * @return {number} Index of the next logo.
+	 */
+	function pickRandomIndex(count, current) {
+		if (count < 2) {
+			return current;
+		}
+		var next = Math.floor(Math.random() * (count - 1));
+		return next >= current ? next + 1 : next;
+	}
+
+	/**
+	 * Whether this browser can mask an element with an image.
+	 *
+	 * @return {boolean} True when mask-image is supported.
+	 */
+	function supportsMask() {
+		if (typeof CSS === "undefined" || !CSS.supports) {
+			return false;
+		}
+		return (
+			CSS.supports("mask-image", 'url("a.png")') ||
+			CSS.supports("-webkit-mask-image", 'url("a.png")')
+		);
+	}
+
+	/**
+	 * Tint spotlight logos exactly: the item gets the chosen colour as its
+	 * background and the logo as its mask, so the logo is drawn in that colour
+	 * pixel for pixel — far closer to a brand colour than the approximate CSS
+	 * filter, which stays in place as the fallback.
+	 *
+	 * The mask URL is attached here rather than in the saved markup because
+	 * WordPress strips url() values from style attributes when the author
+	 * lacks unfiltered_html. Without this script the logos simply keep the
+	 * filter tint — nothing disappears.
+	 *
+	 * Capsules are skipped: they draw their own background, which the mask
+	 * would cut away.
+	 *
+	 * @param {HTMLElement} slider The .dbw-partner-slider element.
+	 * @param {NodeList}    items  The spotlight items.
+	 */
+	function applySpotlightTint(slider, items) {
+		if (
+			!slider.classList.contains("dbw-spot-tint") ||
+			slider.classList.contains("dbw-capsules") ||
+			!supportsMask()
+		) {
+			return;
+		}
+		for (var i = 0; i < items.length; i++) {
+			var img = items[i].querySelector("img");
+			if (!img) {
+				continue;
+			}
+			var url = img.currentSrc || img.getAttribute("src");
+			if (!url) {
+				continue;
+			}
+			items[i].style.setProperty(
+				"--dbw-mask",
+				'url("' + url.replace(/["\\]/g, "\\$&") + '")'
+			);
+			items[i].classList.add("dbw-spot-masked");
+		}
+	}
+
+	/**
+	 * Initialise spotlight mode: one logo at a time in a single slot, handed
+	 * over on a timer.
+	 *
+	 * The CSS does the visual work (opacity / transform transitions); this
+	 * only moves the .dbw-spot-active class along. Outgoing logos briefly get
+	 * .dbw-spot-out so the slide transition continues upwards, and are reset
+	 * below the slot once the transition has finished — with transitions
+	 * suppressed for that one frame, so the reset itself is invisible.
+	 *
+	 * With a reduced-motion preference no timer is started at all; the
+	 * stylesheet then lays every logo out side by side instead, so none of
+	 * them stays hidden.
+	 *
+	 * @param {HTMLElement} slider  The .dbw-partner-slider element.
+	 * @param {HTMLElement} stage   The .dbw-spotlight-stage element.
+	 * @param {Function}    onReady Called once the slider can be revealed.
+	 */
+	function initSpotlight(slider, stage, onReady) {
+		var items = stage.querySelectorAll(".dbw-slider-item");
+		if (items.length === 0) {
+			onReady();
+			return;
+		}
+
+		var hold = parseInt(stage.dataset.duration, 10) || 2000;
+		var random = stage.dataset.order === "random";
+		var timer = null;
+
+		// Which logo the saved markup starts on.
+		var current = 0;
+		for (var i = 0; i < items.length; i++) {
+			if (items[i].classList.contains("dbw-spot-active")) {
+				current = i;
+				break;
+			}
+		}
+
+		// Move an outgoing logo back to its waiting position without letting
+		// the move itself animate.
+		var resetItem = function (item) {
+			if (item.classList.contains("dbw-spot-active")) {
+				return;
+			}
+			item.classList.add("dbw-spot-reset");
+			item.classList.remove("dbw-spot-out");
+			// Forced reflow: applies the position change while transitions
+			// are still switched off.
+			void item.offsetWidth;
+			item.classList.remove("dbw-spot-reset");
+		};
+
+		var advance = function () {
+			var next = random
+				? pickRandomIndex(items.length, current)
+				: (current + 1) % items.length;
+			if (next === current) {
+				return;
+			}
+			var previous = items[current];
+			previous.classList.remove("dbw-spot-active");
+			previous.classList.add("dbw-spot-out");
+			items[next].classList.remove("dbw-spot-out");
+			items[next].classList.add("dbw-spot-active");
+			current = next;
+			setTimeout(function () {
+				resetItem(previous);
+			}, SPOT_TRANSITION_MS);
+		};
+
+		slider._dbwSpot = {
+			start: function () {
+				if (
+					timer === null &&
+					items.length > 1 &&
+					!prefersReducedMotion()
+				) {
+					timer = setInterval(advance, hold);
+				}
+			},
+			stop: function () {
+				if (timer !== null) {
+					clearInterval(timer);
+					timer = null;
+				}
+			},
+		};
+
+		// Reveal once the logos have loaded, so the first one never pops in
+		// half-rendered — then start the rotation.
+		var images = [];
+		for (var j = 0; j < items.length; j++) {
+			var img = items[j].querySelector("img");
+			if (img) {
+				images.push(img);
+			}
+		}
+		whenImagesReady(images, function () {
+			applyBalance(stage, slider);
+			// Tint before revealing, so no logo is ever seen in the wrong
+			// colour first.
+			applySpotlightTint(slider, items);
+			onReady();
+			slider._dbwSpot.start();
+		});
+	}
+
+	/**
 	 * Pause or resume every track of a slider at once.
 	 *
 	 * @param {HTMLElement} slider The .dbw-partner-slider element.
 	 * @param {string}      state  "paused" or "running".
 	 */
 	function setPlayState(slider, state) {
+		// Spotlight mode runs on a timer instead of a CSS animation.
+		if (slider._dbwSpot) {
+			if (state === "paused") {
+				slider._dbwSpot.stop();
+			} else {
+				slider._dbwSpot.start();
+			}
+		}
 		var tracks = slider.querySelectorAll(".dbw-slider-track");
 		for (var i = 0; i < tracks.length; i++) {
 			tracks[i].style.animationPlayState = state;
@@ -355,22 +548,27 @@
 			slider.classList.add("dbw-ready");
 		};
 
-		if (tracks.length === 0) {
+		// Spotlight mode (v2.2) replaces the scrolling tracks with a single
+		// slot; everything below (pause button, hover / touch pause) applies
+		// to both modes.
+		var stage = slider.querySelector(".dbw-spotlight-stage");
+		if (stage) {
+			initSpotlight(slider, stage, reveal);
+		} else if (tracks.length === 0) {
 			reveal();
-			return;
+		} else {
+			var pending = tracks.length;
+			var trackReady = function () {
+				pending--;
+				if (pending === 0) {
+					reveal();
+				}
+			};
+
+			tracks.forEach(function (track) {
+				initTrack(track, slider, trackReady);
+			});
 		}
-
-		var pending = tracks.length;
-		var trackReady = function () {
-			pending--;
-			if (pending === 0) {
-				reveal();
-			}
-		};
-
-		tracks.forEach(function (track) {
-			initTrack(track, slider, trackReady);
-		});
 
 		// Optional pause/play button (accessibility). While button-paused
 		// (.dbw-paused) the hover/touch handlers below leave the state alone.

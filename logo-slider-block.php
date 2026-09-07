@@ -3,7 +3,7 @@
  * Plugin Name: Logo Slider – Infinite Carousel & Marquee Block
  * Plugin URI: https://www.dennisbuchwald.de/apps/logo-slider
  * Description: A professional infinity logo carousel Gutenberg block with customizable speed, spacing, hover-stop and optional links. Perfect for showcasing partner, client or sponsor logos.
- * Version: 2.1.0
+ * Version: 2.2.0
  * Requires at least: 6.0
  * Tested up to: 7.0
  * Requires PHP: 7.2
@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define plugin constants
-define( 'ILCB_VERSION', '2.1.0' );
+define( 'ILCB_VERSION', '2.2.0' );
 define( 'ILCB_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'ILCB_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'ILCB_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
@@ -218,9 +218,11 @@ function ilcb_add_inline_styles() {
             .dbw-slider-item { min-height: 50px; }
             .dbw-slider-item img { 
                 display: block !important; 
-                opacity: 1 !important;
                 min-height: var(--logo-height, 50px);
             }
+            /* Spotlight logos tinted through a mask are drawn by the item
+               background, so the image itself has to stay invisible. */
+            .dbw-slider-item:not(.dbw-spot-masked) img { opacity: 1 !important; }
         </style>';
 
         // Keep the carousel visible when JavaScript is disabled. With JS the

@@ -14,7 +14,7 @@ import {
 	RangeControl,
 	ColorPalette,
 } from "@wordpress/components";
-import { Fragment } from "@wordpress/element";
+import { Fragment, useEffect, useState } from "@wordpress/element";
 import { __ } from "@wordpress/i18n";
 import "./editor.scss";
 import "./style.scss";
@@ -66,6 +66,19 @@ const CAPSULE_BORDER_MAP = { thin: "1px", medium: "2px", thick: "4px" };
 const CAPSULE_GLOW_MAP = { subtle: "6px", medium: "14px", strong: "26px" };
 
 /**
+ * Spotlight mode: colour cycle used when the user switches to "Color cycle"
+ * without having picked colours yet.
+ */
+const DEFAULT_SPOTLIGHT_COLORS = ["#2563eb", "#db2777", "#f59e0b"];
+
+/**
+ * Spotlight mode: how long one logo stays visible, in seconds (bounds for the
+ * editor control and the saved data-attribute).
+ */
+const SPOTLIGHT_MIN_DURATION = 0.5;
+const SPOTLIGHT_MAX_DURATION = 10;
+
+/**
  * Current block attributes (v1.4+).
  */
 const BLOCK_ATTRIBUTES = {
@@ -89,6 +102,13 @@ const BLOCK_ATTRIBUTES = {
 	linkRel: { type: "string", default: "" },
 	linkTitle: { type: "string", default: "" },
 	layout: { type: "string", default: "single" },
+	spotlightDuration: { type: "number", default: 2 },
+	spotlightTransition: { type: "string", default: "fade" },
+	spotlightOrder: { type: "string", default: "sequence" },
+	spotlightAlign: { type: "string", default: "center" },
+	spotlightColorMode: { type: "string", default: "inherit" },
+	spotlightColor: { type: "string", default: "#2563eb" },
+	spotlightColors: { type: "array", default: [] },
 	rowCount: { type: "number", default: 3 },
 	rowSpeedMode: { type: "string", default: "uniform" },
 	rowGap: { type: "string", default: "medium" },
@@ -147,6 +167,15 @@ function isValidUrl(string) {
 function sliderClasses(attributes) {
 	const classes = ["dbw-partner-slider"];
 	if (attributes.layout === "rows") classes.push("dbw-layout-rows");
+	// Spotlight: one logo at a time, swapped on a timer (v2.2).
+	if (attributes.layout === "spotlight") {
+		classes.push("dbw-layout-spotlight");
+		classes.push("dbw-spot-" + getSpotlightTransition(attributes));
+		classes.push("dbw-spot-align-" + getSpotlightAlign(attributes));
+		if (attributes.spotlightColorMode !== "inherit") {
+			classes.push("dbw-spot-tint");
+		}
+	}
 	if (!attributes.overlayEnabled) classes.push("no-overlay");
 	// General logo colour (backward-compat: blackLogos still emits the
 	// legacy class; new modes add their own class).
@@ -160,7 +189,10 @@ function sliderClasses(attributes) {
 	// Restore original logo colors on hover — works with every color mode.
 	if (
 		attributes.colorOnHover &&
-		(attributes.blackLogos || attributes.logoColorMode !== "original")
+		(attributes.blackLogos ||
+			attributes.logoColorMode !== "original" ||
+			(attributes.layout === "spotlight" &&
+				attributes.spotlightColorMode !== "inherit"))
 	)
 		classes.push("dbw-color-hover");
 	// Balanced logo sizes (area-based). Only added when enabled, so existing
@@ -224,6 +256,18 @@ function sliderStyle(attributes) {
 			style["--capsule-pad-x-mobile"] =
 				Math.round(mobileHeight * f.x * 10) / 10 + "px";
 		}
+	}
+	// Spotlight with a single tint colour: one filter for every logo, so the
+	// items themselves stay style-free (the colour cycle sets it per item).
+	if (
+		attributes.layout === "spotlight" &&
+		attributes.spotlightColorMode === "single"
+	) {
+		// Two ways to the same colour: --spot-color drives the exact mask
+		// tint applied by the frontend script, --spot-filter is the
+		// approximate CSS-filter fallback for when that script never runs.
+		style["--spot-color"] = attributes.spotlightColor || "#2563eb";
+		style["--spot-filter"] = computeColorFilter(attributes.spotlightColor);
 	}
 	// Custom logo colour filter (emitted regardless of capsules — the
 	// capsule CSS reset neutralises it when capsules are active).
@@ -307,6 +351,100 @@ function getCapsuleGlowSize(attributes) {
 		return (parseInt(attributes.capsuleGlowSizeCustom, 10) || 0) + "px";
 	}
 	return CAPSULE_GLOW_MAP[attributes.capsuleGlowSize] || "14px";
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Spotlight helpers (v2.2)                                                  */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Resolve the spotlight transition, guarding against unknown values.
+ *
+ * @param {Object} attributes Block attributes.
+ * @return {string} "fade", "slide" or "none".
+ */
+function getSpotlightTransition(attributes) {
+	const value = attributes.spotlightTransition;
+	return value === "slide" || value === "none" ? value : "fade";
+}
+
+/**
+ * Resolve the spotlight alignment, guarding against unknown values.
+ *
+ * @param {Object} attributes Block attributes.
+ * @return {string} "left", "center" or "right".
+ */
+function getSpotlightAlign(attributes) {
+	const value = attributes.spotlightAlign;
+	return value === "left" || value === "right" ? value : "center";
+}
+
+/**
+ * Hold time of a single logo, in milliseconds — written to the stage as a
+ * data attribute and read by the frontend script.
+ *
+ * @param {Object} attributes Block attributes.
+ * @return {number} Hold time in ms.
+ */
+function getSpotlightDurationMs(attributes) {
+	const seconds = parseFloat(attributes.spotlightDuration);
+	const safe = isNaN(seconds) ? 2 : seconds;
+	return Math.round(
+		Math.min(
+			SPOTLIGHT_MAX_DURATION,
+			Math.max(SPOTLIGHT_MIN_DURATION, safe)
+		) * 1000
+	);
+}
+
+/**
+ * The colour cycle for spotlight mode. Falls back to the built-in palette
+ * while the user has not picked any colour yet, so the mode never renders
+ * uncoloured logos right after being switched on.
+ *
+ * @param {Object} attributes Block attributes.
+ * @return {string[]} Hex colours.
+ */
+function getSpotlightColors(attributes) {
+	const colors = Array.isArray(attributes.spotlightColors)
+		? attributes.spotlightColors.filter(Boolean)
+		: [];
+	return colors.length > 0 ? colors : DEFAULT_SPOTLIGHT_COLORS;
+}
+
+/**
+ * Whether the exact tint (a coloured surface masked by the logo itself) can be
+ * used. Capsules bring their own background, so they keep the filter tint.
+ *
+ * @param {Object} attributes Block attributes.
+ * @return {boolean} True when the mask tint applies.
+ */
+function usesSpotlightMask(attributes) {
+	return (
+		attributes.layout === "spotlight" &&
+		attributes.spotlightColorMode !== "inherit" &&
+		!attributes.capsuleEnabled
+	);
+}
+
+/**
+ * Per-item CSS custom properties for spotlight mode. Only the colour cycle
+ * needs them — a single tint colour is inherited from the slider element.
+ *
+ * @param {Object} attributes Block attributes.
+ * @param {number} index      Position of the logo.
+ * @return {?Object} Style object, or undefined when nothing is needed.
+ */
+function getSpotlightItemStyle(attributes, index) {
+	if (attributes.spotlightColorMode !== "cycle") {
+		return undefined;
+	}
+	const colors = getSpotlightColors(attributes);
+	const color = colors[index % colors.length];
+	return {
+		"--spot-color": color,
+		"--spot-filter": computeColorFilter(color),
+	};
 }
 
 /**
@@ -505,6 +643,126 @@ function buildSliderRows(attributes) {
 }
 
 /**
+ * Render a single logo — the <img>, wrapped in its link when one is set.
+ * Shared by the scrolling tracks and the spotlight stage so both produce
+ * byte-identical logo markup.
+ *
+ * @param {Object} image     Image data ({ url, alt, link, width, height }).
+ * @param {Object} linkProps linkTarget / linkRel / linkTitle.
+ * @param {string} loading   Image loading attribute.
+ * @param {Object} opts      Editor-preview-only options ({ noLinks }).
+ * @return {Object} The logo element.
+ */
+function renderLogoContent(image, linkProps, loading, opts) {
+	const { linkTarget, linkRel, linkTitle } = linkProps;
+	const imgElement = (
+		<img
+			src={image.url}
+			alt={image.alt || ""}
+			width={image.width || undefined}
+			height={image.height || undefined}
+			loading={loading}
+		/>
+	);
+	return image.link && !opts.noLinks ? (
+		<a
+			href={image.link}
+			target={linkTarget || "_self"}
+			rel={
+				linkTarget === "_blank"
+					? `noopener noreferrer${linkRel ? ` ${linkRel}` : ""}`
+					: linkRel || undefined
+			}
+			title={linkTitle || undefined}
+			aria-label={linkTitle || "Logo Link"}
+		>
+			{imgElement}
+		</a>
+	) : (
+		imgElement
+	);
+}
+
+/**
+ * Render the spotlight stage: every logo stacked in the same grid cell, with
+ * exactly one of them carrying .dbw-spot-active. The frontend script moves
+ * that class along on a timer; without JavaScript the first logo simply
+ * stays put.
+ *
+ * @param {Object}  attributes  Block attributes.
+ * @param {Object}  linkProps   linkTarget / linkRel / linkTitle.
+ * @param {Object}  capsuleProps Capsule rendering options.
+ * @param {number}  activeIndex Index of the logo shown first (editor preview
+ *                              passes the currently rotating one).
+ * @param {Object}  opts        Editor-preview-only options ({ balance, noLinks }).
+ * @return {Object} The stage element.
+ */
+function renderSpotlight(
+	attributes,
+	linkProps,
+	capsuleProps,
+	activeIndex = 0,
+	opts = {}
+) {
+	const images = attributes.images || [];
+
+	return (
+		<div className="dbw-slider-wrapper">
+			<div
+				className="dbw-spotlight-stage"
+				data-duration={getSpotlightDurationMs(attributes)}
+				data-order={
+					attributes.spotlightOrder === "random"
+						? "random"
+						: "sequence"
+				}
+			>
+				{images.map((image, index) => {
+					const content = renderLogoContent(
+						image,
+						linkProps,
+						"eager",
+						opts
+					);
+					const style = getSpotlightItemStyle(attributes, index) || {};
+					if (opts.balance) {
+						style["--logo-scale"] = getBalanceScale(image).toFixed(3);
+					}
+					// On the front end the script attaches the mask: the URL
+					// must not travel inside the saved markup, where post
+					// filtering can strip url() values. The editor preview is
+					// never saved, so it can mask right away.
+					if (opts.mask && image.url) {
+						style["--dbw-mask"] = 'url("' + image.url + '")';
+					}
+					return (
+						<div
+							key={"spot-" + index}
+							className={
+								"dbw-slider-item" +
+								(index === activeIndex
+									? " dbw-spot-active"
+									: "") +
+								(opts.mask && image.url
+									? " dbw-spot-masked"
+									: "")
+							}
+							style={
+								Object.keys(style).length > 0 ? style : undefined
+							}
+						>
+							{capsuleProps.enabled
+								? wrapInCapsule(content, 0, index, capsuleProps)
+								: content}
+						</div>
+					);
+				})}
+			</div>
+		</div>
+	);
+}
+
+/**
  * Render one scrolling track (one row).
  *
  * @param {Array}  rowImages Images belonging to this row.
@@ -528,36 +786,9 @@ function renderTrack(
 	loading = "eager",
 	opts = {}
 ) {
-	const { linkTarget, linkRel, linkTitle } = linkProps;
-
 	const renderSet = (setIndex) =>
 		rowImages.map((image, index) => {
-			const imgElement = (
-				<img
-					src={image.url}
-					alt={image.alt || ""}
-					width={image.width || undefined}
-					height={image.height || undefined}
-					loading={loading}
-				/>
-			);
-			const content = image.link && !opts.noLinks ? (
-				<a
-					href={image.link}
-					target={linkTarget || "_self"}
-					rel={
-						linkTarget === "_blank"
-							? `noopener noreferrer${linkRel ? ` ${linkRel}` : ""}`
-							: linkRel || undefined
-					}
-					title={linkTitle || undefined}
-					aria-label={linkTitle || "Logo Link"}
-				>
-					{imgElement}
-				</a>
-			) : (
-				imgElement
-			);
+			const content = renderLogoContent(image, linkProps, loading, opts);
 			return (
 				<div
 					key={"s" + setIndex + "-" + index}
@@ -919,6 +1150,13 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 			linkRel,
 			linkTitle,
 			layout,
+			spotlightDuration,
+			spotlightTransition,
+			spotlightOrder,
+			spotlightAlign,
+			spotlightColorMode,
+			spotlightColor,
+			spotlightColors,
 			rowCount,
 			rowSpeedMode,
 			rowGap,
@@ -970,6 +1208,26 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 			setAttributes({ images: [...images, ...newImages] });
 		};
 
+		// Spotlight colour cycle: the list always mirrors what is rendered, so
+		// switching the mode on seeds it with the built-in palette.
+		const spotColorList = getSpotlightColors(attributes);
+		const setSpotColorList = (list) =>
+			setAttributes({ spotlightColors: list });
+		const updateSpotColor = (index, color) => {
+			const list = [...spotColorList];
+			list[index] = color || "#000000";
+			setSpotColorList(list);
+		};
+		const addSpotColor = () => {
+			setSpotColorList([
+				...spotColorList,
+				spotColorList[spotColorList.length - 1] || "#2563eb",
+			]);
+		};
+		const removeSpotColor = (index) => {
+			setSpotColorList(spotColorList.filter((_, i) => i !== index));
+		};
+
 		const removeImage = (index) => {
 			setAttributes({ images: images.filter((_, i) => i !== index) });
 		};
@@ -979,6 +1237,20 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 			updated[index] = { ...updated[index], [field]: value };
 			setAttributes({ images: updated });
 		};
+
+		// Spotlight live preview: the frontend script does not run inside the
+		// editor, so the editor rotates the active logo itself.
+		const [spotIndex, setSpotIndex] = useState(0);
+		const spotCount = images.length;
+		useEffect(() => {
+			if (layout !== "spotlight" || spotCount < 2) {
+				return undefined;
+			}
+			const interval = setInterval(() => {
+				setSpotIndex((current) => (current + 1) % spotCount);
+			}, getSpotlightDurationMs(attributes));
+			return () => clearInterval(interval);
+		}, [layout, spotCount, spotlightDuration]);
 
 		// Live preview: same markup and CSS as the front end, animated by the
 		// stylesheet's fallback animation. Links are disabled and the reveal
@@ -1030,9 +1302,180 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 									),
 									value: "rows",
 								},
+								{
+									label: __(
+										"Spotlight (one logo at a time)",
+										"infinite-logo-carousel-block"
+									),
+									value: "spotlight",
+								},
 							]}
 							onChange={(val) => setAttributes({ layout: val })}
 						/>
+						{layout === "spotlight" && (
+							<Fragment>
+								<RangeControl
+									label={__(
+										"Time per Logo (seconds)",
+										"infinite-logo-carousel-block"
+									)}
+									help={__(
+										"How long each logo stays visible before the next one takes over.",
+										"infinite-logo-carousel-block"
+									)}
+									value={spotlightDuration}
+									onChange={(val) =>
+										setAttributes({
+											spotlightDuration:
+												val || SPOTLIGHT_MIN_DURATION,
+										})
+									}
+									min={SPOTLIGHT_MIN_DURATION}
+									max={SPOTLIGHT_MAX_DURATION}
+									step={0.5}
+								/>
+								<SelectControl
+									label={__(
+										"Transition",
+										"infinite-logo-carousel-block"
+									)}
+									value={spotlightTransition}
+									options={[
+										{ label: __("Fade", "infinite-logo-carousel-block"), value: "fade" },
+										{ label: __("Slide up", "infinite-logo-carousel-block"), value: "slide" },
+										{ label: __("Hard cut", "infinite-logo-carousel-block"), value: "none" },
+									]}
+									onChange={(val) =>
+										setAttributes({
+											spotlightTransition: val,
+										})
+									}
+								/>
+								<SelectControl
+									label={__(
+										"Order",
+										"infinite-logo-carousel-block"
+									)}
+									value={spotlightOrder}
+									options={[
+										{ label: __("As added", "infinite-logo-carousel-block"), value: "sequence" },
+										{ label: __("Random", "infinite-logo-carousel-block"), value: "random" },
+									]}
+									onChange={(val) =>
+										setAttributes({ spotlightOrder: val })
+									}
+								/>
+								<SelectControl
+									label={__(
+										"Alignment",
+										"infinite-logo-carousel-block"
+									)}
+									value={spotlightAlign}
+									options={[
+										{ label: __("Left", "infinite-logo-carousel-block"), value: "left" },
+										{ label: __("Center", "infinite-logo-carousel-block"), value: "center" },
+										{ label: __("Right", "infinite-logo-carousel-block"), value: "right" },
+									]}
+									onChange={(val) =>
+										setAttributes({ spotlightAlign: val })
+									}
+								/>
+								<SelectControl
+									label={__(
+										"Logo Color",
+										"infinite-logo-carousel-block"
+									)}
+									help={__(
+										"Color cycle tints every logo in a different color, one after the other.",
+										"infinite-logo-carousel-block"
+									)}
+									value={spotlightColorMode}
+									options={[
+										{ label: __("Use general logo color", "infinite-logo-carousel-block"), value: "inherit" },
+										{ label: __("One color", "infinite-logo-carousel-block"), value: "single" },
+										{ label: __("Color cycle", "infinite-logo-carousel-block"), value: "cycle" },
+									]}
+									onChange={(val) =>
+										setAttributes({
+											spotlightColorMode: val,
+											// Seed the cycle so the list shown
+											// matches what gets rendered.
+											spotlightColors:
+												val === "cycle" &&
+												spotlightColors.length === 0
+													? DEFAULT_SPOTLIGHT_COLORS
+													: spotlightColors,
+										})
+									}
+								/>
+								{spotlightColorMode === "single" && (
+									<Fragment>
+										<p className="components-base-control__label">
+											{__("Logo Color", "infinite-logo-carousel-block")}
+										</p>
+										<ColorPalette
+											value={spotlightColor}
+											onChange={(color) =>
+												setAttributes({
+													spotlightColor:
+														color || "#2563eb",
+												})
+											}
+										/>
+									</Fragment>
+								)}
+								{spotlightColorMode === "cycle" && (
+									<div className="dbw-spot-color-list">
+										{spotColorList.map((color, index) => (
+											<div
+												className="dbw-spot-color-row"
+												key={"spot-color-" + index}
+											>
+												<p className="components-base-control__label">
+													{__("Color", "infinite-logo-carousel-block") +
+														" " +
+														(index + 1)}
+												</p>
+												<ColorPalette
+													value={color}
+													onChange={(value) =>
+														updateSpotColor(
+															index,
+															value
+														)
+													}
+												/>
+												{spotColorList.length > 1 && (
+													<Button
+														isDestructive
+														variant="tertiary"
+														onClick={() =>
+															removeSpotColor(
+																index
+															)
+														}
+													>
+														{__("Remove color", "infinite-logo-carousel-block")}
+													</Button>
+												)}
+											</div>
+										))}
+										<Button
+											variant="secondary"
+											onClick={addSpotColor}
+										>
+											{__("Add color", "infinite-logo-carousel-block")}
+										</Button>
+									</div>
+								)}
+								<p>
+									{__(
+										"Every logo takes its turn in the same spot. The edge gradient and the scrolling speed do not apply in this mode.",
+										"infinite-logo-carousel-block"
+									)}
+								</p>
+							</Fragment>
+						)}
 						{layout === "rows" && (
 							<Fragment>
 								<RangeControl
@@ -1535,7 +1978,22 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 						}
 						style={sliderStyle(attributes)}
 					>
-						{previewRows.map((rowImages, rowIndex) => {
+						{layout === "spotlight" &&
+							renderSpotlight(
+								attributes,
+								previewLinkProps,
+								previewCapsuleProps,
+								images.length > 0
+									? spotIndex % images.length
+									: 0,
+								{
+									balance: balanceLogos,
+									noLinks: true,
+									mask: usesSpotlightMask(attributes),
+								}
+							)}
+						{layout !== "spotlight" &&
+							previewRows.map((rowImages, rowIndex) => {
 							const direction =
 								rowIndex % 2 === 1 ? "reverse" : "normal";
 							const duration =
@@ -1666,6 +2124,22 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 			className: sliderClasses(attributes),
 			style: sliderStyle(attributes),
 		});
+
+		// Spotlight mode shows one logo at a time instead of scrolling tracks.
+		if (layout === "spotlight") {
+			return (
+				<div {...blockProps}>
+					{renderSpotlight(attributes, linkProps, capsuleProps)}
+					{showPauseButton && (
+						<button
+							className="dbw-pause-btn"
+							type="button"
+							aria-pressed="false"
+						></button>
+					)}
+				</div>
+			);
+		}
 
 		return (
 			<div {...blockProps}>

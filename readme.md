@@ -1,6 +1,6 @@
 # Logo Slider – Infinite Carousel & Marquee Block
 
-[![WordPress Plugin Version](https://img.shields.io/badge/version-2.1.0-blue)](https://wordpress.org/plugins/infinite-logo-carousel-block/)
+[![WordPress Plugin Version](https://img.shields.io/badge/version-2.2.0-blue)](https://wordpress.org/plugins/infinite-logo-carousel-block/)
 [![License](https://img.shields.io/badge/license-GPL%20v2-green)](https://www.gnu.org/licenses/gpl-2.0.html)
 [![WordPress](https://img.shields.io/badge/WordPress-6.0%2B-blue)](https://wordpress.org/)
 [![Tested up to](https://img.shields.io/badge/tested%20up%20to-7.0-blue)](https://wordpress.org/)
@@ -14,6 +14,8 @@ A professional infinity logo carousel Gutenberg block with customizable speed, s
 
 - **Infinite Scrolling** - Seamless, continuous loop without interruption
 - **Multi-Row Layout** - Spread large logo sets across 2-4 rows with alternating scroll direction and optional varied speeds
+- **Spotlight Mode** - One logo at a time in a single slot; the logos hand over on a timer with a fade, a slide or a hard cut, in fixed or random order
+- **Spotlight Color Cycle** - One brand color for every spotlight logo, or a rotating set of colors (applied through a mask, so the color is exact)
 - **Capsule Style** - Rounded containers behind logos: filled (uniform/alternating checkerboard) or outline, with an optional glow effect
 - **Hover-Pause** - Animation automatically pauses on mouse hover
 - **Touch Support** - Tap to pause/resume on mobile devices
@@ -159,6 +161,12 @@ npm run format   # Code formatting
 Developed by [Dennis Buchwald](https://www.dennisbuchwald.de) — WordPress development, Gutenberg blocks and performance optimization.
 
 ## Changelog
+
+### 2.2.0
+
+- NEW: Spotlight display mode — one logo at a time instead of a scrolling row, with adjustable hold time, fade/slide/hard-cut transitions, fixed or random order and left/center/right alignment
+- NEW: Color cycle for the spotlight — one brand color or a rotating set, applied through a CSS mask for an exact match
+- Accessibility: with reduced motion the spotlight lays out all logos side by side; pause button and hover-pause work in this mode too
 
 ### 2.1.0
 

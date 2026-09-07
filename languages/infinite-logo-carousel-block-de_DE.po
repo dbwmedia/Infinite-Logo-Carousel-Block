@@ -4,7 +4,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Logo Slider 1.7.0\n"
+"Project-Id-Version: Logo Slider 2.2.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/infinite-logo-carousel-block/\n"
 "POT-Creation-Date: 2026-05-22 12:00+0000\n"
 "PO-Revision-Date: 2026-08-09 12:00+0000\n"
@@ -472,3 +472,70 @@ msgstr "Originalfarben bei Hover"
 msgid "The logo returns to its original colors when the visitor hovers over it. Works with every color mode."
 msgstr "Das Logo zeigt beim Überfahren mit der Maus wieder seine Originalfarben. Funktioniert mit jedem Farbmodus."
 
+# Spotlight mode (2.2.0)
+
+msgid "Spotlight (one logo at a time)"
+msgstr "Spotlight (ein Logo nach dem anderen)"
+
+msgid "Time per Logo (seconds)"
+msgstr "Zeit pro Logo (Sekunden)"
+
+msgid "How long each logo stays visible before the next one takes over."
+msgstr "Wie lange jedes Logo sichtbar bleibt, bevor das nächste übernimmt."
+
+msgid "Transition"
+msgstr "Übergang"
+
+msgid "Fade"
+msgstr "Überblenden"
+
+msgid "Slide up"
+msgstr "Nach oben schieben"
+
+msgid "Hard cut"
+msgstr "Harter Schnitt"
+
+msgid "Order"
+msgstr "Reihenfolge"
+
+msgid "As added"
+msgstr "Wie eingefügt"
+
+msgid "Random"
+msgstr "Zufällig"
+
+msgid "Alignment"
+msgstr "Ausrichtung"
+
+msgid "Left"
+msgstr "Links"
+
+msgid "Center"
+msgstr "Mittig"
+
+msgid "Right"
+msgstr "Rechts"
+
+msgid "Color cycle tints every logo in a different color, one after the other."
+msgstr "Der Farbwechsel färbt jedes Logo nacheinander in einer anderen Farbe ein."
+
+msgid "Use general logo color"
+msgstr "Allgemeine Logo-Farbe verwenden"
+
+msgid "One color"
+msgstr "Eine Farbe"
+
+msgid "Color cycle"
+msgstr "Farbwechsel"
+
+msgid "Color"
+msgstr "Farbe"
+
+msgid "Remove color"
+msgstr "Farbe entfernen"
+
+msgid "Add color"
+msgstr "Farbe hinzufügen"
+
+msgid "Every logo takes its turn in the same spot. The edge gradient and the scrolling speed do not apply in this mode."
+msgstr "Jedes Logo kommt nacheinander an dieselbe Stelle. Der Kantenverlauf und die Scroll-Geschwindigkeit gelten in diesem Modus nicht."
