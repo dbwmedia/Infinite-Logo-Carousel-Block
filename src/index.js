@@ -1228,6 +1228,56 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 			setSpotColorList(spotColorList.filter((_, i) => i !== index));
 		};
 
+		// One place for the logo colour, in every layout. In spotlight mode the
+		// two extra modes (a single exact colour and the colour cycle) join the
+		// same dropdown instead of opening a second colour control elsewhere.
+		const logoColorValue =
+			layout === "spotlight" && spotlightColorMode === "cycle"
+				? "cycle"
+				: layout === "spotlight" && spotlightColorMode === "single"
+					? "custom"
+					: blackLogos
+						? "black"
+						: logoColorMode;
+
+		const setLogoColorMode = (value) => {
+			if (layout !== "spotlight") {
+				setAttributes({
+					logoColorMode: value,
+					blackLogos: value === "black",
+				});
+				return;
+			}
+			if (value === "cycle") {
+				setAttributes({
+					spotlightColorMode: "cycle",
+					spotlightColors: spotColorList,
+					logoColorMode: "original",
+					blackLogos: false,
+				});
+				return;
+			}
+			if (value === "custom") {
+				setAttributes({
+					spotlightColorMode: "single",
+					// Carry over a colour the user had already picked for the
+					// filter-based custom mode.
+					spotlightColor:
+						logoColorMode === "custom"
+							? logoCustomColor
+							: spotlightColor,
+					logoColorMode: "original",
+					blackLogos: false,
+				});
+				return;
+			}
+			setAttributes({
+				spotlightColorMode: "inherit",
+				logoColorMode: value,
+				blackLogos: value === "black",
+			});
+		};
+
 		const removeImage = (index) => {
 			setAttributes({ images: images.filter((_, i) => i !== index) });
 		};
@@ -1312,170 +1362,6 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 							]}
 							onChange={(val) => setAttributes({ layout: val })}
 						/>
-						{layout === "spotlight" && (
-							<Fragment>
-								<RangeControl
-									label={__(
-										"Time per Logo (seconds)",
-										"infinite-logo-carousel-block"
-									)}
-									help={__(
-										"How long each logo stays visible before the next one takes over.",
-										"infinite-logo-carousel-block"
-									)}
-									value={spotlightDuration}
-									onChange={(val) =>
-										setAttributes({
-											spotlightDuration:
-												val || SPOTLIGHT_MIN_DURATION,
-										})
-									}
-									min={SPOTLIGHT_MIN_DURATION}
-									max={SPOTLIGHT_MAX_DURATION}
-									step={0.5}
-								/>
-								<SelectControl
-									label={__(
-										"Transition",
-										"infinite-logo-carousel-block"
-									)}
-									value={spotlightTransition}
-									options={[
-										{ label: __("Fade", "infinite-logo-carousel-block"), value: "fade" },
-										{ label: __("Slide up", "infinite-logo-carousel-block"), value: "slide" },
-										{ label: __("Hard cut", "infinite-logo-carousel-block"), value: "none" },
-									]}
-									onChange={(val) =>
-										setAttributes({
-											spotlightTransition: val,
-										})
-									}
-								/>
-								<SelectControl
-									label={__(
-										"Order",
-										"infinite-logo-carousel-block"
-									)}
-									value={spotlightOrder}
-									options={[
-										{ label: __("As added", "infinite-logo-carousel-block"), value: "sequence" },
-										{ label: __("Random", "infinite-logo-carousel-block"), value: "random" },
-									]}
-									onChange={(val) =>
-										setAttributes({ spotlightOrder: val })
-									}
-								/>
-								<SelectControl
-									label={__(
-										"Alignment",
-										"infinite-logo-carousel-block"
-									)}
-									value={spotlightAlign}
-									options={[
-										{ label: __("Left", "infinite-logo-carousel-block"), value: "left" },
-										{ label: __("Center", "infinite-logo-carousel-block"), value: "center" },
-										{ label: __("Right", "infinite-logo-carousel-block"), value: "right" },
-									]}
-									onChange={(val) =>
-										setAttributes({ spotlightAlign: val })
-									}
-								/>
-								<SelectControl
-									label={__(
-										"Logo Color",
-										"infinite-logo-carousel-block"
-									)}
-									help={__(
-										"Color cycle tints every logo in a different color, one after the other.",
-										"infinite-logo-carousel-block"
-									)}
-									value={spotlightColorMode}
-									options={[
-										{ label: __("Use general logo color", "infinite-logo-carousel-block"), value: "inherit" },
-										{ label: __("One color", "infinite-logo-carousel-block"), value: "single" },
-										{ label: __("Color cycle", "infinite-logo-carousel-block"), value: "cycle" },
-									]}
-									onChange={(val) =>
-										setAttributes({
-											spotlightColorMode: val,
-											// Seed the cycle so the list shown
-											// matches what gets rendered.
-											spotlightColors:
-												val === "cycle" &&
-												spotlightColors.length === 0
-													? DEFAULT_SPOTLIGHT_COLORS
-													: spotlightColors,
-										})
-									}
-								/>
-								{spotlightColorMode === "single" && (
-									<Fragment>
-										<p className="components-base-control__label">
-											{__("Logo Color", "infinite-logo-carousel-block")}
-										</p>
-										<ColorPalette
-											value={spotlightColor}
-											onChange={(color) =>
-												setAttributes({
-													spotlightColor:
-														color || "#2563eb",
-												})
-											}
-										/>
-									</Fragment>
-								)}
-								{spotlightColorMode === "cycle" && (
-									<div className="dbw-spot-color-list">
-										{spotColorList.map((color, index) => (
-											<div
-												className="dbw-spot-color-row"
-												key={"spot-color-" + index}
-											>
-												<p className="components-base-control__label">
-													{__("Color", "infinite-logo-carousel-block") +
-														" " +
-														(index + 1)}
-												</p>
-												<ColorPalette
-													value={color}
-													onChange={(value) =>
-														updateSpotColor(
-															index,
-															value
-														)
-													}
-												/>
-												{spotColorList.length > 1 && (
-													<Button
-														isDestructive
-														variant="tertiary"
-														onClick={() =>
-															removeSpotColor(
-																index
-															)
-														}
-													>
-														{__("Remove color", "infinite-logo-carousel-block")}
-													</Button>
-												)}
-											</div>
-										))}
-										<Button
-											variant="secondary"
-											onClick={addSpotColor}
-										>
-											{__("Add color", "infinite-logo-carousel-block")}
-										</Button>
-									</div>
-								)}
-								<p>
-									{__(
-										"Every logo takes its turn in the same spot. The edge gradient and the scrolling speed do not apply in this mode.",
-										"infinite-logo-carousel-block"
-									)}
-								</p>
-							</Fragment>
-						)}
 						{layout === "rows" && (
 							<Fragment>
 								<RangeControl
@@ -1559,10 +1445,91 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 							</Fragment>
 						)}
 					</PanelBody>
+					{layout === "spotlight" && (
+						<PanelBody
+							title={__("Spotlight", "infinite-logo-carousel-block")}
+							initialOpen={true}
+						>
+							<RangeControl
+								label={__(
+									"Time per Logo (seconds)",
+									"infinite-logo-carousel-block"
+								)}
+								help={__(
+									"How long each logo stays visible before the next one takes over.",
+									"infinite-logo-carousel-block"
+								)}
+								value={spotlightDuration}
+								onChange={(val) =>
+									setAttributes({
+										spotlightDuration:
+											val || SPOTLIGHT_MIN_DURATION,
+									})
+								}
+								min={SPOTLIGHT_MIN_DURATION}
+								max={SPOTLIGHT_MAX_DURATION}
+								step={0.5}
+							/>
+							<SelectControl
+								label={__(
+									"Transition",
+									"infinite-logo-carousel-block"
+								)}
+								value={spotlightTransition}
+								options={[
+									{ label: __("Fade", "infinite-logo-carousel-block"), value: "fade" },
+									{ label: __("Slide up", "infinite-logo-carousel-block"), value: "slide" },
+									{ label: __("Hard cut", "infinite-logo-carousel-block"), value: "none" },
+								]}
+								onChange={(val) =>
+									setAttributes({
+										spotlightTransition: val,
+									})
+								}
+							/>
+							<SelectControl
+								label={__(
+									"Order",
+									"infinite-logo-carousel-block"
+								)}
+								value={spotlightOrder}
+								options={[
+									{ label: __("As added", "infinite-logo-carousel-block"), value: "sequence" },
+									{ label: __("Random", "infinite-logo-carousel-block"), value: "random" },
+								]}
+								onChange={(val) =>
+									setAttributes({ spotlightOrder: val })
+								}
+							/>
+							<SelectControl
+								label={__(
+									"Alignment",
+									"infinite-logo-carousel-block"
+								)}
+								value={spotlightAlign}
+								options={[
+									{ label: __("Left", "infinite-logo-carousel-block"), value: "left" },
+									{ label: __("Center", "infinite-logo-carousel-block"), value: "center" },
+									{ label: __("Right", "infinite-logo-carousel-block"), value: "right" },
+								]}
+								onChange={(val) =>
+									setAttributes({ spotlightAlign: val })
+								}
+							/>
+							<p>
+								{__(
+									"Every logo takes its turn in the same spot. The edge gradient and the scrolling speed do not apply in this mode.",
+									"infinite-logo-carousel-block"
+								)}
+							</p>
+						</PanelBody>
+					)}
 					<PanelBody
 						title={__("Speed", "infinite-logo-carousel-block")}
 						initialOpen={true}
 					>
+						{layout !== "spotlight" && (
+							<Fragment>
 						<SelectControl
 							label={__("Carousel Speed", "infinite-logo-carousel-block")}
 							value={speed}
@@ -1584,6 +1551,8 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 								max={300}
 								step={5}
 							/>
+						)}
+							</Fragment>
 						)}
 						<ToggleControl
 							label={__("Show pause button", "infinite-logo-carousel-block")}
@@ -1697,6 +1666,7 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 							/>
 						)}
 					</PanelBody>
+					{layout !== "spotlight" && (
 					<PanelBody
 						title={__("Overlay Settings", "infinite-logo-carousel-block")}
 						initialOpen={false}
@@ -1720,44 +1690,100 @@ registerBlockType("infinite-logo-carousel-block/carousel", {
 							/>
 						)}
 					</PanelBody>
+					)}
 					<PanelBody
 						title={__("Logo Display", "infinite-logo-carousel-block")}
 						initialOpen={false}
 					>
 						<SelectControl
 							label={__("Logo Color", "infinite-logo-carousel-block")}
-							help={__("Applies a uniform color to all logos for a cohesive look.", "infinite-logo-carousel-block")}
-							value={blackLogos ? "black" : logoColorMode}
+							help={
+								layout === "spotlight"
+									? __("One color, or a color cycle that gives every logo its own color in turn.", "infinite-logo-carousel-block")
+									: __("Applies a uniform color to all logos for a cohesive look.", "infinite-logo-carousel-block")
+							}
+							value={logoColorValue}
 							options={[
 								{ label: __("Original", "infinite-logo-carousel-block"), value: "original" },
 								{ label: __("Black", "infinite-logo-carousel-block"), value: "black" },
 								{ label: __("White", "infinite-logo-carousel-block"), value: "white" },
 								{ label: __("Grayscale", "infinite-logo-carousel-block"), value: "grayscale" },
 								{ label: __("Custom Color", "infinite-logo-carousel-block"), value: "custom" },
+								...(layout === "spotlight"
+									? [
+											{
+												label: __("Color cycle", "infinite-logo-carousel-block"),
+												value: "cycle",
+											},
+									  ]
+									: []),
 							]}
-							onChange={(val) =>
-								setAttributes({
-									logoColorMode: val,
-									blackLogos: val === "black",
-								})
-							}
+							onChange={setLogoColorMode}
 						/>
-						{!blackLogos && logoColorMode === "custom" && (
+						{logoColorValue === "custom" && (
 							<Fragment>
 								<p className="components-base-control__label">
 									{__("Custom Color", "infinite-logo-carousel-block")}
 								</p>
 								<ColorPalette
-									value={logoCustomColor}
+									value={
+										layout === "spotlight"
+											? spotlightColor
+											: logoCustomColor
+									}
 									onChange={(color) =>
-										setAttributes({
-											logoCustomColor: color || "#999999",
-										})
+										setAttributes(
+											layout === "spotlight"
+												? {
+														spotlightColor:
+															color || "#2563eb",
+												  }
+												: {
+														logoCustomColor:
+															color || "#999999",
+												  }
+										)
 									}
 								/>
 							</Fragment>
 						)}
-						{(blackLogos || logoColorMode !== "original") && (
+						{logoColorValue === "cycle" && (
+							<div className="dbw-spot-color-list">
+								{spotColorList.map((color, index) => (
+									<div
+										className="dbw-spot-color-row"
+										key={"spot-color-" + index}
+									>
+										<p className="components-base-control__label">
+											{__("Color", "infinite-logo-carousel-block") +
+												" " +
+												(index + 1)}
+										</p>
+										<ColorPalette
+											value={color}
+											onChange={(value) =>
+												updateSpotColor(index, value)
+											}
+										/>
+										{spotColorList.length > 1 && (
+											<Button
+												isDestructive
+												variant="tertiary"
+												onClick={() =>
+													removeSpotColor(index)
+												}
+											>
+												{__("Remove color", "infinite-logo-carousel-block")}
+											</Button>
+										)}
+									</div>
+								))}
+								<Button variant="secondary" onClick={addSpotColor}>
+									{__("Add color", "infinite-logo-carousel-block")}
+								</Button>
+							</div>
+						)}
+						{logoColorValue !== "original" && (
 							<ToggleControl
 								label={__("Original colors on hover", "infinite-logo-carousel-block")}
 								help={__("The logo returns to its original colors when the visitor hovers over it. Works with every color mode.", "infinite-logo-carousel-block")}

@@ -1,6 +1,6 @@
 # Logo Slider – Infinite Carousel & Marquee Block
 
-[![WordPress Plugin Version](https://img.shields.io/badge/version-2.2.0-blue)](https://wordpress.org/plugins/infinite-logo-carousel-block/)
+[![WordPress Plugin Version](https://img.shields.io/badge/version-2.2.1-blue)](https://wordpress.org/plugins/infinite-logo-carousel-block/)
 [![License](https://img.shields.io/badge/license-GPL%20v2-green)](https://www.gnu.org/licenses/gpl-2.0.html)
 [![WordPress](https://img.shields.io/badge/WordPress-6.0%2B-blue)](https://wordpress.org/)
 [![Tested up to](https://img.shields.io/badge/tested%20up%20to-7.0-blue)](https://wordpress.org/)
@@ -81,36 +81,49 @@ npm run build
 ## Usage
 
 1. Add new block in Gutenberg editor
-2. Search for "Infinite Logo Carousel"
+2. Search for "Logo Slider"
 3. Upload your logos
-4. Configure settings in the sidebar:
-   - Speed (slow/medium/fast)
-   - Logo spacing
-   - Logo height
+4. Pick a display mode: Single Row, Multiple Rows or Spotlight
+5. Configure settings in the sidebar:
+   - Layout (single row / multiple rows / spotlight)
+   - Spotlight: time per logo, transition, order, alignment
+   - Speed (slow/medium/fast/custom)
+   - Logo spacing and logo height (desktop + optional mobile height)
    - Overlay settings
-   - Black logos option
+   - Logo color: original, black, white, grayscale, custom color, or a color cycle in spotlight mode
+   - Capsule style
    - Link settings
    - Alt text per logo
 
 ## Block Settings
 
-| Setting           | Options                                   | Default    |
-| ----------------- | ----------------------------------------- | ---------- |
-| Layout            | Single Row / Multiple Rows (2-4 rows)     | Single Row |
-| Row Speed         | Uniform / Varied (multi-row only)         | Uniform    |
-| Speed             | Slow (40s), Medium (25s), Fast (15s)      | Medium     |
-| Logo Spacing      | Small (20px), Medium (40px), Large (60px) | Medium     |
-| Logo Height       | 30px - 150px                              | 50px       |
-| Top/Bottom Margin | Small (25px), Medium (50px), Large (75px) | Medium     |
-| Overlay           | On/Off with color picker                  | On (white) |
-| Black Logos       | On/Off                                    | Off        |
-| Link Target       | Same window / New window                  | Same       |
-| Rel Attributes    | Custom (nofollow, sponsored, etc.)        | None       |
-| Title Attribute   | Custom tooltip text                       | None       |
+| Setting                | Options                                                              | Default    |
+| ---------------------- | -------------------------------------------------------------------- | ---------- |
+| Layout                 | Single Row / Multiple Rows (2-4 rows) / Spotlight                    | Single Row |
+| Row Speed              | Uniform / Varied (multi-row only)                                     | Uniform    |
+| Time per Logo          | 0.5s - 10s (spotlight only)                                           | 2s         |
+| Transition             | Fade / Slide up / Hard cut (spotlight only)                           | Fade       |
+| Order                  | As added / Random (spotlight only)                                    | As added   |
+| Alignment              | Left / Center / Right (spotlight only)                                | Center     |
+| Speed                  | Slow (40s), Medium (25s), Fast (15s), Custom (5-300s)                 | Medium     |
+| Logo Spacing           | Small (20px), Medium (40px), Large (60px), XL (100px), Custom         | Medium     |
+| Logo Height            | 30px - 150px, optional separate mobile height                         | 50px       |
+| Balance Logo Sizes     | On/Off (area-based size equalization)                                 | Off        |
+| Top/Bottom Margin      | Small (25px), Medium (50px), Large (75px)                             | Medium     |
+| Overlay                | On/Off with color picker (not used in spotlight)                      | On (white) |
+| Logo Color             | Original / Black / White / Grayscale / Custom Color / Color cycle*    | Original   |
+| Original Colors on Hover | On/Off                                                              | Off        |
+| Capsule Style          | Off / Uniform / Alternating / Outline, corner, padding, glow          | Off        |
+| Pause Button           | On/Off (WCAG 2.2.2)                                                   | Off        |
+| Link Target            | Same window / New window                                              | Same       |
+| Rel Attributes         | Custom (nofollow, sponsored, etc.)                                    | None       |
+| Title Attribute        | Custom tooltip text                                                   | None       |
+
+\* Color cycle is available in spotlight mode. There the tint is applied through a mask, so the logos take the exact color; the other modes use a CSS filter.
 
 ## Compatibility
 
-- WordPress 5.8 or higher (tested up to 7.0)
+- WordPress 6.0 or higher (tested up to 7.0)
 - PHP 7.2 or higher
 - Modern browsers (Chrome, Firefox, Safari, Edge)
 - Gutenberg editor (required)
@@ -130,8 +143,9 @@ This is a Gutenberg block and works natively only in the block editor. For other
 ```
 infinite-logo-carousel-block/
 ├── src/
-│   ├── index.js         # Block registration, editor UI, save output
-│   ├── frontend.js      # Frontend animations & touch support
+│   ├── index.js         # Carousel block: registration, editor UI, save output
+│   ├── marquee.js       # Text marquee block
+│   ├── frontend.js      # Frontend engine: scroll animation, spotlight timer, pause
 │   ├── editor.scss      # Editor styles
 │   └── style.scss       # Frontend styles
 ├── build/               # Compiled files
@@ -161,6 +175,13 @@ npm run format   # Code formatting
 Developed by [Dennis Buchwald](https://www.dennisbuchwald.de) — WordPress development, Gutenberg blocks and performance optimization.
 
 ## Changelog
+
+### 2.2.1
+
+- IMPROVED: Spotlight settings moved into their own "Spotlight" panel
+- IMPROVED: One logo color control again — the spotlight color modes joined the existing Logo Color selector under "Logo Display"
+- IMPROVED: Carousel speed and overlay settings are hidden in spotlight mode, where they have no effect
+- Saved content unchanged (editor-only release)
 
 ### 2.2.0
 

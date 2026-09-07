@@ -4,7 +4,7 @@ Tags: logo carousel, logo slider, logo marquee, text marquee, client logos
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.2
-Stable tag: 2.2.0
+Stable tag: 2.2.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -19,7 +19,7 @@ Infinity logo carousel and text marquee for client, partner or sponsor logos.
 * **Infinite Scrolling** - Seamless, continuous loop without interruption
 * **Multi-Row Layout** - Spread large logo sets across 2-4 rows with alternating scroll direction
 * **Spotlight Mode** - Show one logo at a time in a single slot: the logos take turns with a fade, a slide or a hard cut. Ideal next to a headline, or for a handful of strong reference logos
-* **Spotlight Color Cycle** - Tint the spotlight logos in one brand color, or let them rotate through a whole color set
+* **Spotlight Color Cycle** - Tint the spotlight logos in one brand color, or let them rotate through a whole color set. Set in the same "Logo Color" place as every other color mode
 * **Capsule Style** - Rounded containers behind logos: filled (uniform or alternating checkerboard) or outline, with an optional glow effect
 * **Hover-Pause** - Animation automatically pauses on mouse hover
 * **Customizable Speed** - Choose between slow, medium, and fast scrolling
@@ -27,7 +27,7 @@ Infinity logo carousel and text marquee for client, partner or sponsor logos.
 * **Optional Logo Links** - Link each logo individually to external websites
 * **Overlay Control** - Enable/disable edge overlay with custom colors
 * **Color Customization** - Adjust overlay color to match your design
-* **Logo Color Mode** - Convert all logos to black, white or a custom tint color
+* **Logo Color Mode** - Convert all logos to black, white, grayscale or a custom tint color, all from one selector
 * **Adjustable Logo Height** - Set custom height from 30px to 150px
 * **Mobile Logo Height** - Optional separate logo height for phones, or fully automatic scaling
 * **Balanced Logo Sizes** - Optionally equalize the visual weight of wide and compact logos automatically
@@ -54,11 +54,12 @@ Infinity logo carousel and text marquee for client, partner or sponsor logos.
 
 = How It Works =
 
-1. Add the Infinite Logo Carousel block to any page or post
+1. Add the Logo Slider block to any page or post
 2. Upload your logos (supports JPG, PNG, SVG, WebP)
-3. Customize speed, spacing, and appearance
-4. Optionally add links to each logo
-5. Publish and enjoy your professional logo carousel
+3. Pick a display mode: one scrolling row, several rows, or Spotlight (one logo at a time)
+4. Customize speed, spacing, colors and appearance
+5. Optionally add links to each logo
+6. Publish and enjoy your professional logo carousel
 
 = Customization Options =
 
@@ -72,12 +73,25 @@ Infinity logo carousel and text marquee for client, partner or sponsor logos.
 - Medium (40px between logos)
 - Large (60px between logos)
 
+**Display Modes:**
+- Single Row - one continuously scrolling row
+- Multiple Rows - 2 to 4 rows, alternating direction, uniform or varied speed
+- Spotlight - one logo at a time in the same slot
+
+**Spotlight Settings:**
+- Time per logo (0.5 to 10 seconds)
+- Transition: Fade, Slide up or Hard cut
+- Order: as added or random
+- Alignment: left, center or right
+
 **Visual Options:**
 - Enable/disable edge overlay
 - Custom overlay color picker
-- Logo color mode: Original, Black, White or Custom Color
+- Logo color mode: Original, Black, White, Grayscale or Custom Color; in Spotlight mode also a Color cycle
+- Original colors on hover, combinable with every color mode
+- Capsule style behind the logos: filled, alternating or outline, with optional glow
 - Custom top/bottom margins
-- Adjustable logo height (30px to 150px)
+- Adjustable logo height (30px to 150px), with an optional separate height for phones
 
 = Developer Friendly =
 
@@ -136,9 +150,17 @@ Yes, each logo can be individually linked to any URL. Links open in a new tab by
 
 In the block settings sidebar, you'll find a color picker under "Overlay Settings" where you can choose any color to match your design.
 
+= What is the Spotlight mode? =
+
+Instead of a scrolling row it shows one logo at a time in a single slot. The logos hand over on a timer, so a single strong reference logo carries the whole spot. You set the time per logo, the transition (fade, slide up, hard cut), the order and the alignment in the "Spotlight" panel. It works well next to a headline and needs only a handful of logos to look complete.
+
+= Can I show the spotlight logos in my brand colors? =
+
+Yes. Under "Logo Display" choose "Custom Color" for a single color, or "Color cycle" to give every logo its own color in turn - add as many colors as you like and the logos rotate through them. In spotlight mode the color is applied through a mask, so the logos take exactly the color you picked. This works with logos that have a transparent background (PNG, SVG, WebP).
+
 = What does the "Logo Color" option do? =
 
-This setting lets you convert all logos to a uniform color — Black, White, or a Custom Color of your choice. It's particularly useful when you have colorful logos but want a consistent, monochrome appearance.
+This setting lets you convert all logos to a uniform look - Black, White, Grayscale or a Custom Color of your choice. It's particularly useful when you have colorful logos but want a consistent appearance. In Spotlight mode the same selector also offers a Color cycle, which gives every logo its own color in turn. Add "Original colors on hover" below it if the logos should show their real colors when a visitor points at them.
 
 = Can I use SVG logos? =
 
@@ -192,6 +214,12 @@ Yes, the plugin doesn't collect, store, or transmit any personal data. It's comp
 8. Logo size adjustment controls
 
 == Changelog ==
+
+= 2.2.1 =
+* IMPROVED: The spotlight settings now live in their own "Spotlight" panel instead of being tucked into the layout options.
+* IMPROVED: One place for the logo color again. The spotlight color modes ("Custom Color" for a single color, "Color cycle" for a rotating set) joined the existing Logo Color selector under "Logo Display", so there is no second color control any more.
+* IMPROVED: Settings without an effect in spotlight mode (carousel speed, edge overlay) are hidden while that mode is active.
+* Saved content is unchanged - this release only touches the editor sidebar.
 
 = 2.2.0 =
 * NEW: Spotlight display mode — instead of a scrolling carousel, one logo at a time takes the stage and the logos hand over on a timer. Adjustable hold time, three transitions (fade, slide up, hard cut), fixed or random order and left/center/right alignment.
@@ -337,6 +365,9 @@ Yes, the plugin doesn't collect, store, or transmit any personal data. It's comp
 * WordPress 6.8 compatibility
 
 == Upgrade Notice ==
+
+= 2.2.1 =
+Editor cleanup for the new Spotlight mode: own settings panel, and the spotlight colors moved into the regular Logo Color selector instead of a second control. Your saved sliders are unaffected.
 
 = 2.2.0 =
 New Spotlight mode: one logo at a time instead of a scrolling row, with fade/slide/hard-cut transitions and an optional brand color cycle. Existing sliders keep working unchanged.

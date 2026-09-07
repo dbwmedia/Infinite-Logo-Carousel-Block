@@ -539,3 +539,9 @@ msgstr "Farbe hinzufügen"
 
 msgid "Every logo takes its turn in the same spot. The edge gradient and the scrolling speed do not apply in this mode."
 msgstr "Jedes Logo kommt nacheinander an dieselbe Stelle. Der Kantenverlauf und die Scroll-Geschwindigkeit gelten in diesem Modus nicht."
+
+msgid "Spotlight"
+msgstr "Spotlight"
+
+msgid "One color, or a color cycle that gives every logo its own color in turn."
+msgstr "Eine Farbe, oder ein Farbwechsel, der jedem Logo nacheinander eine eigene Farbe gibt."
