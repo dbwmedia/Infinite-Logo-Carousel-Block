@@ -2,71 +2,35 @@
 node_modules/
 vendor/
 
-# Build files - NUR für Git ignorieren
-# Für WordPress.org SVN MÜSSEN diese inkludiert sein!
-build/
-dist/
+# build/ IS committed on purpose: it is what ships to WordPress.org, and
+# old builds (git show vX:build/index.js) are the reference for block
+# deprecation tests.
 
-# Development files
-.DS_Store
-Thumbs.db
+# Logs and caches
 *.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+.cache/
+.phpunit.result.cache
+test-results/
+playwright-report/
 
-# Editor directories and files
+# Editor and OS files
 .idea/
 .vscode/
 *.swp
 *.swo
 *~
-
-# OS files
 .DS_Store
-.DS_Store?
 ._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
+Thumbs.db
 
-# WordPress specific
-wp-config.php
-.htaccess
-
-# Backup files
-*.bak
-*.backup
-*.old
-
-# Temporary files
-*.tmp
-*.temp
-.cache/
-
-# Package files
+# Archives
 *.zip
 *.tar.gz
 *.rar
 
-# Test files
-tests/
-phpunit.xml
-.phpunit.result.cache
-
-# Documentation source
-docs/
-
-# SVN Repository (wichtig!)
+# WordPress.org SVN working copy (deployed by deploy.sh)
 infinite-logo-carousel-block/
 
-# WordPress.org assets (lokal entwickelt)
-.wordpress-org/
-
-# Development documentation 
-.dev/.claude_code.yaml
-.claude_code.yaml
-.claude_code.yaml
-
-# Internal dev notes
+# Internal notes and tooling config
 .dev/
+.claude_code.yaml

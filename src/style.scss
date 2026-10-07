@@ -135,6 +135,12 @@
 	// Logo text direction is restored on the items below.
 	direction: ltr;
 
+	// Spotlight mode does not scroll; its slot alignment keeps following the
+	// page direction, exactly as before 2.3.1.
+	.dbw-layout-spotlight & {
+		direction: inherit;
+	}
+
 	// Same vertical-glow exception as on the slider container — this inner
 	// wrapper otherwise clips the glow first, before it can reach the outer
 	// container's relaxed clip box.
@@ -590,7 +596,9 @@
 
 // RTL pages: the wrapper forces left-to-right for the scroll animation;
 // give text inside the items (text marquee, captions) its direction back.
-:where([dir="rtl"]) .dbw-slider-item {
+// :dir() follows the nearest dir attribute, so an LTR section inside an RTL
+// page stays LTR.
+.dbw-slider-item:dir(rtl) {
 	direction: rtl;
 }
 
@@ -616,7 +624,7 @@
 	}
 
 	// A static grid follows the page direction again.
-	:where([dir="rtl"]) .dbw-slider-wrapper {
+	.dbw-slider-wrapper:dir(rtl) {
 		direction: rtl;
 	}
 

@@ -183,7 +183,7 @@ Developed by [Dennis Buchwald](https://www.dennisbuchwald.de) — WordPress deve
 
 ### 2.3.1
 
-- FIXED: RTL pages (Hebrew, Arabic) showed an empty row after one pass. `.dbw-slider-wrapper` now forces `direction: ltr` (the animation assumes copies to the right of the first set); `.dbw-slider-item` restores `rtl` under `[dir="rtl"]`, and the reduced-motion grid follows the page direction again.
+- FIXED: RTL pages (Hebrew, Arabic) showed an empty row after one pass. `.dbw-slider-wrapper` now forces `direction: ltr` (the animation assumes copies to the right of the first set); `.dbw-slider-item` restores `rtl` under `[dir="rtl"]`, and the reduced-motion grid follows the page direction again. Props to polinar for reporting!
 
 ### 2.3.0
 

@@ -1,164 +1,131 @@
 #!/bin/bash
 
-# WordPress.org Deployment Script für Infinite Logo Carousel Block
-# Author: dbw media
-# Usage: ./deploy.sh [VERSION]
+# WordPress.org deployment for the Logo Slider plugin.
+# Usage: ./deploy.sh VERSION
 #
-# WICHTIG: Dieses Script verwendet IMMER das lokale SVN Repository im Projektordner!
-# SVN Repository Pfad: ./infinite-logo-carousel-block/
+# Release order: bump the version everywhere, commit, tag vVERSION, push,
+# then run this script. It refuses to deploy anything that is not exactly
+# the tagged, clean, freshly built Git state.
+#
+# The SVN working copy lives in ./infinite-logo-carousel-block/.
 
-set -e  # Exit bei Fehler
+set -euo pipefail
 
-# Farben für Output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
-# Funktionen
-error() {
-    echo -e "${RED}ERROR: $1${NC}" >&2
-    exit 1
-}
+error()   { echo -e "${RED}ERROR: $1${NC}" >&2; exit 1; }
+info()    { echo -e "${BLUE}INFO: $1${NC}"; }
+success() { echo -e "${GREEN}SUCCESS: $1${NC}"; }
+warning() { echo -e "${YELLOW}WARNING: $1${NC}"; }
 
-info() {
-    echo -e "${BLUE}INFO: $1${NC}"
-}
-
-success() {
-    echo -e "${GREEN}SUCCESS: $1${NC}"
-}
-
-warning() {
-    echo -e "${YELLOW}WARNING: $1${NC}"
-}
-
-# Version Parameter prüfen
-if [ -z "$1" ]; then
-    error "Version parameter required! Usage: ./deploy.sh [VERSION]"
-fi
+[ $# -eq 1 ] || error "Usage: ./deploy.sh VERSION"
 
 VERSION="$1"
 SVN_USERNAME="dbwmediadennis"
 SVN_PATH="./infinite-logo-carousel-block"
+SVN_URL="https://plugins.svn.wordpress.org/infinite-logo-carousel-block"
 
-info "Starting deployment for version $VERSION"
+# Only these paths are shipped. Everything else (tests, docs, editor
+# config, credentials) can never reach the public SVN by accident.
+SHIP=(logo-slider-block.php block.json uninstall.php readme.txt package.json build src languages)
 
-# 1. Prüfungen
-info "Running pre-deployment checks..."
+[[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || error "VERSION must look like 1.2.3"
+[ -f logo-slider-block.php ] || error "Run this from the plugin directory"
+[ -d "$SVN_PATH/.svn" ] || error "$SVN_PATH is not an SVN working copy"
 
-# Check if we're in the right directory
-if [ ! -f "logo-slider-block.php" ]; then
-    error "Not in the correct project directory! logo-slider-block.php not found."
+# 1. Version consistency
+info "Checking version $VERSION in every file..."
+check_version() {
+    local file="$1" pattern="$2"
+    grep -qE "$pattern" "$file" || error "$file does not declare version $VERSION ($pattern)"
+}
+V="${VERSION//./\\.}"
+check_version logo-slider-block.php "^ \* Version: $V\$"
+check_version logo-slider-block.php "'ILCB_VERSION', '$V'"
+check_version readme.txt "^Stable tag: $V\$"
+check_version readme.txt "^= $V =\$"
+check_version package.json "\"version\": \"$V\""
+check_version readme.md "version-$V-blue"
+success "Version is consistent"
+
+# 2. Git state: clean, and HEAD is the release tag
+info "Checking Git state..."
+[ -z "$(git status --porcelain)" ] || error "Working tree is not clean. Commit or stash first."
+TAG_COMMIT="$(git rev-parse -q --verify "refs/tags/v$VERSION^{commit}" || true)"
+[ -n "$TAG_COMMIT" ] || error "Git tag v$VERSION is missing. Create it: git tag v$VERSION && git push origin v$VERSION"
+[ "$TAG_COMMIT" = "$(git rev-parse HEAD)" ] || error "HEAD is not at tag v$VERSION"
+success "Git state is clean and tagged"
+
+# 3. Fresh build must match the committed build
+info "Building..."
+npm run build
+[ -z "$(git status --porcelain -- build)" ] || error "Fresh build differs from the committed build/. Commit the build first."
+success "Build matches the tagged commit"
+
+# 4. SVN: the tag must not exist yet
+info "Checking SVN tag..."
+if svn ls "$SVN_URL/tags/$VERSION" >/dev/null 2>&1; then
+    error "SVN tag $VERSION already exists"
 fi
+svn update "$SVN_PATH"
 
-# Check if SVN directory exists
-if [ ! -d "$SVN_PATH" ]; then
-    error "SVN repository not found at $SVN_PATH"
-fi
+# 5. Mirror the shipped paths into trunk (removals included)
+info "Copying files to trunk..."
+for path in "${SHIP[@]}"; do
+    [ -e "$path" ] || error "Missing $path"
+done
+# Remove everything in trunk that is not on the ship list.
+for existing in "$SVN_PATH/trunk/"* "$SVN_PATH/trunk/".[!.]*; do
+    [ -e "$existing" ] || continue
+    name="$(basename "$existing")"
+    keep=0
+    for path in "${SHIP[@]}"; do [ "$name" = "$path" ] && keep=1; done
+    [ $keep -eq 1 ] || rm -rf "$existing"
+done
+for path in "${SHIP[@]}"; do
+    if [ -d "$path" ]; then
+        rsync -a --delete --exclude='.DS_Store' "$path/" "$SVN_PATH/trunk/$path/"
+    else
+        cp "$path" "$SVN_PATH/trunk/$path"
+    fi
+done
 
-# Check if SVN directory is actually an SVN repo
-if [ ! -d "$SVN_PATH/.svn" ]; then
-    error "$SVN_PATH is not an SVN repository"
-fi
-
-# Check if package.json exists
-if [ ! -f "package.json" ]; then
-    error "package.json not found"
-fi
-
-success "Pre-deployment checks passed"
-
-# 2. Build erstellen
-info "Creating production build..."
-npm run build || error "Build failed"
-success "Production build created"
-
-# 3. SVN Repository updaten
-info "Updating SVN repository..."
 cd "$SVN_PATH"
-svn update || error "SVN update failed"
-cd ..
-success "SVN repository updated"
+svn add --force trunk --quiet
+# Files that vanished locally are scheduled for deletion (paths with spaces safe).
+svn status trunk | sed -n 's/^! *//p' | while IFS= read -r missing; do
+    svn delete --quiet "$missing"
+done
 
-# 4. Dateien zu SVN trunk kopieren
-info "Copying files to SVN trunk..."
-rsync -av \
-    --exclude='.git*' \
-    --exclude='node_modules' \
-    --exclude='*.log' \
-    --exclude='.DS_Store' \
-    --exclude='package-lock.json' \
-    --exclude='.claude*' \
-    --exclude='.dev' \
-    --exclude='.wordpress-org' \
-    --exclude='DEPLOY-*.md' \
-    --exclude='PLUGIN-CHECK-*.md' \
-    --exclude='readme.md' \
-    --exclude='infinite-logo-carousel-block' \
-    --exclude='deploy.sh' \
-    ./ "$SVN_PATH/trunk/" || error "File copy failed"
-success "Files copied to SVN trunk"
+# Last line of defence against publishing secrets or junk.
+if svn status trunk | grep -Ei '(\.env|\.zip|\.log|sftp\.json|\.vscode|\.idea)'; then
+    error "Suspicious files staged in trunk, aborting"
+fi
 
-# 5. SVN Changes verarbeiten
-info "Processing SVN changes..."
-cd "$SVN_PATH"
+# Trunk and tag go out in ONE commit, so Stable tag never points to a
+# tag that does not exist yet.
+svn copy --quiet trunk "tags/$VERSION"
 
-# Add new files
-svn add trunk --force 2>/dev/null || true
-
-# Remove deleted files
-svn status | grep '^!' | awk '{print $2}' | xargs -r svn delete 2>/dev/null || true
-
-# Show status
-info "SVN Status:"
+info "SVN status:"
 svn status
 
-# 6. User Confirmation vor Commit
 echo ""
-warning "About to commit to SVN trunk with version $VERSION"
+warning "About to commit trunk + tags/$VERSION to WordPress.org"
 read -p "Continue? (y/N): " -n 1 -r
 echo
-if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-    error "Deployment aborted by user"
-fi
+[[ $REPLY =~ ^[Yy]$ ]] || error "Deployment aborted"
 
-# 7. SVN Trunk Commit
-info "Committing to SVN trunk..."
-svn commit -m "v$VERSION: WordPress.org release" --username "$SVN_USERNAME" || error "SVN trunk commit failed"
-success "SVN trunk committed"
-
-# 8. Tag erstellen
-info "Creating SVN tag $VERSION..."
-svn copy trunk "tags/$VERSION" || error "SVN tag creation failed"
-success "SVN tag created"
-
-# 9. Tag committen
-info "Committing SVN tag..."
-svn commit -m "Tag version $VERSION" --username "$SVN_USERNAME" || error "SVN tag commit failed"
-success "SVN tag committed"
-
-# 10. Verification (against the REMOTE repository — the local working copy
-# listing produced false negatives right after the tag commit)
-info "Verifying deployment..."
-if svn list "https://plugins.svn.wordpress.org/infinite-logo-carousel-block/tags/" | grep -q "^$VERSION/$"; then
-    success "Tag $VERSION successfully created"
-else
-    error "Tag verification failed"
-fi
-
+svn commit -m "Release $VERSION" --username "$SVN_USERNAME"
 cd ..
 
-# 11. Final Success Message
+# 6. Verify against the remote repository
+info "Verifying..."
+svn ls "$SVN_URL/tags/" | grep -qxF "$VERSION/" || error "Tag verification failed"
+
 echo ""
-success "🚀 DEPLOYMENT SUCCESSFUL!"
-echo ""
-info "Version $VERSION has been deployed to WordPress.org"
-info "Check: https://wordpress.org/plugins/infinite-logo-carousel-block/"
-info "Plugin will be available in ~15 minutes"
-echo ""
-warning "Don't forget to:"
-echo "  - Create a Git tag: git tag v$VERSION && git push origin v$VERSION"
-echo "  - Update any documentation"
-echo "  - Test the plugin installation from WordPress.org"
+success "Version $VERSION is live on WordPress.org (allow ~15 minutes)"
+info "https://wordpress.org/plugins/infinite-logo-carousel-block/"
