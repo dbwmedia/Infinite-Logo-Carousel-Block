@@ -26,7 +26,7 @@
 		"lint:js": "wp-scripts lint-js src tests",
 		"format": "wp-scripts format",
 		"test": "npm run test:blocks && npm run test:php && npm run test:e2e",
-		"test:blocks": "node --test tests/js/",
+		"test:blocks": "node --test tests/js/blocks.test.cjs",
 		"test:php": "tests/php/fetch-wp.sh && php tests/php/render-test.php",
 		"test:e2e": "playwright test",
 		"fixtures": "node tests/js/make-fixtures.cjs",
