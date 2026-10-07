@@ -1,0 +1,18 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "playground",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "-y",
+        "@wp-playground/cli@latest",
+        "server",
+        "--port=9400",
+        "--mount=.:/wordpress/wp-content/plugins/infinite-logo-carousel-block",
+        "--blueprint=tests/playground/blueprint.json"
+      ],
+      "port": 9400
+    }
+  ]
+}

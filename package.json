@@ -1,6 +1,6 @@
 {
 	"name": "infinite-logo-carousel-block",
-	"version": "2.3.1",
+	"version": "2.4.0",
 	"description": "Professional infinity logo carousel Gutenberg block with customizable speed, spacing and hover-pause.",
 	"author": "Dennis Buchwald",
 	"homepage": "https://www.dennisbuchwald.de/apps/logo-slider",
@@ -23,7 +23,7 @@
 	"scripts": {
 		"build": "wp-scripts build",
 		"start": "wp-scripts start",
-		"lint:js": "wp-scripts lint-js src tests",
+		"lint:js": "wp-scripts lint-js src tests/js tests/e2e bin",
 		"format": "wp-scripts format",
 		"test": "npm run test:blocks && npm run test:php && npm run test:e2e",
 		"test:blocks": "node --test tests/js/blocks.test.cjs",
@@ -31,7 +31,8 @@
 		"test:e2e": "playwright test",
 		"fixtures": "node tests/js/make-fixtures.cjs",
 		"check:version": "bin/check-version.sh",
-		"packages-update": "wp-scripts packages-update"
+		"packages-update": "wp-scripts packages-update",
+		"check:i18n": "node bin/i18n-missing.cjs --strict"
 	},
 	"devDependencies": {
 		"@wordpress/blocks": "^16.1.0",

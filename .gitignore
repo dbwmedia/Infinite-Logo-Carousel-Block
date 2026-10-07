@@ -35,3 +35,4 @@ infinite-logo-carousel-block/
 .dev/
 .claude_code.yaml
 tests/php/.wp/
+tests/fixtures/current/

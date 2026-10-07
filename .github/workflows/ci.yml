@@ -21,6 +21,8 @@ jobs:
       - name: Committed build is up to date
         run: git diff --exit-code -- build
       - run: npm run check:version
+      - run: npm run lint:js
+      - run: npm run check:i18n
       - run: npm run test:blocks
 
   php:
