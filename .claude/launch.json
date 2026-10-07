@@ -13,6 +13,21 @@
         "--blueprint=tests/playground/blueprint.json"
       ],
       "port": 9400
+    },
+    {
+      "name": "playground-min",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "-y",
+        "@wp-playground/cli@latest",
+        "server",
+        "--port=9401",
+        "--mount=.:/wordpress/wp-content/plugins/infinite-logo-carousel-block",
+        "--blueprint=tests/playground/blueprint-min.json",
+        "--wp=6.6",
+        "--php=7.4"
+      ],
+      "port": 9401
     }
   ]
 }

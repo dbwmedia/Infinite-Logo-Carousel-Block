@@ -1,0 +1,15 @@
+{
+	"$schema": "https://playground.wordpress.net/blueprint-schema.json",
+	"landingPage": "/wp-admin/post-new.php",
+	"preferredVersions": {
+		"php": "7.4",
+		"wp": "6.6"
+	},
+	"login": true,
+	"steps": [
+		{
+			"step": "activatePlugin",
+			"pluginPath": "infinite-logo-carousel-block/logo-slider-block.php"
+		}
+	]
+}
