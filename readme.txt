@@ -4,7 +4,7 @@ Tags: logo carousel, logo slider, logo marquee, text marquee, client logos
 Requires at least: 6.6
 Tested up to: 7.0
 Requires PHP: 7.2
-Stable tag: 2.3.1
+Stable tag: 2.4.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -18,21 +18,25 @@ Infinity logo carousel and text marquee for client, partner or sponsor logos.
 
 * **Infinite Scrolling** - Seamless, continuous loop without interruption
 * **Multi-Row Layout** - Spread large logo sets across 2-4 rows with alternating scroll direction
+* **Static Logo Grid** - All logos at once, wrapped and centred, without motion
 * **Spotlight Mode** - Show one logo at a time in a single slot: the logos take turns with a fade, a slide or a hard cut. Ideal next to a headline, or for a handful of strong reference logos
 * **Spotlight Color Cycle** - Tint the spotlight logos in one brand color, or let them rotate through a whole color set. Set in the same "Logo Color" place as every other color mode
 * **Capsule Style** - Rounded containers behind logos: filled (uniform or alternating checkerboard) or outline, with an optional glow effect
 * **Hover-Pause** - Animation automatically pauses on mouse hover
 * **Customizable Speed** - Choose between slow, medium, and fast scrolling
 * **Flexible Logo Spacing** - Small, medium, or large gaps between logos
-* **Optional Logo Links** - Link each logo individually to external websites
-* **Overlay Control** - Enable/disable edge overlay with custom colors
-* **Color Customization** - Adjust overlay color to match your design
+* **Optional Logo Links** - Link each logo individually, with page search and an optional new tab per logo
+* **Easy Logo Management** - Drag & drop upload, reorder, replace and remove logos in the sidebar, with a hint for logos that have no alt text
+* **Edge Fade** - Transparent fade that works on any background (images and gradients included), or a classic color overlay
+* **Reverse Direction** - Let the logos run from left to right
 * **Logo Color Mode** - Convert all logos to black, white, grayscale or a custom tint color, all from one selector
 * **Adjustable Logo Height** - Set custom height from 30px to 150px
 * **Mobile Logo Height** - Optional separate logo height for phones, or fully automatic scaling
 * **Balanced Logo Sizes** - Optionally equalize the visual weight of wide and compact logos automatically
 * **Text Marquee Block** - Second block: infinitely scrolling text ticker for reviews, badges or announcements
-* **Pause Button** - Optional pause/play control for better accessibility (WCAG 2.2.2)
+* **Accessible Motion** - Pause button (on by default for new carousels), pauses on keyboard focus and while off screen (WCAG 2.2.2)
+* **Right-to-Left Ready** - Seamless loop on Hebrew, Arabic and other RTL pages
+* **Works with Optimization Plugins** - Layout-critical CSS travels with the block, so delayed stylesheets (WP Rocket, Hummingbird, ...) cannot break the layout
 * **Alt Texts from the Media Library** - Missing alt texts are filled in from the attachment while the page renders, so alt texts maintained in the media library reach the front end without touching the block
 * **Screen Reader Friendly Loop** - The repeated logo sets are hidden from assistive technology, so a client name is announced once instead of once per copy
 * **Lazy Loading** - Logos load lazily by default and are only measured once the carousel comes into view, which keeps them off the critical path
@@ -80,6 +84,7 @@ Infinity logo carousel and text marquee for client, partner or sponsor logos.
 - Single Row - one continuously scrolling row
 - Multiple Rows - 2 to 4 rows, alternating direction, uniform or varied speed
 - Spotlight - one logo at a time in the same slot
+- Static Grid - all logos at once, no motion
 
 **Spotlight Settings:**
 - Time per logo (0.5 to 10 seconds)
@@ -88,8 +93,7 @@ Infinity logo carousel and text marquee for client, partner or sponsor logos.
 - Alignment: left, center or right
 
 **Visual Options:**
-- Enable/disable edge overlay
-- Custom overlay color picker
+- Edge fade: transparent (any background) or a color overlay, or off
 - Logo color mode: Original, Black, White, Grayscale or Custom Color; in Spotlight mode also a Color cycle
 - Original colors on hover, combinable with every color mode
 - Capsule style behind the logos: filled, alternating or outline, with optional glow
@@ -147,23 +151,31 @@ Absolutely! The carousel is fully responsive and works perfectly on all devices 
 
 = Can I link the logos to websites? =
 
-Yes, each logo can be individually linked to any URL. Links open in a new tab by default for better user experience.
+Yes, each logo can be linked individually: open the "Logos" panel in the block sidebar, type a URL or search for one of your pages. Choose "Open in new tab" per logo, or set the target for all logos under "Link Settings". Only web, e-mail and phone links are allowed; anything else is removed on the page.
 
-= How do I customize the overlay color? =
+= How do I fade out the edges? =
 
-In the block settings sidebar, you'll find a color picker under "Overlay Settings" where you can choose any color to match your design.
+Under "Edge Fade" choose "Transparent" - the logos themselves fade out, so it works on any background, images and gradients included. "Color overlay" paints the edges in one color of your choice (capsules with a glow always use the color overlay, so the glow is not cut off).
+
+= The carousel looks broken with WP Rocket, Hummingbird or another optimization plugin. =
+
+Since 2.4.0 the layout-critical CSS travels with the block itself, so a delayed stylesheet can no longer stack the logos on top of each other. If you also delay JavaScript until user interaction, the carousel starts moving at the first interaction; to start it right away, exclude `infinite-logo-carousel-block/src/frontend.js` from "Delay JavaScript".
+
+= Does it work on right-to-left (Hebrew, Arabic) pages? =
+
+Yes. The loop is seamless on RTL pages since 2.4.0, and text in the Text Marquee keeps its right-to-left direction.
 
 = My logos have no alt text in the front end. What now? =
 
-Since version 2.3.0 the plugin fills missing alt texts in while the page is rendered: it reads the alt text from the attachment in the media library. Maintain the alt text there and reload the page - no need to open or re-save the block. An alt text you typed into the block itself always wins, it is never overwritten. If an image has no alt text anywhere, it is rendered without an alt attribute (an empty alt would tell screen readers the logo is decorative) and the file is named in the PHP error log, so the gap is visible instead of silent.
+Since version 2.3.0 the plugin fills missing alt texts in while the page is rendered: it reads the alt text from the attachment in the media library. Maintain the alt text there and reload the page - no need to open or re-save the block. An alt text you typed into the block itself always wins, it is never overwritten. If an image has no alt text anywhere, it is rendered without an alt attribute (an empty alt would tell screen readers the logo is decorative) and falls back to the attachment title. The "Logos" panel in the block sidebar shows how many logos still have no alt text.
 
 = Is the carousel usable with a screen reader? =
 
-Yes. The seamless loop repeats every logo several times; only the first set carries alt text, all copies are hidden from assistive technology and their links are out of the tab order. A client name is therefore announced exactly once. You can give the whole carousel a name under "Speed" -> "Screen reader label", for example "Our clients". Visitors who ask their system to reduce motion get a static grid of all logos instead of a moving row.
+Yes. The seamless loop repeats every logo several times; only the first set carries alt text, all copies are hidden from assistive technology and their links are out of the tab order. A client name is therefore announced exactly once. You can give the whole carousel a name under "Accessibility & Loading" -> "Screen reader label", for example "Our clients". The carousel pauses while a logo link has keyboard focus, new carousels come with a pause button, and visitors who ask their system to reduce motion get a static grid of all logos instead of a moving row.
 
 = When do the logo images load? =
 
-Lazily, which is what you want for a carousel below the fold. The animation is only measured once the carousel comes close to the viewport, and the images it needs are loaded at that moment. If your carousel sits at the very top of the page, switch on "Load images immediately" under "Speed".
+Lazily, which is what you want for a carousel below the fold. The animation is only measured once the carousel comes close to the viewport, and the images it needs are loaded at that moment. If your carousel sits at the very top of the page, switch on "Load images immediately" under "Accessibility & Loading". The plugin also adds a srcset, so a small logo does not download a large file.
 
 = What is the Spotlight mode? =
 
@@ -230,8 +242,26 @@ Yes, the plugin doesn't collect, store, or transmit any personal data. It's comp
 
 == Changelog ==
 
-= 2.3.1 =
-* FIXED: On right-to-left pages (Hebrew, Arabic, ...) the carousel ran through its logos once and then left an empty row. The track is now always laid out left to right, so the loop is seamless in every language; text inside the items keeps its right-to-left direction. Props to polinar for reporting!
+= 2.4.0 =
+* FIXED: On right-to-left pages (Hebrew, Arabic, ...) the carousel ran through its logos once and then left an empty row. The loop is now seamless in every language; text inside the items keeps its right-to-left direction. Props to polinar for reporting!
+* FIXED: With optimization plugins that delay the stylesheet (WP Rocket, Hummingbird, ...) the logos briefly stacked up at full size. The layout-critical CSS now travels with the block.
+* FIXED: A short row (few narrow logos or text items) left a gap on very wide screens. Missing copies are added automatically.
+* FIXED: Before the script had measured the row, the CSS animation jumped at the loop seam for some logo counts.
+* FIXED: Logos repeated inside the first set (alternating capsules with an odd logo count) were announced twice by screen readers.
+* FIXED: Every logo link was named "Logo Link" for screen readers, overriding the logo's alt text. The alt text is now the link name; logos without any alt text fall back to their media library title.
+* FIXED: Swiping over the carousel on a phone paused and resumed it. Only a real tap does now.
+* FIXED: Black, white, grayscale and custom logo colors looked different depending on the page (an inline !important overrode them). They now look the same everywhere, as the editor shows them.
+* SECURITY: Logo links are limited to web, e-mail and phone URLs on output; unknown link targets get rel="noopener".
+* NEW: Static Logo Grid layout, and block variations "Logo Wall", "Logo Spotlight" and "Logo Grid" in the inserter.
+* NEW: Transparent edge fade that works on any background. New carousels use it by default.
+* NEW: Reverse direction, "None" as top/bottom margin, "Open in new tab" per logo.
+* NEW: Logo management in the sidebar: drag & drop upload, reorder, replace, page search for links, and a hint for logos without alt text.
+* IMPROVED: Accessibility - the carousel pauses while a logo has keyboard focus, new carousels show the pause button by default, the button has a translated name, a clear focus ring and 3:1 contrast, and hidden spotlight logos can no longer receive focus.
+* IMPROVED: Performance - srcset for logo images, the animation pauses while the carousel is off screen, the front-end script only loads on pages with a block, and the alt text lookup no longer queries per logo.
+* IMPROVED: Missing alt texts are written to the PHP error log only with WP_DEBUG_LOG enabled.
+* IMPROVED: window.ilcbInit() starts carousels added to the page later (AJAX, page builders).
+* CHANGED: Requires WordPress 6.6 or newer.
+* Existing carousels keep working unchanged - nothing needs to be re-saved.
 
 = 2.3.0 =
 * FIXED: Alt texts maintained in the media library never reached the front end. The block saves its markup once, so an alt text added to the attachment afterwards was ignored - the images went out with alt="". Missing alt texts are now filled in from the attachment while the page renders, for existing content too, without opening a single block. An alt text entered in the block is never overwritten.
@@ -395,8 +425,8 @@ Yes, the plugin doesn't collect, store, or transmit any personal data. It's comp
 
 == Upgrade Notice ==
 
-= 2.3.1 =
-Fixes the infinite loop on right-to-left pages (Hebrew, Arabic): the carousel no longer stops after one pass.
+= 2.4.0 =
+Fixes the loop on right-to-left pages and the layout with optimization plugins, improves accessibility and adds a static logo grid, a transparent edge fade and easier logo management. Requires WordPress 6.6. Existing carousels keep working unchanged.
 
 = 2.3.0 =
 Accessibility and performance release. Alt texts from the media library now reach the front end (existing content included, nothing to re-save), screen readers announce each logo once instead of once per copy, and logos load lazily again. Existing blocks are migrated silently.

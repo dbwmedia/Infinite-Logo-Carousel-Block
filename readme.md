@@ -1,6 +1,6 @@
 # Logo Slider – Infinite Carousel & Marquee Block
 
-[![WordPress Plugin Version](https://img.shields.io/badge/version-2.3.1-blue)](https://wordpress.org/plugins/infinite-logo-carousel-block/)
+[![WordPress Plugin Version](https://img.shields.io/badge/version-2.4.0-blue)](https://wordpress.org/plugins/infinite-logo-carousel-block/)
 [![License](https://img.shields.io/badge/license-GPL%20v2-green)](https://www.gnu.org/licenses/gpl-2.0.html)
 [![WordPress](https://img.shields.io/badge/WordPress-6.6%2B-blue)](https://wordpress.org/)
 [![Tested up to](https://img.shields.io/badge/tested%20up%20to-7.0-blue)](https://wordpress.org/)
@@ -181,9 +181,16 @@ Developed by [Dennis Buchwald](https://www.dennisbuchwald.de) — WordPress deve
 
 ## Changelog
 
-### 2.3.1
+### 2.4.0
 
-- FIXED: RTL pages (Hebrew, Arabic) showed an empty row after one pass. `.dbw-slider-wrapper` now forces `direction: ltr` (the animation assumes copies to the right of the first set); `.dbw-slider-item` restores `rtl` under `[dir="rtl"]`, and the reduced-motion grid follows the page direction again. Props to polinar for reporting!
+- FIXED: RTL pages (Hebrew, Arabic) showed an empty row after one pass: `.dbw-slider-wrapper` forces `direction: ltr`, items restore it via `:dir(rtl)`, spotlight and the static grid keep the page direction. Props to polinar for reporting!
+- FIXED: Delayed stylesheets (WP Rocket, Hummingbird): zero-specificity critical layout CSS is printed with the first block.
+- FIXED: Short tracks leave no gap on wide screens (frontend.js clones missing copies); the CSS fallback shifts by exactly one set (`--dbw-loop-shift` from the render filter).
+- FIXED: Logos repeated inside the first set are aria-hidden; the generic "Logo Link" label is dropped in favour of the alt text; attachment title as alt fallback; touch pause only on real taps; color modes no longer overridden by an inline `!important`.
+- SECURITY: render filter limits `href` to http(s)/mailto/tel and `target` to `_self`/`_blank` (+ `noopener`).
+- NEW: Static grid layout, block variations (Logo Slider, Logo Wall, Logo Spotlight, Logo Grid), transparent mask edge fade (`overlayStyle: "fade"`), `reverseDirection`, margin "none", per-logo `newTab`, sidebar logo management (reorder, replace, URLInput, missing-alt notice), MediaPlaceholder empty state, inserter example.
+- IMPROVED: Pause on keyboard focus and off screen, translated pause button name with `aria-pressed`, inert hidden spotlight logos, srcset/sizes, `view_script` for the marquee, `update_meta_cache` + cached URL lookups, `window.ilcbInit()`.
+- DEV: `src/index.js` split into `src/carousel/*`; deprecations use a frozen helper snapshot. Test suite: block validation against fixtures of 13 releases + golden save check (`npm run test:blocks`), PHP render filter tests (`npm run test:php`), Playwright front-end tests (`npm run test:e2e`), GitHub Actions CI. `@wordpress/scripts` 36; requires WordPress 6.6.
 
 ### 2.3.0
 

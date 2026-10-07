@@ -66,6 +66,29 @@
 		display: none;
 	}
 
+	// Transparent edge fade (v2.4): the logos themselves fade out through a
+	// mask, so the edges work on any background, images and gradients
+	// included. A mask would also clip the capsule glow vertically, so glow
+	// capsules keep the colour overlay.
+	&.dbw-overlay-fade:not(.dbw-cap-glow) {
+		&::before,
+		&::after {
+			display: none;
+		}
+
+		.dbw-slider-wrapper {
+			$fade: linear-gradient(
+				to right,
+				transparent,
+				#000 var(--dbw-fade-width, 100px),
+				#000 calc(100% - var(--dbw-fade-width, 100px)),
+				transparent
+			);
+			-webkit-mask-image: $fade;
+			mask-image: $fade;
+		}
+	}
+
 	&.black-logos img {
 		filter: brightness(0);
 	}
@@ -600,6 +623,27 @@
 // page stays LTR.
 .dbw-slider-item:dir(rtl) {
 	direction: rtl;
+}
+
+// Static logo grid (v2.4): one set, wrapped and centred, no motion. Same
+// layout the reduced-motion preference gets for a scrolling carousel.
+.dbw-layout-grid {
+	&::before,
+	&::after {
+		display: none;
+	}
+
+	.dbw-slider-track {
+		animation: none;
+		flex-wrap: wrap;
+		justify-content: center;
+		width: auto;
+		row-gap: calc(var(--slide-gap, 40px) / 2);
+	}
+
+	.dbw-slider-wrapper {
+		direction: inherit;
+	}
 }
 
 // Accessibility: respect the reduced-motion preference. !important also

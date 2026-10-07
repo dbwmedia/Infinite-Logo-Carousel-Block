@@ -27,6 +27,8 @@
 		"ariaLabel": { "type": "string", "default": "" },
 		"overlayEnabled": { "type": "boolean", "default": true },
 		"overlayColor": { "type": "string", "default": "#ffffff" },
+		"overlayStyle": { "type": "string", "default": "color" },
+		"reverseDirection": { "type": "boolean", "default": false },
 		"blackLogos": { "type": "boolean", "default": false },
 		"logoColorMode": { "type": "string", "default": "original" },
 		"logoCustomColor": { "type": "string", "default": "#999999" },

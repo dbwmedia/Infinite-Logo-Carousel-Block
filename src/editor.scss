@@ -1,57 +1,66 @@
-.dbw-partner-slider-editor-wrapper {
-	border: 1px solid #ccc;
-	padding: 20px;
-	background: #f9f9f9;
-}
+// The canvas shows the carousel exactly as on the page; logo management
+// lives in the sidebar (Logos panel).
+.dbw-logo-list {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
 
-.dbw-partner-slider-editor {
-	.dbw-partner-slider-images {
+	.dbw-logo-card {
 		display: flex;
-		flex-wrap: wrap;
-		gap: 15px;
-		margin-bottom: 20px;
+		flex-direction: column;
+		gap: 8px;
+		padding: 10px;
+		border: 1px solid #ddd;
+		border-radius: 2px;
+	}
 
-		.dbw-partner-slider-image {
-			background: #fff;
-			border: 1px solid #ddd;
-			padding: 10px;
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			justify-content: center;
-			min-width: 120px;
+	.dbw-logo-card__head {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 8px;
 
-			img {
-				display: block;
-				max-height: 50px;
-				margin-bottom: 10px;
-			}
-
-			.dbw-remove-button {
-				margin-top: 10px;
-				color: #b32d2e;
-				font-size: 12px;
-			}
-
-			.components-base-control__field {
-				width: 100%;
-			}
-
-			.dbw-invalid-url input {
-				border-color: #cc1818 !important;
-			}
+		img {
+			max-width: 110px;
+			max-height: 40px;
+			object-fit: contain;
 		}
 	}
 
-	.components-button {
-		margin-top: 10px;
+	.dbw-logo-card__actions {
+		display: flex;
+		flex-shrink: 0;
+	}
+
+	.dbw-logo-card__link .components-base-control__label {
+		display: block;
+		margin-bottom: 8px;
+		font-size: 11px;
+		font-weight: 500;
+		text-transform: uppercase;
+	}
+
+	.dbw-logo-card__link .block-editor-url-input {
+		min-width: 0;
+		max-width: 100%;
+
+		input,
+		.block-editor-url-input__input {
+			box-sizing: border-box;
+			width: 100%;
+			max-width: 100%;
+		}
+	}
+
+	.dbw-logo-card__error {
+		margin: 4px 0 0;
+		color: #cc1818;
 	}
 }
 
 // Live preview inside the editor: cap the vertical footprint so a multi-row
 // slider doesn't push the management UI off screen, and keep the preview's
 // outer margins compact inside the editor card.
-.dbw-partner-slider-editor-wrapper .dbw-editor-preview,
 .dbw-marquee-editor-wrapper .dbw-editor-preview {
 	margin-top: 10px;
 	margin-bottom: 20px;

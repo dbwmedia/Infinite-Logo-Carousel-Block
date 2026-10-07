@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Logo Slider 2.2.0\n"
+"Project-Id-Version: Logo Slider 2.4.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/infinite-logo-carousel-block/\n"
 "POT-Creation-Date: 2026-05-22 12:00+0000\n"
-"PO-Revision-Date: 2026-08-09 12:00+0000\n"
+"PO-Revision-Date: 2026-10-07 12:00+0000\n"
 "Last-Translator: Dennis Buchwald\n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -560,3 +560,122 @@ msgstr "Gibt dem Karussell einen Namen für Screenreader, z. B. \"Unsere Kunden\
 
 msgid "Our clients"
 msgstr "Unsere Kunden"
+
+msgid "Add logos"
+msgstr "Logos hinzufügen"
+
+msgid "Logos"
+msgstr "Logos"
+
+msgid "Static Grid (no motion)"
+msgstr "Statisches Raster (ohne Bewegung)"
+
+msgid "Motion"
+msgstr "Bewegung"
+
+msgid "Reverse direction"
+msgstr "Richtung umkehren"
+
+msgid "Logos move from left to right instead. With several rows, every row flips."
+msgstr "Die Logos laufen stattdessen von links nach rechts. Bei mehreren Reihen dreht sich jede Reihe um."
+
+msgid "The static grid shows every logo once, without any motion."
+msgstr "Das statische Raster zeigt jedes Logo einmal, ganz ohne Bewegung."
+
+msgid "Accessibility & Loading"
+msgstr "Barrierefreiheit & Laden"
+
+msgid "None"
+msgstr "Keiner"
+
+msgid "Edge Fade"
+msgstr "Ausblenden an den Rändern"
+
+msgid "Fade out at the edges"
+msgstr "An den Rändern ausblenden"
+
+msgid "Logos fade in and out at the left and right edge."
+msgstr "Die Logos werden am linken und rechten Rand weich ein- und ausgeblendet."
+
+msgid "Fade style"
+msgstr "Art des Ausblendens"
+
+msgid "Transparent (any background)"
+msgstr "Transparent (für jeden Hintergrund)"
+
+msgid "Color overlay"
+msgstr "Farbverlauf"
+
+msgid "Capsules with a glow use the color overlay, so the glow is not cut off."
+msgstr "Kapseln mit Leuchteffekt nutzen den Farbverlauf, damit das Leuchten nicht abgeschnitten wird."
+
+msgid "Transparent works on images and gradients too. The color overlay paints the edges in one color."
+msgstr "Transparent funktioniert auch auf Bildern und Verläufen. Der Farbverlauf färbt die Ränder in einer Farbe."
+
+#, c-format
+msgid "Color %d"
+msgstr "Farbe %d"
+
+msgid "Drop logo files here, upload them, or pick them from the media library. Select several at once."
+msgstr "Ziehen Sie Logo-Dateien hierher, laden Sie sie hoch oder wählen Sie sie aus der Mediathek. Sie können mehrere auf einmal auswählen."
+
+msgid "Client or partner logos in an endless row."
+msgstr "Kunden- oder Partnerlogos in einer endlosen Reihe."
+
+msgid "Logo Wall"
+msgstr "Logo-Wand"
+
+msgid "Several rows of logos moving in opposite directions."
+msgstr "Mehrere Logo-Reihen, die gegenläufig laufen."
+
+msgid "Logo Spotlight"
+msgstr "Logo-Spotlight"
+
+msgid "One logo at a time in the same spot."
+msgstr "Ein Logo nach dem anderen an derselben Stelle."
+
+msgid "Logo Grid"
+msgstr "Logo-Raster"
+
+msgid "All logos at once, static and centred."
+msgstr "Alle Logos auf einmal, statisch und zentriert."
+
+msgid "Move up"
+msgstr "Nach oben"
+
+msgid "Move down"
+msgstr "Nach unten"
+
+msgid "Replace"
+msgstr "Ersetzen"
+
+msgid "Alt text"
+msgstr "Alternativtext"
+
+msgid "Company name"
+msgstr "Firmenname"
+
+msgid "Empty: the alt text from the media library is used."
+msgstr "Leer: Der Alternativtext aus der Mediathek wird verwendet."
+
+msgid "Link (optional)"
+msgstr "Link (optional)"
+
+msgid "Only web, e-mail and phone links are allowed. This link is removed on the page."
+msgstr "Erlaubt sind nur Web-, E-Mail- und Telefon-Links. Dieser Link wird auf der Seite entfernt."
+
+msgid "Open in new tab"
+msgstr "In neuem Tab öffnen"
+
+#, c-format
+msgid "Item %d"
+msgstr "Eintrag %d"
+
+msgid "Pause animation"
+msgstr "Animation pausieren"
+
+#, c-format
+msgid "%d logo has no alt text. Screen readers then only hear its file name."
+msgid_plural "%d logos have no alt text. Screen readers then only hear their file names."
+msgstr[0] "%d Logo hat keinen Alternativtext. Screenreader lesen dann nur den Dateinamen vor."
+msgstr[1] "%d Logos haben keinen Alternativtext. Screenreader lesen dann nur die Dateinamen vor."

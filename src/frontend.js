@@ -15,23 +15,23 @@
  * - A ResizeObserver keeps the animation correct when a track changes size
  *   later on (responsive breakpoints, lazy/late-loading images, web fonts).
  */
-(function () {
-	"use strict";
+( function () {
+	'use strict';
 
-	var SETTLE_DELAY = 250; // Debounce (ms) for the no-ResizeObserver fallback.
-	var REVEAL_TIMEOUT = 1500; // Show the carousel after this at the latest.
+	const SETTLE_DELAY = 250; // Debounce (ms) for the no-ResizeObserver fallback.
+	const REVEAL_TIMEOUT = 1500; // Show the carousel after this at the latest.
 
 	// Calibration width (px). For a carousel wider than this the scroll speed
 	// equals (this width / configured duration) pixels per second — so a
 	// SMALLER value here means a slower carousel overall. It also keeps the
 	// speed consistent regardless of the number of logos. Narrower carousels
 	// keep their plain configured duration.
-	var REFERENCE_WIDTH = 1000;
+	const REFERENCE_WIDTH = 1000;
 
 	// Spotlight mode: how long a hand-over takes. Must match --spot-fade plus
 	// --spot-handover in style.scss — the script waits for it before
 	// resetting an outgoing logo to its starting position.
-	var SPOT_TRANSITION_MS = 450;
+	const SPOT_TRANSITION_MS = 450;
 
 	/**
 	 * Whether the visitor has asked for reduced motion. The carousel then stays
@@ -41,8 +41,8 @@
 	 */
 	function prefersReducedMotion() {
 		return (
-			typeof window.matchMedia === "function" &&
-			window.matchMedia("(prefers-reduced-motion: reduce)").matches
+			typeof window.matchMedia === 'function' &&
+			window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches
 		);
 	}
 
@@ -54,15 +54,15 @@
 	 * @param {HTMLElement} el Element to inspect.
 	 * @return {boolean} True when the background is dark.
 	 */
-	function isBackgroundDark(el) {
-		var parts = getComputedStyle(el).backgroundColor.match(/[\d.]+/g);
-		if (!parts || parts.length < 3) {
+	function isBackgroundDark( el ) {
+		const parts = getComputedStyle( el ).backgroundColor.match( /[\d.]+/g );
+		if ( ! parts || parts.length < 3 ) {
 			return true;
 		}
-		var r = parseFloat(parts[0]);
-		var g = parseFloat(parts[1]);
-		var b = parseFloat(parts[2]);
-		return (0.299 * r + 0.587 * g + 0.114 * b) / 255 < 0.55;
+		const r = parseFloat( parts[ 0 ] );
+		const g = parseFloat( parts[ 1 ] );
+		const b = parseFloat( parts[ 2 ] );
+		return ( 0.299 * r + 0.587 * g + 0.114 * b ) / 255 < 0.55;
 	}
 
 	/**
@@ -73,35 +73,35 @@
 	 *
 	 * @param {HTMLElement} slider The .dbw-partner-slider element.
 	 */
-	function fixCapsuleContrast(slider) {
+	function fixCapsuleContrast( slider ) {
 		if (
-			!slider.classList.contains("dbw-capsules") ||
-			slider.classList.contains("dbw-cap-outline") ||
-			slider.classList.contains("dbw-cap-logo-manual")
+			! slider.classList.contains( 'dbw-capsules' ) ||
+			slider.classList.contains( 'dbw-cap-outline' ) ||
+			slider.classList.contains( 'dbw-cap-logo-manual' )
 		) {
 			return;
 		}
-		["dbw-cap-a", "dbw-cap-b"].forEach(function (colorClass) {
-			var sample = slider.querySelector("." + colorClass);
-			if (!sample) {
+		[ 'dbw-cap-a', 'dbw-cap-b' ].forEach( function ( colorClass ) {
+			const sample = slider.querySelector( '.' + colorClass );
+			if ( ! sample ) {
 				return;
 			}
-			var dark = isBackgroundDark(sample);
-			var add = dark ? "dbw-logo-light" : "dbw-logo-dark";
-			var remove = dark ? "dbw-logo-dark" : "dbw-logo-light";
-			var capsules = slider.querySelectorAll("." + colorClass);
-			for (var i = 0; i < capsules.length; i++) {
-				capsules[i].classList.add(add);
-				capsules[i].classList.remove(remove);
+			const dark = isBackgroundDark( sample );
+			const add = dark ? 'dbw-logo-light' : 'dbw-logo-dark';
+			const remove = dark ? 'dbw-logo-dark' : 'dbw-logo-light';
+			const capsules = slider.querySelectorAll( '.' + colorClass );
+			for ( let i = 0; i < capsules.length; i++ ) {
+				capsules[ i ].classList.add( add );
+				capsules[ i ].classList.remove( remove );
 			}
-		});
+		} );
 	}
 
 	// Balanced logo sizes: reference aspect ratio and scale bounds. Must match
 	// the values used for the editor preview in src/index.js.
-	var BALANCE_REF_RATIO = 2;
-	var BALANCE_MIN_SCALE = 0.65;
-	var BALANCE_MAX_SCALE = 1.4;
+	const BALANCE_REF_RATIO = 2;
+	const BALANCE_MIN_SCALE = 0.65;
+	const BALANCE_MAX_SCALE = 1.4;
 
 	/**
 	 * Apply the balanced-size scale factor to every item of a track. The scale
@@ -113,28 +113,30 @@
 	 * @param {HTMLElement} track  The .dbw-slider-track element.
 	 * @param {HTMLElement} slider The parent .dbw-partner-slider element.
 	 */
-	function applyBalance(track, slider) {
-		if (!slider.classList.contains("dbw-balance")) {
+	function applyBalance( track, slider ) {
+		if ( ! slider.classList.contains( 'dbw-balance' ) ) {
 			return;
 		}
-		var items = track.querySelectorAll(".dbw-slider-item");
-		for (var i = 0; i < items.length; i++) {
-			var img = items[i].querySelector("img");
-			if (!img) {
+		const items = track.querySelectorAll( '.dbw-slider-item' );
+		for ( let i = 0; i < items.length; i++ ) {
+			const img = items[ i ].querySelector( 'img' );
+			if ( ! img ) {
 				continue;
 			}
-			var w = img.naturalWidth || parseInt(img.getAttribute("width"), 10);
-			var h =
-				img.naturalHeight || parseInt(img.getAttribute("height"), 10);
-			if (!w || !h) {
+			const w =
+				img.naturalWidth || parseInt( img.getAttribute( 'width' ), 10 );
+			const h =
+				img.naturalHeight ||
+				parseInt( img.getAttribute( 'height' ), 10 );
+			if ( ! w || ! h ) {
 				continue;
 			}
-			var scale = Math.sqrt(BALANCE_REF_RATIO / (w / h));
+			let scale = Math.sqrt( BALANCE_REF_RATIO / ( w / h ) );
 			scale = Math.min(
 				BALANCE_MAX_SCALE,
-				Math.max(BALANCE_MIN_SCALE, scale)
+				Math.max( BALANCE_MIN_SCALE, scale )
 			);
-			items[i].style.setProperty("--logo-scale", scale.toFixed(3));
+			items[ i ].style.setProperty( '--logo-scale', scale.toFixed( 3 ) );
 		}
 	}
 
@@ -146,10 +148,10 @@
 	 * @param {number}   logoCount Number of items that form one set.
 	 * @return {number} Width of one set in pixels.
 	 */
-	function measureSetWidth(items, logoCount) {
-		var width = 0;
-		for (var i = 0; i < logoCount && i < items.length; i++) {
-			width += items[i].getBoundingClientRect().width;
+	function measureSetWidth( items, logoCount ) {
+		let width = 0;
+		for ( let i = 0; i < logoCount && i < items.length; i++ ) {
+			width += items[ i ].getBoundingClientRect().width;
 		}
 		return width;
 	}
@@ -165,26 +167,28 @@
 	 * @param {number}      logoCount Number of items that form one set.
 	 * @param {number}      setWidth  Width of one set in pixels.
 	 */
-	function ensureCoverage(track, logoCount, setWidth) {
-		if (setWidth < 1) {
+	function ensureCoverage( track, logoCount, setWidth ) {
+		if ( setWidth < 1 ) {
 			return;
 		}
-		var needed = track.parentElement.clientWidth + setWidth;
-		var items = track.querySelectorAll(".dbw-slider-item");
-		var copies = Math.ceil(needed / setWidth) - Math.floor(items.length / logoCount);
-		for (var c = 0; c < copies && c < 50; c++) {
-			for (var i = 0; i < logoCount; i++) {
-				var clone = items[i].cloneNode(true);
-				clone.setAttribute("aria-hidden", "true");
-				var links = clone.querySelectorAll("a");
-				for (var l = 0; l < links.length; l++) {
-					links[l].setAttribute("tabindex", "-1");
+		const needed = track.parentElement.clientWidth + setWidth;
+		const items = track.querySelectorAll( '.dbw-slider-item' );
+		const copies =
+			Math.ceil( needed / setWidth ) -
+			Math.floor( items.length / logoCount );
+		for ( let c = 0; c < copies && c < 50; c++ ) {
+			for ( let i = 0; i < logoCount; i++ ) {
+				const clone = items[ i ].cloneNode( true );
+				clone.setAttribute( 'aria-hidden', 'true' );
+				const links = clone.querySelectorAll( 'a' );
+				for ( let l = 0; l < links.length; l++ ) {
+					links[ l ].setAttribute( 'tabindex', '-1' );
 				}
-				var imgs = clone.querySelectorAll("img");
-				for (var m = 0; m < imgs.length; m++) {
-					imgs[m].setAttribute("alt", "");
+				const imgs = clone.querySelectorAll( 'img' );
+				for ( let m = 0; m < imgs.length; m++ ) {
+					imgs[ m ].setAttribute( 'alt', '' );
 				}
-				track.appendChild(clone);
+				track.appendChild( clone );
 			}
 		}
 	}
@@ -198,51 +202,62 @@
 	 * @param {HTMLElement} track    The .dbw-slider-track element.
 	 * @param {number}      setWidth Width of one logo set in pixels.
 	 */
-	function applyAnimation(track, setWidth) {
+	function applyAnimation( track, setWidth ) {
 		// Without a usable measurement we leave the CSS fallback animation in place.
-		if (setWidth < 1) {
+		if ( setWidth < 1 ) {
 			return;
 		}
 
 		// Ignore sub-pixel jitter so the animation does not restart needlessly.
-		if (Math.abs(setWidth - (track._dbwSetWidth || 0)) < 1) {
+		if ( Math.abs( setWidth - ( track._dbwSetWidth || 0 ) ) < 1 ) {
 			return;
 		}
 		track._dbwSetWidth = setWidth;
 
 		// One stable keyframe name per track, reused across recalculations.
-		var animationName = track._dbwAnimName;
-		if (!animationName) {
-			animationName = "dbw-scroll-" + Math.random().toString(36).slice(2, 11);
+		let animationName = track._dbwAnimName;
+		if ( ! animationName ) {
+			animationName =
+				'dbw-scroll-' + Math.random().toString( 36 ).slice( 2, 11 );
 			track._dbwAnimName = animationName;
 		}
 
 		// A dedicated <style> element per track keeps the lifecycle clean.
-		var styleEl = track._dbwStyleEl;
-		if (!styleEl) {
-			styleEl = document.createElement("style");
-			document.head.appendChild(styleEl);
+		let styleEl = track._dbwStyleEl;
+		if ( ! styleEl ) {
+			styleEl = document.createElement( 'style' );
+			document.head.appendChild( styleEl );
 			track._dbwStyleEl = styleEl;
 		}
 		styleEl.textContent =
-			"@keyframes " + animationName + "{" +
-			"0%{transform:translateX(0)}" +
-			"100%{transform:translateX(-" + setWidth + "px)}}";
+			'@keyframes ' +
+			animationName +
+			'{' +
+			'0%{transform:translateX(0)}' +
+			'100%{transform:translateX(-' +
+			setWidth +
+			'px)}}';
 
 		// Scale the configured duration to the actual set width, so the visual
 		// speed stays consistent regardless of the number of logos. A wide set
 		// (many logos) would otherwise race past at the same fixed duration.
-		var baseDuration =
+		const baseDuration =
 			parseFloat(
-				getComputedStyle(track).getPropertyValue("--scroll-duration")
+				getComputedStyle( track ).getPropertyValue(
+					'--scroll-duration'
+				)
 			) || 25;
-		var durationSec = baseDuration * Math.max(1, setWidth / REFERENCE_WIDTH);
-		var duration = durationSec.toFixed(2) + "s";
+		const durationSec =
+			baseDuration * Math.max( 1, setWidth / REFERENCE_WIDTH );
+		const duration = durationSec.toFixed( 2 ) + 's';
 
-		var reverse = track.dataset.direction === "reverse";
+		const reverse = track.dataset.direction === 'reverse';
 		track.style.animation =
-			animationName + " " + duration + " linear infinite" +
-			(reverse ? " reverse" : "");
+			animationName +
+			' ' +
+			duration +
+			' linear infinite' +
+			( reverse ? ' reverse' : '' );
 	}
 
 	/**
@@ -258,12 +273,12 @@
 	 *
 	 * @param {HTMLImageElement[]} images Images that will be measured.
 	 */
-	function forceLoad(images) {
-		images.forEach(function (img) {
-			if (!img.complete && img.loading === "lazy") {
-				img.loading = "eager";
+	function forceLoad( images ) {
+		images.forEach( function ( img ) {
+			if ( ! img.complete && img.loading === 'lazy' ) {
+				img.loading = 'eager';
 			}
-		});
+		} );
 	}
 
 	/**
@@ -271,28 +286,28 @@
 	 * (or failed). Resolves immediately when there is nothing to wait for.
 	 *
 	 * @param {HTMLImageElement[]} images   Images to wait for.
-	 * @param {Function}           callback Called once when all images settled.
+	 * @param {() => void}         callback Called once when all images settled.
 	 */
-	function whenImagesReady(images, callback) {
-		var pending = images.length;
-		if (pending === 0) {
+	function whenImagesReady( images, callback ) {
+		let pending = images.length;
+		if ( pending === 0 ) {
 			callback();
 			return;
 		}
-		var settle = function () {
+		const settle = function () {
 			pending--;
-			if (pending === 0) {
+			if ( pending === 0 ) {
 				callback();
 			}
 		};
-		images.forEach(function (img) {
-			if (img.complete) {
+		images.forEach( function ( img ) {
+			if ( img.complete ) {
 				settle();
 			} else {
-				img.addEventListener("load", settle, { once: true });
-				img.addEventListener("error", settle, { once: true });
+				img.addEventListener( 'load', settle, { once: true } );
+				img.addEventListener( 'error', settle, { once: true } );
 			}
-		});
+		} );
 	}
 
 	/**
@@ -303,82 +318,88 @@
 	 *
 	 * @param {HTMLElement} track   The .dbw-slider-track element.
 	 * @param {HTMLElement} slider  The parent .dbw-partner-slider element.
-	 * @param {Function}    onReady Called once when this track is ready.
+	 * @param {() => void}  onReady Called once when this track is ready.
 	 */
-	function initTrack(track, slider, onReady) {
-		var items = track.querySelectorAll(".dbw-slider-item");
-		if (items.length === 0) {
+	function initTrack( track, slider, onReady ) {
+		const items = track.querySelectorAll( '.dbw-slider-item' );
+		if ( items.length === 0 ) {
 			onReady();
 			return;
 		}
 
 		// Logo count: per-track data attribute (v1.3+), with a fallback to the
 		// slider-level CSS variable for content saved before v1.3.
-		var logoCount = parseInt(track.dataset.logoCount, 10);
-		if (!logoCount) {
+		let logoCount = parseInt( track.dataset.logoCount, 10 );
+		if ( ! logoCount ) {
 			logoCount =
-				parseInt(slider.style.getPropertyValue("--logo-count"), 10) || 0;
+				parseInt(
+					slider.style.getPropertyValue( '--logo-count' ),
+					10
+				) || 0;
 		}
-		if (logoCount === 0) {
+		if ( logoCount === 0 ) {
 			onReady();
 			return;
 		}
 
-		// Respect the reduced-motion preference: leave the row completely
-		// static instead of building and applying a scroll animation.
-		if (prefersReducedMotion()) {
+		// Respect the reduced-motion preference, and the static grid layout:
+		// leave the row completely static.
+		if (
+			prefersReducedMotion() ||
+			slider.classList.contains( 'dbw-layout-grid' )
+		) {
 			onReady();
 			return;
 		}
 
 		// Animation is only applied once the first logo set has loaded; before
 		// that any measurement would be wrong and freeze the carousel.
-		var imagesReady = false;
+		let imagesReady = false;
 
-		var recalc = function () {
-			if (!imagesReady) {
+		const recalc = function () {
+			if ( ! imagesReady ) {
 				return;
 			}
-			var setWidth = measureSetWidth(items, logoCount);
-			ensureCoverage(track, logoCount, setWidth);
-			applyAnimation(track, setWidth);
+			const setWidth = measureSetWidth( items, logoCount );
+			ensureCoverage( track, logoCount, setWidth );
+			applyAnimation( track, setWidth );
 		};
 
 		// Collect the images of the first set and start once they are loaded.
-		var firstSet = [];
-		for (var i = 0; i < logoCount && i < items.length; i++) {
-			var img = items[i].querySelector("img");
-			if (img) {
-				firstSet.push(img);
+		const firstSet = [];
+		for ( let i = 0; i < logoCount && i < items.length; i++ ) {
+			const img = items[ i ].querySelector( 'img' );
+			if ( img ) {
+				firstSet.push( img );
 			}
 		}
-		forceLoad(firstSet);
-		whenImagesReady(firstSet, function () {
+		forceLoad( firstSet );
+		whenImagesReady( firstSet, function () {
 			// Balanced sizes change item widths, so apply them BEFORE the
 			// track is measured for the scroll animation.
-			applyBalance(track, slider);
+			applyBalance( track, slider );
 			imagesReady = true;
 			recalc();
 			onReady();
-		});
+		} );
 
 		// Self-healing: re-measure whenever the track changes size – responsive
 		// breakpoints, lazy/late-loading images, web fonts swapping in, etc.
-		if (typeof ResizeObserver !== "undefined") {
-			var rafId;
-			var observer = new ResizeObserver(function () {
-				cancelAnimationFrame(rafId);
-				rafId = requestAnimationFrame(recalc);
-			});
-			observer.observe(track);
+		if ( typeof ResizeObserver !== 'undefined' ) {
+			let rafId;
+			const observer = new ResizeObserver( function () {
+				cancelAnimationFrame( rafId );
+				rafId = requestAnimationFrame( recalc );
+			} );
+			observer.observe( track );
 			track._dbwObserver = observer;
 		} else {
 			// Fallback for browsers without ResizeObserver support.
-			var resizeTimer;
-			window.addEventListener("resize", function () {
-				clearTimeout(resizeTimer);
-				resizeTimer = setTimeout(recalc, SETTLE_DELAY);
-			});
+			let resizeTimer;
+			window.addEventListener( 'resize', function () {
+				clearTimeout( resizeTimer );
+				resizeTimer = setTimeout( recalc, SETTLE_DELAY );
+			} );
 		}
 	}
 
@@ -390,11 +411,11 @@
 	 * @param {number} current Index currently on screen.
 	 * @return {number} Index of the next logo.
 	 */
-	function pickRandomIndex(count, current) {
-		if (count < 2) {
+	function pickRandomIndex( count, current ) {
+		if ( count < 2 ) {
 			return current;
 		}
-		var next = Math.floor(Math.random() * (count - 1));
+		const next = Math.floor( Math.random() * ( count - 1 ) );
 		return next >= current ? next + 1 : next;
 	}
 
@@ -404,12 +425,12 @@
 	 * @return {boolean} True when mask-image is supported.
 	 */
 	function supportsMask() {
-		if (typeof CSS === "undefined" || !CSS.supports) {
+		if ( typeof CSS === 'undefined' || ! CSS.supports ) {
 			return false;
 		}
 		return (
-			CSS.supports("mask-image", 'url("a.png")') ||
-			CSS.supports("-webkit-mask-image", 'url("a.png")')
+			CSS.supports( 'mask-image', 'url("a.png")' ) ||
+			CSS.supports( '-webkit-mask-image', 'url("a.png")' )
 		);
 	}
 
@@ -430,28 +451,28 @@
 	 * @param {HTMLElement} slider The .dbw-partner-slider element.
 	 * @param {NodeList}    items  The spotlight items.
 	 */
-	function applySpotlightTint(slider, items) {
+	function applySpotlightTint( slider, items ) {
 		if (
-			!slider.classList.contains("dbw-spot-tint") ||
-			slider.classList.contains("dbw-capsules") ||
-			!supportsMask()
+			! slider.classList.contains( 'dbw-spot-tint' ) ||
+			slider.classList.contains( 'dbw-capsules' ) ||
+			! supportsMask()
 		) {
 			return;
 		}
-		for (var i = 0; i < items.length; i++) {
-			var img = items[i].querySelector("img");
-			if (!img) {
+		for ( let i = 0; i < items.length; i++ ) {
+			const img = items[ i ].querySelector( 'img' );
+			if ( ! img ) {
 				continue;
 			}
-			var url = img.currentSrc || img.getAttribute("src");
-			if (!url) {
+			const url = img.currentSrc || img.getAttribute( 'src' );
+			if ( ! url ) {
 				continue;
 			}
-			items[i].style.setProperty(
-				"--dbw-mask",
-				'url("' + url.replace(/["\\]/g, "\\$&") + '")'
+			items[ i ].style.setProperty(
+				'--dbw-mask',
+				'url("' + url.replace( /["\\]/g, '\\$&' ) + '")'
 			);
-			items[i].classList.add("dbw-spot-masked");
+			items[ i ].classList.add( 'dbw-spot-masked' );
 		}
 	}
 
@@ -471,23 +492,23 @@
 	 *
 	 * @param {HTMLElement} slider  The .dbw-partner-slider element.
 	 * @param {HTMLElement} stage   The .dbw-spotlight-stage element.
-	 * @param {Function}    onReady Called once the slider can be revealed.
+	 * @param {() => void}  onReady Called once the slider can be revealed.
 	 */
-	function initSpotlight(slider, stage, onReady) {
-		var items = stage.querySelectorAll(".dbw-slider-item");
-		if (items.length === 0) {
+	function initSpotlight( slider, stage, onReady ) {
+		const items = stage.querySelectorAll( '.dbw-slider-item' );
+		if ( items.length === 0 ) {
 			onReady();
 			return;
 		}
 
-		var hold = parseInt(stage.dataset.duration, 10) || 2000;
-		var random = stage.dataset.order === "random";
-		var timer = null;
+		const hold = parseInt( stage.dataset.duration, 10 ) || 2000;
+		const random = stage.dataset.order === 'random';
+		let timer = null;
 
 		// Which logo the saved markup starts on.
-		var current = 0;
-		for (var i = 0; i < items.length; i++) {
-			if (items[i].classList.contains("dbw-spot-active")) {
+		let current = 0;
+		for ( let i = 0; i < items.length; i++ ) {
+			if ( items[ i ].classList.contains( 'dbw-spot-active' ) ) {
 				current = i;
 				break;
 			}
@@ -495,63 +516,63 @@
 
 		// Move an outgoing logo back to its waiting position without letting
 		// the move itself animate.
-		var resetItem = function (item) {
-			if (item.classList.contains("dbw-spot-active")) {
+		const resetItem = function ( item ) {
+			if ( item.classList.contains( 'dbw-spot-active' ) ) {
 				return;
 			}
-			item.classList.add("dbw-spot-reset");
-			item.classList.remove("dbw-spot-out");
+			item.classList.add( 'dbw-spot-reset' );
+			item.classList.remove( 'dbw-spot-out' );
 			// Forced reflow: applies the position change while transitions
 			// are still switched off.
 			void item.offsetWidth;
-			item.classList.remove("dbw-spot-reset");
+			item.classList.remove( 'dbw-spot-reset' );
 		};
 
 		// Only the logo on screen may take focus; the others sit invisible
 		// in the same slot.
-		var syncInert = function () {
-			for (var k = 0; k < items.length; k++) {
-				if (k === current) {
-					items[k].removeAttribute("inert");
+		const syncInert = function () {
+			for ( let k = 0; k < items.length; k++ ) {
+				if ( k === current ) {
+					items[ k ].removeAttribute( 'inert' );
 				} else {
-					items[k].setAttribute("inert", "");
+					items[ k ].setAttribute( 'inert', '' );
 				}
 			}
 		};
 		syncInert();
 
-		var advance = function () {
-			var next = random
-				? pickRandomIndex(items.length, current)
-				: (current + 1) % items.length;
-			if (next === current) {
+		const advance = function () {
+			const next = random
+				? pickRandomIndex( items.length, current )
+				: ( current + 1 ) % items.length;
+			if ( next === current ) {
 				return;
 			}
-			var previous = items[current];
-			previous.classList.remove("dbw-spot-active");
-			previous.classList.add("dbw-spot-out");
-			items[next].classList.remove("dbw-spot-out");
-			items[next].classList.add("dbw-spot-active");
+			const previous = items[ current ];
+			previous.classList.remove( 'dbw-spot-active' );
+			previous.classList.add( 'dbw-spot-out' );
+			items[ next ].classList.remove( 'dbw-spot-out' );
+			items[ next ].classList.add( 'dbw-spot-active' );
 			current = next;
 			syncInert();
-			setTimeout(function () {
-				resetItem(previous);
-			}, SPOT_TRANSITION_MS);
+			setTimeout( function () {
+				resetItem( previous );
+			}, SPOT_TRANSITION_MS );
 		};
 
 		slider._dbwSpot = {
-			start: function () {
+			start() {
 				if (
 					timer === null &&
 					items.length > 1 &&
-					!prefersReducedMotion()
+					! prefersReducedMotion()
 				) {
-					timer = setInterval(advance, hold);
+					timer = setInterval( advance, hold );
 				}
 			},
-			stop: function () {
-				if (timer !== null) {
-					clearInterval(timer);
+			stop() {
+				if ( timer !== null ) {
+					clearInterval( timer );
 					timer = null;
 				}
 			},
@@ -559,22 +580,22 @@
 
 		// Reveal once the logos have loaded, so the first one never pops in
 		// half-rendered — then start the rotation.
-		var images = [];
-		for (var j = 0; j < items.length; j++) {
-			var img = items[j].querySelector("img");
-			if (img) {
-				images.push(img);
+		const images = [];
+		for ( let j = 0; j < items.length; j++ ) {
+			const img = items[ j ].querySelector( 'img' );
+			if ( img ) {
+				images.push( img );
 			}
 		}
-		forceLoad(images);
-		whenImagesReady(images, function () {
-			applyBalance(stage, slider);
+		forceLoad( images );
+		whenImagesReady( images, function () {
+			applyBalance( stage, slider );
 			// Tint before revealing, so no logo is ever seen in the wrong
 			// colour first.
-			applySpotlightTint(slider, items);
+			applySpotlightTint( slider, items );
 			onReady();
 			slider._dbwSpot.start();
-		});
+		} );
 	}
 
 	/**
@@ -583,18 +604,18 @@
 	 * @param {HTMLElement} slider The .dbw-partner-slider element.
 	 * @param {string}      state  "paused" or "running".
 	 */
-	function setPlayState(slider, state) {
+	function setPlayState( slider, state ) {
 		// Spotlight mode runs on a timer instead of a CSS animation.
-		if (slider._dbwSpot) {
-			if (state === "paused") {
+		if ( slider._dbwSpot ) {
+			if ( state === 'paused' ) {
 				slider._dbwSpot.stop();
 			} else {
 				slider._dbwSpot.start();
 			}
 		}
-		var tracks = slider.querySelectorAll(".dbw-slider-track");
-		for (var i = 0; i < tracks.length; i++) {
-			tracks[i].style.animationPlayState = state;
+		const tracks = slider.querySelectorAll( '.dbw-slider-track' );
+		for ( let i = 0; i < tracks.length; i++ ) {
+			tracks[ i ].style.animationPlayState = state;
 		}
 	}
 
@@ -604,131 +625,137 @@
 	 *
 	 * @param {HTMLElement} slider The .dbw-partner-slider element.
 	 */
-	function initSlider(slider) {
-		var tracks = slider.querySelectorAll(".dbw-slider-track");
+	function initSlider( slider ) {
+		const tracks = slider.querySelectorAll( '.dbw-slider-track' );
 
 		// Correct filled-capsule logo contrast against the resolved background
 		// colour — needed when the capsule colour is a theme CSS variable.
-		fixCapsuleContrast(slider);
+		fixCapsuleContrast( slider );
 
 		// Reveal the carousel only once every track is ready (images loaded
 		// and animation applied). This prevents the visible build-up / shift
 		// while images and layout are still settling.
-		var revealed = false;
-		var reveal = function () {
-			if (revealed) {
+		let revealed = false;
+		const reveal = function () {
+			if ( revealed ) {
 				return;
 			}
 			revealed = true;
-			slider.classList.add("dbw-ready");
+			slider.classList.add( 'dbw-ready' );
 		};
 		// A single slow logo must not keep the whole carousel invisible.
-		setTimeout(reveal, REVEAL_TIMEOUT);
+		setTimeout( reveal, REVEAL_TIMEOUT );
 
 		// Spotlight mode (v2.2) replaces the scrolling tracks with a single
 		// slot; everything below (pause button, hover / touch pause) applies
 		// to both modes.
-		var stage = slider.querySelector(".dbw-spotlight-stage");
-		if (stage) {
-			initSpotlight(slider, stage, reveal);
-		} else if (tracks.length === 0) {
+		const stage = slider.querySelector( '.dbw-spotlight-stage' );
+		if ( stage ) {
+			initSpotlight( slider, stage, reveal );
+		} else if ( tracks.length === 0 ) {
 			reveal();
 		} else {
-			var pending = tracks.length;
-			var trackReady = function () {
+			let pending = tracks.length;
+			const trackReady = function () {
 				pending--;
-				if (pending === 0) {
+				if ( pending === 0 ) {
 					reveal();
 				}
 			};
 
-			tracks.forEach(function (track) {
-				initTrack(track, slider, trackReady);
-			});
+			tracks.forEach( function ( track ) {
+				initTrack( track, slider, trackReady );
+			} );
 		}
 
 		// Why the slider is paused. It runs only while nothing holds it:
 		// button (sticky), hover, keyboard focus inside, a tap (touch), or
 		// being off screen.
-		var holds = {};
-		slider._dbwHold = function (reason, on) {
-			if (on) {
-				holds[reason] = true;
+		const holds = {};
+		slider._dbwHold = function ( reason, on ) {
+			if ( on ) {
+				holds[ reason ] = true;
 			} else {
-				delete holds[reason];
+				delete holds[ reason ];
 			}
 			setPlayState(
 				slider,
-				Object.keys(holds).length ? "paused" : "running"
+				Object.keys( holds ).length ? 'paused' : 'running'
 			);
 		};
 
 		// Optional pause/play button (WCAG 2.2.2). The accessible name
 		// ("Pause animation", translated) comes from the server; the state is
 		// announced through aria-pressed, so the name stays the same.
-		var pauseBtn = slider.querySelector(".dbw-pause-btn");
-		if (pauseBtn) {
-			if (!pauseBtn.getAttribute("aria-label")) {
-				pauseBtn.setAttribute("aria-label", "Pause animation");
+		const pauseBtn = slider.querySelector( '.dbw-pause-btn' );
+		if ( pauseBtn ) {
+			if ( ! pauseBtn.getAttribute( 'aria-label' ) ) {
+				pauseBtn.setAttribute( 'aria-label', 'Pause animation' );
 			}
-			pauseBtn.addEventListener("click", function () {
-				var paused = slider.classList.toggle("dbw-paused");
-				pauseBtn.setAttribute("aria-pressed", paused ? "true" : "false");
-				slider._dbwHold("button", paused);
-			});
+			pauseBtn.addEventListener( 'click', function () {
+				const paused = slider.classList.toggle( 'dbw-paused' );
+				pauseBtn.setAttribute(
+					'aria-pressed',
+					paused ? 'true' : 'false'
+				);
+				slider._dbwHold( 'button', paused );
+			} );
 		}
 
 		// Pause on hover (pointer devices).
-		slider.addEventListener("mouseenter", function () {
-			slider._dbwHold("hover", true);
-		});
-		slider.addEventListener("mouseleave", function () {
-			slider._dbwHold("hover", false);
-		});
+		slider.addEventListener( 'mouseenter', function () {
+			slider._dbwHold( 'hover', true );
+		} );
+		slider.addEventListener( 'mouseleave', function () {
+			slider._dbwHold( 'hover', false );
+		} );
 
 		// Pause while keyboard focus is inside, so a focused logo link does
 		// not move away under the focus ring.
-		slider.addEventListener("focusin", function () {
-			slider._dbwHold("focus", true);
-		});
-		slider.addEventListener("focusout", function (e) {
-			if (!slider.contains(e.relatedTarget)) {
-				slider._dbwHold("focus", false);
+		slider.addEventListener( 'focusin', function () {
+			slider._dbwHold( 'focus', true );
+		} );
+		slider.addEventListener( 'focusout', function ( e ) {
+			if ( ! slider.contains( e.relatedTarget ) ) {
+				slider._dbwHold( 'focus', false );
 			}
-		});
+		} );
 
 		// Tap to toggle pause (touch). Only a real tap counts: a swipe that
 		// scrolls the page, or a tap on a link or the button, does not.
-		var touchStart = null;
+		let touchStart = null;
 		slider.addEventListener(
-			"touchstart",
-			function (e) {
+			'touchstart',
+			function ( e ) {
 				touchStart =
 					e.touches.length === 1
-						? { x: e.touches[0].clientX, y: e.touches[0].clientY }
+						? {
+								x: e.touches[ 0 ].clientX,
+								y: e.touches[ 0 ].clientY,
+							}
 						: null;
 			},
 			{ passive: true }
 		);
 		slider.addEventListener(
-			"touchend",
-			function (e) {
-				var start = touchStart;
+			'touchend',
+			function ( e ) {
+				const start = touchStart;
 				touchStart = null;
-				if (!start || !e.changedTouches.length) {
+				if ( ! start || ! e.changedTouches.length ) {
 					return;
 				}
-				if (e.target.closest && e.target.closest("a, button")) {
+				if ( e.target.closest && e.target.closest( 'a, button' ) ) {
 					return;
 				}
-				var t = e.changedTouches[0];
+				const t = e.changedTouches[ 0 ];
 				if (
-					Math.abs(t.clientX - start.x) > 10 ||
-					Math.abs(t.clientY - start.y) > 10
+					Math.abs( t.clientX - start.x ) > 10 ||
+					Math.abs( t.clientY - start.y ) > 10
 				) {
 					return;
 				}
-				slider._dbwHold("tap", !holds.tap);
+				slider._dbwHold( 'tap', ! holds.tap );
 			},
 			{ passive: true }
 		);
@@ -736,7 +763,7 @@
 
 	// How far ahead of the viewport a slider is initialised (and its images
 	// pulled out of lazy loading).
-	var INIT_MARGIN = "300px 0px";
+	const INIT_MARGIN = '300px 0px';
 
 	/**
 	 * Find and initialise every carousel on the page exactly once.
@@ -749,37 +776,40 @@
 	 * exactly as before.
 	 */
 	function initLogoSliders() {
-		var sliders = document.querySelectorAll(".dbw-partner-slider");
-		var supportsObserver = typeof IntersectionObserver !== "undefined";
-		var observer = supportsObserver
+		const sliders = document.querySelectorAll( '.dbw-partner-slider' );
+		const supportsObserver = typeof IntersectionObserver !== 'undefined';
+		const observer = supportsObserver
 			? new IntersectionObserver(
-					function (entries) {
-						entries.forEach(function (entry) {
-							var slider = entry.target;
-							if (entry.isIntersecting) {
-								startSlider(slider);
+					function ( entries ) {
+						entries.forEach( function ( entry ) {
+							const slider = entry.target;
+							if ( entry.isIntersecting ) {
+								startSlider( slider );
 							}
 							// Off screen nothing needs to move: saves CPU,
 							// GPU and battery.
-							if (slider._dbwHold) {
-								slider._dbwHold("offscreen", !entry.isIntersecting);
+							if ( slider._dbwHold ) {
+								slider._dbwHold(
+									'offscreen',
+									! entry.isIntersecting
+								);
 							}
-						});
+						} );
 					},
 					{ rootMargin: INIT_MARGIN }
-			  )
+				)
 			: null;
 
-		sliders.forEach(function (slider) {
-			if (slider.dataset.initialized === "true") {
+		sliders.forEach( function ( slider ) {
+			if ( slider.dataset.initialized === 'true' ) {
 				return;
 			}
-			if (observer) {
-				observer.observe(slider);
+			if ( observer ) {
+				observer.observe( slider );
 			} else {
-				startSlider(slider);
+				startSlider( slider );
 			}
-		});
+		} );
 	}
 
 	/**
@@ -787,17 +817,17 @@
 	 *
 	 * @param {HTMLElement} slider The .dbw-partner-slider element.
 	 */
-	function startSlider(slider) {
-		if (slider.dataset.initialized === "true") {
+	function startSlider( slider ) {
+		if ( slider.dataset.initialized === 'true' ) {
 			return;
 		}
-		slider.dataset.initialized = "true";
-		initSlider(slider);
+		slider.dataset.initialized = 'true';
+		initSlider( slider );
 	}
 
 	// Initialise as soon as the DOM is ready.
-	if (document.readyState === "loading") {
-		document.addEventListener("DOMContentLoaded", initLogoSliders);
+	if ( document.readyState === 'loading' ) {
+		document.addEventListener( 'DOMContentLoaded', initLogoSliders );
 	} else {
 		initLogoSliders();
 	}
@@ -805,4 +835,4 @@
 	// Sliders added later (AJAX, page builders, infinite scroll) can be
 	// initialised with window.ilcbInit().
 	window.ilcbInit = initLogoSliders;
-})();
+} )();
