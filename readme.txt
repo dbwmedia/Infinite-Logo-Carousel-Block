@@ -4,7 +4,7 @@ Tags: logo carousel, logo slider, logo marquee, text marquee, client logos
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.2
-Stable tag: 2.3.0
+Stable tag: 2.3.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -230,6 +230,9 @@ Yes, the plugin doesn't collect, store, or transmit any personal data. It's comp
 
 == Changelog ==
 
+= 2.3.1 =
+* FIXED: On right-to-left pages (Hebrew, Arabic, ...) the carousel ran through its logos once and then left an empty row. The track is now always laid out left to right, so the loop is seamless in every language; text inside the items keeps its right-to-left direction.
+
 = 2.3.0 =
 * FIXED: Alt texts maintained in the media library never reached the front end. The block saves its markup once, so an alt text added to the attachment afterwards was ignored - the images went out with alt="". Missing alt texts are now filled in from the attachment while the page renders, for existing content too, without opening a single block. An alt text entered in the block is never overwritten.
 * FIXED: An image with no alt text anywhere is rendered without an alt attribute instead of alt="", and is named in the PHP error log. An empty alt tells assistive technology that an image is decorative, which a client logo is not.
@@ -391,6 +394,9 @@ Yes, the plugin doesn't collect, store, or transmit any personal data. It's comp
 * WordPress 6.8 compatibility
 
 == Upgrade Notice ==
+
+= 2.3.1 =
+Fixes the infinite loop on right-to-left pages (Hebrew, Arabic): the carousel no longer stops after one pass.
 
 = 2.3.0 =
 Accessibility and performance release. Alt texts from the media library now reach the front end (existing content included, nothing to re-save), screen readers announce each logo once instead of once per copy, and logos load lazily again. Existing blocks are migrated silently.
