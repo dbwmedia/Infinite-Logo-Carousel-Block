@@ -31,26 +31,14 @@ SVN_URL="https://plugins.svn.wordpress.org/infinite-logo-carousel-block"
 
 # Only these paths are shipped. Everything else (tests, docs, editor
 # config, credentials) can never reach the public SVN by accident.
-SHIP=(logo-slider-block.php block.json uninstall.php readme.txt package.json build src languages)
+SHIP=(logo-slider-block.php block.json uninstall.php readme.txt package.json build src includes languages)
 
 [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || error "VERSION must look like 1.2.3"
 [ -f logo-slider-block.php ] || error "Run this from the plugin directory"
 [ -d "$SVN_PATH/.svn" ] || error "$SVN_PATH is not an SVN working copy"
 
 # 1. Version consistency
-info "Checking version $VERSION in every file..."
-check_version() {
-    local file="$1" pattern="$2"
-    grep -qE "$pattern" "$file" || error "$file does not declare version $VERSION ($pattern)"
-}
-V="${VERSION//./\\.}"
-check_version logo-slider-block.php "^ \* Version: $V\$"
-check_version logo-slider-block.php "'ILCB_VERSION', '$V'"
-check_version readme.txt "^Stable tag: $V\$"
-check_version readme.txt "^= $V =\$"
-check_version package.json "\"version\": \"$V\""
-check_version readme.md "version-$V-blue"
-success "Version is consistent"
+bin/check-version.sh "$VERSION" || error "Version mismatch"
 
 # 2. Git state: clean, and HEAD is the release tag
 info "Checking Git state..."

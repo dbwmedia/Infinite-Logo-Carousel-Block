@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  js:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # block tests read old builds from Git tags
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Committed build is up to date
+        run: git diff --exit-code -- build
+      - run: npm run check:version
+      - run: npm run test:blocks
+
+  php:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: ["7.2", "8.4"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+      - name: Syntax
+        run: find . -name '*.php' -not -path './node_modules/*' -not -path './tests/php/.wp/*' -not -path './infinite-logo-carousel-block/*' -print0 | xargs -0 -n1 php -l
+      - run: tests/php/fetch-wp.sh && php tests/php/render-test.php
+
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: tests/php/fetch-wp.sh
+      - run: npm run test:e2e

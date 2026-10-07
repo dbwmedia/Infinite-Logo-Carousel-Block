@@ -34,3 +34,4 @@ infinite-logo-carousel-block/
 # Internal notes and tooling config
 .dev/
 .claude_code.yaml
+tests/php/.wp/
