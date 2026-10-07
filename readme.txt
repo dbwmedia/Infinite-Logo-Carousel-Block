@@ -1,7 +1,7 @@
 === Logo Slider – Infinite Carousel & Marquee Block ===
 Contributors: dbwmediadennis
 Tags: logo carousel, logo slider, logo marquee, text marquee, client logos
-Requires at least: 6.0
+Requires at least: 6.6
 Tested up to: 7.0
 Requires PHP: 7.2
 Stable tag: 2.3.1
@@ -103,7 +103,7 @@ Built with modern development practices:
 - Clean, well-documented code
 - Translation ready
 - Follows WordPress coding standards
-- Compatible with WordPress 6.0+
+- Compatible with WordPress 6.6+
 
 == Installation ==
 

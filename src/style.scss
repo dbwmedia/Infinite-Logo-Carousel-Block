@@ -68,23 +68,19 @@
 
 	&.black-logos img {
 		filter: brightness(0);
-		opacity: 0.8;
 	}
 
 	&.dbw-logos-white img {
 		filter: brightness(0) invert(1);
-		opacity: 0.8;
 	}
 
 	&.dbw-logos-custom img {
 		filter: var(--logo-filter, none);
-		opacity: 0.8;
 	}
 
 	// Grayscale mode: logos run desaturated.
 	&.dbw-logos-gray img {
 		filter: grayscale(1);
-		opacity: 0.7;
 	}
 
 	// Original colors on hover (v2.1) — an independent option that pairs with
@@ -93,14 +89,11 @@
 	// outranks both the color-mode rules above and the capsule logo-color
 	// rules further down without needing !important.
 	&.dbw-color-hover img {
-		transition:
-			filter 0.25s ease,
-			opacity 0.25s ease;
+		transition: filter 0.25s ease;
 	}
 
 	&.dbw-color-hover .dbw-slider-item:hover img {
 		filter: none;
-		opacity: 1;
 	}
 
 	&:hover .dbw-slider-track {
@@ -156,7 +149,6 @@
 	width: max-content;
 	max-width: none;
 	animation: dbw-infinity-scroll var(--scroll-duration, 25s) linear infinite;
-	will-change: transform;
 
 	// Reverse-scrolling rows (no-JS fallback; the frontend script applies its
 	// own exact-width animation including direction).
@@ -299,7 +291,7 @@
 // wires the click handler and aria attributes; the icon is pure CSS.
 .dbw-pause-btn {
 	position: absolute;
-	right: 12px;
+	inset-inline-end: 12px;
 	bottom: 12px;
 	z-index: 3;
 	width: 34px;
@@ -307,17 +299,23 @@
 	padding: 0;
 	border: 0;
 	border-radius: 50%;
-	background: rgba(0, 0, 0, 0.45);
+	// White icon on 70 % black: well above the 3:1 needed for controls,
+	// on light and dark sections alike.
+	background: rgba(0, 0, 0, 0.7);
 	cursor: pointer;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	opacity: 0.65;
-	transition: opacity 0.2s ease;
+	transition: background-color 0.2s ease;
 
-	&:hover,
+	&:hover {
+		background: rgba(0, 0, 0, 0.85);
+	}
+
 	&:focus-visible {
-		opacity: 1;
+		outline: 2px solid currentColor;
+		outline-offset: 2px;
+		box-shadow: 0 0 0 4px #fff;
 	}
 
 	// Pause icon (two bars).
@@ -509,8 +507,10 @@
 	0% {
 		transform: translateX(0);
 	}
+	// Exactly one logo set. The render filter sets --dbw-loop-shift per
+	// track (the number of saved copies varies); -50 % is the old guess.
 	100% {
-		transform: translateX(-50%);
+		transform: translateX(var(--dbw-loop-shift, -50%));
 	}
 }
 

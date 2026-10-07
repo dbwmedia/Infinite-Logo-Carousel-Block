@@ -2,7 +2,7 @@
 
 [![WordPress Plugin Version](https://img.shields.io/badge/version-2.3.1-blue)](https://wordpress.org/plugins/infinite-logo-carousel-block/)
 [![License](https://img.shields.io/badge/license-GPL%20v2-green)](https://www.gnu.org/licenses/gpl-2.0.html)
-[![WordPress](https://img.shields.io/badge/WordPress-6.0%2B-blue)](https://wordpress.org/)
+[![WordPress](https://img.shields.io/badge/WordPress-6.6%2B-blue)](https://wordpress.org/)
 [![Tested up to](https://img.shields.io/badge/tested%20up%20to-7.0-blue)](https://wordpress.org/)
 [![PHP](https://img.shields.io/badge/PHP-7.2%2B-purple)](https://php.net/)
 
@@ -128,7 +128,7 @@ npm run build
 
 ## Compatibility
 
-- WordPress 6.0 or higher (tested up to 7.0)
+- WordPress 6.6 or higher (tested up to 7.0)
 - PHP 7.2 or higher
 - Modern browsers (Chrome, Firefox, Safari, Edge)
 - Gutenberg editor (required)

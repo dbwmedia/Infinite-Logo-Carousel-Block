@@ -19,6 +19,7 @@
 	"use strict";
 
 	var SETTLE_DELAY = 250; // Debounce (ms) for the no-ResizeObserver fallback.
+	var REVEAL_TIMEOUT = 1500; // Show the carousel after this at the latest.
 
 	// Calibration width (px). For a carousel wider than this the scroll speed
 	// equals (this width / configured duration) pixels per second — so a
@@ -27,8 +28,8 @@
 	// keep their plain configured duration.
 	var REFERENCE_WIDTH = 1000;
 
-	// Spotlight mode: how long the cross-fade / slide takes. Must match the
-	// --spot-fade value in style.scss — the script waits for it before
+	// Spotlight mode: how long a hand-over takes. Must match --spot-fade plus
+	// --spot-handover in style.scss — the script waits for it before
 	// resetting an outgoing logo to its starting position.
 	var SPOT_TRANSITION_MS = 450;
 
@@ -151,6 +152,41 @@
 			width += items[i].getBoundingClientRect().width;
 		}
 		return width;
+	}
+
+	/**
+	 * Make sure the track is long enough for a seamless loop: at least the
+	 * visible width plus one set. The saved markup holds a fixed number of
+	 * copies, which runs short for a few narrow items on a wide screen.
+	 * Missing copies are cloned from the first set, hidden from assistive
+	 * technology like the saved ones.
+	 *
+	 * @param {HTMLElement} track     The .dbw-slider-track element.
+	 * @param {number}      logoCount Number of items that form one set.
+	 * @param {number}      setWidth  Width of one set in pixels.
+	 */
+	function ensureCoverage(track, logoCount, setWidth) {
+		if (setWidth < 1) {
+			return;
+		}
+		var needed = track.parentElement.clientWidth + setWidth;
+		var items = track.querySelectorAll(".dbw-slider-item");
+		var copies = Math.ceil(needed / setWidth) - Math.floor(items.length / logoCount);
+		for (var c = 0; c < copies && c < 50; c++) {
+			for (var i = 0; i < logoCount; i++) {
+				var clone = items[i].cloneNode(true);
+				clone.setAttribute("aria-hidden", "true");
+				var links = clone.querySelectorAll("a");
+				for (var l = 0; l < links.length; l++) {
+					links[l].setAttribute("tabindex", "-1");
+				}
+				var imgs = clone.querySelectorAll("img");
+				for (var m = 0; m < imgs.length; m++) {
+					imgs[m].setAttribute("alt", "");
+				}
+				track.appendChild(clone);
+			}
+		}
 	}
 
 	/**
@@ -303,7 +339,9 @@
 			if (!imagesReady) {
 				return;
 			}
-			applyAnimation(track, measureSetWidth(items, logoCount));
+			var setWidth = measureSetWidth(items, logoCount);
+			ensureCoverage(track, logoCount, setWidth);
+			applyAnimation(track, setWidth);
 		};
 
 		// Collect the images of the first set and start once they are loaded.
@@ -469,6 +507,19 @@
 			item.classList.remove("dbw-spot-reset");
 		};
 
+		// Only the logo on screen may take focus; the others sit invisible
+		// in the same slot.
+		var syncInert = function () {
+			for (var k = 0; k < items.length; k++) {
+				if (k === current) {
+					items[k].removeAttribute("inert");
+				} else {
+					items[k].setAttribute("inert", "");
+				}
+			}
+		};
+		syncInert();
+
 		var advance = function () {
 			var next = random
 				? pickRandomIndex(items.length, current)
@@ -482,6 +533,7 @@
 			items[next].classList.remove("dbw-spot-out");
 			items[next].classList.add("dbw-spot-active");
 			current = next;
+			syncInert();
 			setTimeout(function () {
 				resetItem(previous);
 			}, SPOT_TRANSITION_MS);
@@ -570,6 +622,8 @@
 			revealed = true;
 			slider.classList.add("dbw-ready");
 		};
+		// A single slow logo must not keep the whole carousel invisible.
+		setTimeout(reveal, REVEAL_TIMEOUT);
 
 		// Spotlight mode (v2.2) replaces the scrolling tracks with a single
 		// slot; everything below (pause button, hover / touch pause) applies
@@ -593,48 +647,88 @@
 			});
 		}
 
-		// Optional pause/play button (accessibility). While button-paused
-		// (.dbw-paused) the hover/touch handlers below leave the state alone.
+		// Why the slider is paused. It runs only while nothing holds it:
+		// button (sticky), hover, keyboard focus inside, a tap (touch), or
+		// being off screen.
+		var holds = {};
+		slider._dbwHold = function (reason, on) {
+			if (on) {
+				holds[reason] = true;
+			} else {
+				delete holds[reason];
+			}
+			setPlayState(
+				slider,
+				Object.keys(holds).length ? "paused" : "running"
+			);
+		};
+
+		// Optional pause/play button (WCAG 2.2.2). The accessible name
+		// ("Pause animation", translated) comes from the server; the state is
+		// announced through aria-pressed, so the name stays the same.
 		var pauseBtn = slider.querySelector(".dbw-pause-btn");
 		if (pauseBtn) {
-			pauseBtn.setAttribute("aria-label", "Pause animation");
+			if (!pauseBtn.getAttribute("aria-label")) {
+				pauseBtn.setAttribute("aria-label", "Pause animation");
+			}
 			pauseBtn.addEventListener("click", function () {
 				var paused = slider.classList.toggle("dbw-paused");
-				setPlayState(slider, paused ? "paused" : "running");
 				pauseBtn.setAttribute("aria-pressed", paused ? "true" : "false");
-				pauseBtn.setAttribute(
-					"aria-label",
-					paused ? "Resume animation" : "Pause animation"
-				);
+				slider._dbwHold("button", paused);
 			});
 		}
 
-		// Pause on hover (desktop / pointer devices).
+		// Pause on hover (pointer devices).
 		slider.addEventListener("mouseenter", function () {
-			setPlayState(slider, "paused");
+			slider._dbwHold("hover", true);
 		});
 		slider.addEventListener("mouseleave", function () {
-			if (!slider.classList.contains("dbw-paused")) {
-				setPlayState(slider, "running");
+			slider._dbwHold("hover", false);
+		});
+
+		// Pause while keyboard focus is inside, so a focused logo link does
+		// not move away under the focus ring.
+		slider.addEventListener("focusin", function () {
+			slider._dbwHold("focus", true);
+		});
+		slider.addEventListener("focusout", function (e) {
+			if (!slider.contains(e.relatedTarget)) {
+				slider._dbwHold("focus", false);
 			}
 		});
 
-		// Tap to toggle pause (touch devices). Taps on the pause button are
-		// handled by its own click handler.
-		var touchPaused = false;
+		// Tap to toggle pause (touch). Only a real tap counts: a swipe that
+		// scrolls the page, or a tap on a link or the button, does not.
+		var touchStart = null;
 		slider.addEventListener(
 			"touchstart",
 			function (e) {
-				if (pauseBtn && pauseBtn.contains(e.target)) {
+				touchStart =
+					e.touches.length === 1
+						? { x: e.touches[0].clientX, y: e.touches[0].clientY }
+						: null;
+			},
+			{ passive: true }
+		);
+		slider.addEventListener(
+			"touchend",
+			function (e) {
+				var start = touchStart;
+				touchStart = null;
+				if (!start || !e.changedTouches.length) {
 					return;
 				}
-				if (slider.classList.contains("dbw-paused")) {
+				if (e.target.closest && e.target.closest("a, button")) {
 					return;
 				}
-				if (e.touches.length === 1) {
-					touchPaused = !touchPaused;
-					setPlayState(slider, touchPaused ? "paused" : "running");
+				var t = e.changedTouches[0];
+				if (
+					Math.abs(t.clientX - start.x) > 10 ||
+					Math.abs(t.clientY - start.y) > 10
+				) {
+					return;
 				}
+				slider._dbwHold("tap", !holds.tap);
 			},
 			{ passive: true }
 		);
@@ -661,11 +755,15 @@
 			? new IntersectionObserver(
 					function (entries) {
 						entries.forEach(function (entry) {
-							if (!entry.isIntersecting) {
-								return;
+							var slider = entry.target;
+							if (entry.isIntersecting) {
+								startSlider(slider);
 							}
-							observer.unobserve(entry.target);
-							startSlider(entry.target);
+							// Off screen nothing needs to move: saves CPU,
+							// GPU and battery.
+							if (slider._dbwHold) {
+								slider._dbwHold("offscreen", !entry.isIntersecting);
+							}
 						});
 					},
 					{ rootMargin: INIT_MARGIN }
@@ -704,10 +802,7 @@
 		initLogoSliders();
 	}
 
-	// Gutenberg editor live preview (harmless on the front end).
-	if (window.wp && window.wp.domReady) {
-		window.wp.domReady(function () {
-			setTimeout(initLogoSliders, 100);
-		});
-	}
+	// Sliders added later (AJAX, page builders, infinite scroll) can be
+	// initialised with window.ilcbInit().
+	window.ilcbInit = initLogoSliders;
 })();
