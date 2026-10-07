@@ -159,7 +159,7 @@ Under "Edge Fade" choose "Transparent" - the logos themselves fade out, so it wo
 
 = The carousel looks broken with WP Rocket, Hummingbird or another optimization plugin. =
 
-Since 2.4.0 the layout-critical CSS travels with the block itself, so a delayed stylesheet can no longer stack the logos on top of each other. If you also delay JavaScript until user interaction, the carousel starts moving at the first interaction; to start it right away, exclude `infinite-logo-carousel-block/src/frontend.js` from "Delay JavaScript".
+Since 2.4.0 the layout-critical CSS travels with the block itself, so a delayed stylesheet can no longer stack the logos on top of each other. If you also delay JavaScript until user interaction, the carousel starts moving at the first interaction; to start it right away, exclude `infinite-logo-carousel-block/build/frontend.js` from "Delay JavaScript".
 
 = Does it work on right-to-left (Hebrew, Arabic) pages? =
 

@@ -51,18 +51,34 @@
 	 * always returns rgb()/rgba(), so this works for theme CSS variables,
 	 * named colours and hex alike — unlike a save-time hex-only check.
 	 *
+	 * A (mostly) transparent background shows whatever is behind it, so the
+	 * nearest ancestor with a solid background decides; with none at all the
+	 * page is assumed to be light.
+	 *
 	 * @param {HTMLElement} el Element to inspect.
 	 * @return {boolean} True when the background is dark.
 	 */
 	function isBackgroundDark( el ) {
-		const parts = getComputedStyle( el ).backgroundColor.match( /[\d.]+/g );
-		if ( ! parts || parts.length < 3 ) {
-			return true;
+		for (
+			let node = el;
+			node && node.nodeType === 1;
+			node = node.parentElement
+		) {
+			const parts =
+				getComputedStyle( node ).backgroundColor.match( /[\d.]+/g );
+			if ( ! parts || parts.length < 3 ) {
+				continue;
+			}
+			const alpha = parts.length > 3 ? parseFloat( parts[ 3 ] ) : 1;
+			if ( alpha < 0.5 ) {
+				continue;
+			}
+			const r = parseFloat( parts[ 0 ] );
+			const g = parseFloat( parts[ 1 ] );
+			const b = parseFloat( parts[ 2 ] );
+			return ( 0.299 * r + 0.587 * g + 0.114 * b ) / 255 < 0.55;
 		}
-		const r = parseFloat( parts[ 0 ] );
-		const g = parseFloat( parts[ 1 ] );
-		const b = parseFloat( parts[ 2 ] );
-		return ( 0.299 * r + 0.587 * g + 0.114 * b ) / 255 < 0.55;
+		return false;
 	}
 
 	/**

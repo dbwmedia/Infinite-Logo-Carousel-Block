@@ -58,7 +58,7 @@ async function openBlock( page, fixture, opts = {} ) {
 						: ''
 				}</head><body style="margin:0;padding:40px 0">${ blockHtml(
 					fixture
-				) }<p style="height:1500px">after</p><script src="/src/frontend.js"></script></body></html>`,
+				) }<p style="height:1500px">after</p><script src="/build/frontend.js"></script></body></html>`,
 			} );
 			return;
 		}
@@ -137,7 +137,7 @@ for ( const dir of [ 'ltr', 'rtl' ] ) {
 test( 'CSS fallback (before the script) shifts by exactly one set', async ( {
 	page,
 } ) => {
-	await page.route( '**/src/frontend.js', ( route ) =>
+	await page.route( '**/build/frontend.js', ( route ) =>
 		route.fulfill( { body: '' } )
 	);
 	await openBlock( page, 'carousel-default' );

@@ -97,15 +97,20 @@ function ilcb_register_block() {
         );
     }
     
-    // Register frontend script for perfect infinity loop
-    $frontend_script = ILCB_PLUGIN_DIR . 'src/frontend.js';
-    if ( file_exists( $frontend_script ) ) {
+    // Front-end engine (built and minified from src/frontend.js). Deferred:
+    // it never blocks rendering and initialises once the DOM is parsed.
+    $frontend_asset_path = ILCB_PLUGIN_DIR . 'build/frontend.asset.php';
+    if ( file_exists( $frontend_asset_path ) ) {
+        $frontend_asset = require $frontend_asset_path;
         wp_register_script(
             'ilcb-frontend',
-            ILCB_PLUGIN_URL . 'src/frontend.js',
-            array(),
-            filemtime( $frontend_script ),
-            true
+            ILCB_PLUGIN_URL . 'build/frontend.js',
+            $frontend_asset['dependencies'],
+            $frontend_asset['version'],
+            array(
+                'in_footer' => true,
+                'strategy'  => 'defer',
+            )
         );
     }
 
