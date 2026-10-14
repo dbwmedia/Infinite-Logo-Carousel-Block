@@ -387,6 +387,18 @@
 		color: var(--mq-color, inherit);
 	}
 
+	// Linked items (v2.5) look like the others; the underline appears on
+	// hover and keyboard focus.
+	a.dbw-mq-link {
+		text-decoration: none;
+
+		&:hover,
+		&:focus-visible {
+			text-decoration: underline;
+			text-underline-offset: 0.15em;
+		}
+	}
+
 	.dbw-mq-sep {
 		color: var(--mq-sep-color, var(--mq-color, inherit));
 		margin: 0 calc(var(--slide-gap, 40px) / 2);

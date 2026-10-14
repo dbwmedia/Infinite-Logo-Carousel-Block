@@ -73,6 +73,9 @@ const out = {
 };
 console.log( JSON.stringify( out, null, 2 ) );
 
-if ( process.argv.includes( '--strict' ) && ( out.editor.length || out.php.length ) ) {
+if (
+	process.argv.includes( '--strict' ) &&
+	( out.editor.length || out.php.length )
+) {
 	process.exitCode = 1;
 }

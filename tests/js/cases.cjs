@@ -107,6 +107,15 @@ const marquee = {
 		separator: '',
 		uppercase: true,
 	},
+	links: {
+		items: [ 'Reviews', 'Leer', 'Shop', 'Böse' ],
+		itemLinks: [
+			{ url: 'https://example.com/reviews' },
+			null,
+			{ url: 'https://example.com/shop', newTab: true },
+			{ url: 'javascript:alert(1)' },
+		],
+	},
 };
 
 // First release whose editor could produce a case. Older fixtures would
@@ -122,6 +131,7 @@ const since = {
 	'carousel/spotlight_cycle': 'v2.2.0',
 	'carousel/grid': 'v2.4.0',
 	'carousel/fade_reverse_newtab': 'v2.4.0',
+	'marquee/links': 'v2.5.0',
 };
 
 module.exports = { carousel, marquee, since };

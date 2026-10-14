@@ -199,8 +199,13 @@ function ilcb_filter_block_output( $block_content, $block ) {
 
 	if ( 'infinite-logo-carousel-block/marquee' === $name ) {
 		$tags = new WP_HTML_Tag_Processor( $block_content );
-		while ( $tags->next_tag( array( 'tag_name' => 'BUTTON', 'class_name' => 'dbw-pause-btn' ) ) ) {
-			$tags->set_attribute( 'aria-label', __( 'Pause animation', 'infinite-logo-carousel-block' ) );
+		while ( $tags->next_tag() ) {
+			if ( 'BUTTON' === $tags->get_tag() && $tags->has_class( 'dbw-pause-btn' ) ) {
+				$tags->set_attribute( 'aria-label', __( 'Pause animation', 'infinite-logo-carousel-block' ) );
+			} elseif ( 'A' === $tags->get_tag() ) {
+				// Linked text items (v2.5): same rules as the logo links.
+				ilcb_sanitize_link( $tags );
+			}
 		}
 		return $critical . $tags->get_updated_html();
 	}

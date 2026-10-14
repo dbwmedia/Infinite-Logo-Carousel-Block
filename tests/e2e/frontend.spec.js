@@ -293,3 +293,30 @@ test( 'reverse direction flips the first row', async ( { page } ) => {
 	expect( dir ).toBe( 'reverse' );
 	expect( await gapsAtPhases( page ) ).toEqual( [ 0, 0, 0, 0, 0 ] );
 } );
+
+test( 'marquee links: clickable once, copies out of the tab order, unsafe links removed', async ( {
+	page,
+} ) => {
+	await openBlock( page, 'marquee-links' );
+	await waitReady( page );
+	const links = await page.locator( '.dbw-mq-link' ).evaluateAll( ( as ) =>
+		as.map( ( a ) => ( {
+			href: a.getAttribute( 'href' ),
+			tab: a.getAttribute( 'tabindex' ),
+			hidden: !! a.closest( '[aria-hidden="true"]' ),
+		} ) )
+	);
+	const firstSet = links.filter( ( l ) => ! l.hidden );
+	expect( firstSet.map( ( l ) => l.href ) ).toEqual( [
+		'https://example.com/reviews',
+		'https://example.com/shop',
+		null,
+	] );
+	expect( firstSet.every( ( l ) => l.tab === null ) ).toBe( true );
+	expect(
+		links.filter( ( l ) => l.hidden ).every( ( l ) => l.tab === '-1' )
+	).toBe( true );
+	expect(
+		links.some( ( l ) => ( l.href || '' ).startsWith( 'javascript' ) )
+	).toBe( false );
+} );

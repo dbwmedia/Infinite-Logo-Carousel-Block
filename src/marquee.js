@@ -7,17 +7,20 @@ import { registerBlockType } from '@wordpress/blocks';
 import {
 	InspectorControls,
 	PanelColorSettings,
+	URLInput,
 	useBlockProps,
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
 	Button,
+	CheckboxControl,
 	SelectControl,
 	TextControl,
 	ToggleControl,
 	RangeControl,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
+import { isAllowedLink } from './carousel/logo-list';
 
 const MQ_SPEED_MAP = { slow: '40s', medium: '25s', fast: '15s' };
 const MQ_GAP_MAP = {
@@ -36,6 +39,8 @@ const MQ_SIZE_MAP = {
 
 const MARQUEE_ATTRIBUTES = {
 	items: { type: 'array', default: [] },
+	// v2.5: optional link per item, same index as items ({ url, newTab }).
+	itemLinks: { type: 'array', default: [] },
 	separator: { type: 'string', default: '★' },
 	speed: { type: 'string', default: 'medium' },
 	speedCustom: { type: 'number', default: 60 },
@@ -122,18 +127,41 @@ function marqueeStyle( attributes ) {
  * Render the marquee track. Repeated sets are aria-hidden so screen readers
  * announce the content only once.
  */
+function renderMarqueeText( text, link, decorative ) {
+	if ( ! link || ! link.url ) {
+		return <span className="dbw-mq-text">{ text }</span>;
+	}
+	return (
+		<a
+			className="dbw-mq-text dbw-mq-link"
+			href={ link.url }
+			target={ link.newTab ? '_blank' : undefined }
+			rel={ link.newTab ? 'noopener noreferrer' : undefined }
+			// A copy in the loop must leave the tab order (its item is
+			// aria-hidden).
+			tabIndex={ decorative ? -1 : undefined }
+		>
+			{ text }
+		</a>
+	);
+}
+
 function renderMarqueeTrack( attributes ) {
-	const items = attributes.items.filter( ( t ) => t && t.trim() !== '' );
+	const links = attributes.itemLinks || [];
+	// Keep each item's link with it while dropping empty items.
+	const items = attributes.items
+		.map( ( text, index ) => ( { text, link: links[ index ] } ) )
+		.filter( ( item ) => item.text && item.text.trim() !== '' );
 	const separator = attributes.separator;
 
 	const renderSet = ( setIndex ) =>
-		items.map( ( text, index ) => (
+		items.map( ( { text, link }, index ) => (
 			<div
 				key={ 's' + setIndex + '-' + index }
 				className="dbw-slider-item"
 				aria-hidden={ setIndex > 0 ? 'true' : undefined }
 			>
-				<span className="dbw-mq-text">{ text }</span>
+				{ renderMarqueeText( text, link, setIndex > 0 ) }
 				{ separator !== '' && (
 					<span className="dbw-mq-sep" aria-hidden="true">
 						{ separator }
@@ -202,8 +230,26 @@ registerBlockType( 'infinite-logo-carousel-block/marquee', {
 			setAttributes( { items: updated } );
 		};
 
+		const itemLinks = attributes.itemLinks || [];
+		const updateLink = ( index, changes ) => {
+			const next = [ ...itemLinks ];
+			while ( next.length < items.length ) {
+				next.push( null );
+			}
+			const merged = { ...( next[ index ] || {} ), ...changes };
+			next[ index ] = merged.url ? merged : null;
+			// No links left: store nothing, so the markup stays as before.
+			setAttributes( {
+				itemLinks: next.some( Boolean ) ? next : [],
+			} );
+		};
+
 		const removeItem = ( index ) => {
-			setAttributes( { items: items.filter( ( _, i ) => i !== index ) } );
+			const nextLinks = itemLinks.filter( ( _, i ) => i !== index );
+			setAttributes( {
+				items: items.filter( ( _, i ) => i !== index ),
+				itemLinks: nextLinks.some( Boolean ) ? nextLinks : [],
+			} );
 		};
 
 		const blockProps = useBlockProps( {
@@ -631,6 +677,48 @@ registerBlockType( 'infinite-logo-carousel-block/marquee', {
 									'infinite-logo-carousel-block'
 								) }
 							/>
+							<div className="dbw-marquee-editor-link">
+								<span className="components-base-control__label">
+									{ __(
+										'Link (optional)',
+										'infinite-logo-carousel-block'
+									) }
+								</span>
+								<URLInput
+									__nextHasNoMarginBottom
+									value={ itemLinks[ index ]?.url || '' }
+									onChange={ ( url ) =>
+										updateLink( index, { url } )
+									}
+								/>
+								{ ! isAllowedLink(
+									itemLinks[ index ]?.url
+								) && (
+									<p className="dbw-logo-card__error">
+										{ __(
+											'Only web, e-mail and phone links are allowed. This link is removed on the page.',
+											'infinite-logo-carousel-block'
+										) }
+									</p>
+								) }
+								{ !! itemLinks[ index ]?.url && (
+									<CheckboxControl
+										__nextHasNoMarginBottom
+										label={ __(
+											'Open in new tab',
+											'infinite-logo-carousel-block'
+										) }
+										checked={
+											!! itemLinks[ index ]?.newTab
+										}
+										onChange={ ( newTab ) =>
+											updateLink( index, {
+												newTab: newTab || undefined,
+											} )
+										}
+									/>
+								) }
+							</div>
 							<Button
 								isDestructive
 								variant="secondary"

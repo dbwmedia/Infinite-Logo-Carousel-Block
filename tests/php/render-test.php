@@ -165,6 +165,13 @@ check( false !== strpos( $tracks[0]['style'], '--dbw-loop-shift:calc(-100% / ' .
 $tracks = tags_of( render( 'carousel-rows_varied.html' ), 'DIV', 'dbw-slider-track' );
 check( 2 === count( $tracks ) && false !== strpos( $tracks[1]['style'], '--scroll-duration' ) && false !== strpos( $tracks[1]['style'], '--dbw-loop-shift' ), 'row duration kept next to the loop shift (' . $tracks[1]['style'] . ')' );
 
+// --- Marquee links (v2.5) -------------------------------------------------
+ilcb_test_reset();
+$mq    = '<div class="wp-block-infinite-logo-carousel-block-marquee dbw-partner-slider dbw-marquee"><div class="dbw-slider-wrapper"><div class="dbw-slider-track" data-logo-count="2"><div class="dbw-slider-item"><a class="dbw-mq-text dbw-mq-link" href="https://example.com/a" target="_blank">A</a></div><div class="dbw-slider-item"><a class="dbw-mq-text dbw-mq-link" href="javascript:alert(1)">B</a></div></div></div></div>';
+$links = tags_of( ilcb_filter_block_output( $mq, array( 'blockName' => 'infinite-logo-carousel-block/marquee', 'attrs' => array() ) ), 'A' );
+check( 'https://example.com/a' === $links[0]['href'] && 'noopener' === $links[0]['rel'], 'marquee link kept, _blank gets noopener' );
+check( ! array_key_exists( 'href', $links[1] ), 'marquee javascript: link removed' );
+
 // --- Idempotent ----------------------------------------------------------
 ilcb_test_reset( array( 'meta' => array( 102 => 'Beta' ) ) );
 list( , $attrs, $inner ) = fixture( 'carousel-alts_and_links.html' );

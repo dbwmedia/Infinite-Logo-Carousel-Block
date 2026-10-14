@@ -4,7 +4,7 @@ Tags: logo carousel, logo slider, logo marquee, text marquee, client logos
 Requires at least: 6.6
 Tested up to: 7.0
 Requires PHP: 7.2
-Stable tag: 2.4.0
+Stable tag: 2.5.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -33,7 +33,7 @@ Infinity logo carousel and text marquee for client, partner or sponsor logos.
 * **Adjustable Logo Height** - Set custom height from 30px to 150px
 * **Mobile Logo Height** - Optional separate logo height for phones, or fully automatic scaling
 * **Balanced Logo Sizes** - Optionally equalize the visual weight of wide and compact logos automatically
-* **Text Marquee Block** - Second block: infinitely scrolling text ticker for reviews, badges or announcements
+* **Text Marquee Block** - Second block: infinitely scrolling text ticker for reviews, badges or announcements, each item optionally linked
 * **Accessible Motion** - Pause button (on by default for new carousels), pauses on keyboard focus and while off screen (WCAG 2.2.2)
 * **Right-to-Left Ready** - Seamless loop on Hebrew, Arabic and other RTL pages
 * **Works with Optimization Plugins** - Layout-critical CSS travels with the block, so delayed stylesheets (WP Rocket, Hummingbird, ...) cannot break the layout
@@ -221,6 +221,10 @@ Enable "Custom height on phones" in the "Logo Size" panel and set exactly the he
 
 A second block included since v2.0: an infinitely scrolling text ticker for reviews, badges, offers or announcements ("★ 5.0 Google Reviews ★ Since 2015 ★ ..."). It uses the same smooth animation engine as the Logo Slider, with its own text size, colors, separator and speed settings.
 
+= Can I link the text in the Text Marquee? =
+
+Yes, since 2.5.0. Select the Text Marquee block: under every text item there is a "Link (optional)" field. Type a URL or search for one of your pages, and tick "Open in new tab" if the link should open separately.
+
 = Can I show the original logo colors on hover? =
 
 Yes. In the "Logo Display" panel, enable "Original colors on hover". It works with every color mode — so you can show all logos in black, white, grayscale or a custom tint, and reveal the original colors when a visitor hovers over a logo.
@@ -241,6 +245,11 @@ Yes, the plugin doesn't collect, store, or transmit any personal data. It's comp
 8. Logo size adjustment controls
 
 == Changelog ==
+
+= 2.5.0 =
+* NEW: Links in the Text Marquee. Every text item can link to a page or URL (with page search), optionally in a new tab. Props to rahulkapoordelhi86 for the idea!
+* Links are announced and focusable once; the copies of the loop stay out of the tab order. Only web, e-mail and phone links are allowed on the page.
+* Existing marquees keep working unchanged - nothing needs to be re-saved.
 
 = 2.4.0 =
 * FIXED: On right-to-left pages (Hebrew, Arabic, ...) the carousel ran through its logos once and then left an empty row. The loop is now seamless in every language; text inside the items keeps its right-to-left direction. Props to polinar for reporting!
@@ -424,6 +433,9 @@ Yes, the plugin doesn't collect, store, or transmit any personal data. It's comp
 * WordPress 6.8 compatibility
 
 == Upgrade Notice ==
+
+= 2.5.0 =
+Text Marquee items can now link to a page or URL. Existing marquees keep working unchanged.
 
 = 2.4.0 =
 Fixes the loop on right-to-left pages and the layout with optimization plugins, improves accessibility and adds a static logo grid, a transparent edge fade and easier logo management. Requires WordPress 6.6. Existing carousels keep working unchanged.
